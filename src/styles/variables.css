@@ -2,18 +2,29 @@
    /* -------------------------------------------------------------------------
      Colors
   -------------------------------------------------------------------------- */
-   --woodsmoke: #0d0e12;
-   --tuna: #323340;
-
-   --bone: #e2d8ca;
-   --sandstone: #7a7268;
-   --merlin: #3e3c38;
-
-   --tan: #c9a97a;
-   --buff: #dab98a;
-   --tobacco: #7a6548;
-
-   --cinnabar: #d96060;
+   --oxford-blue: #3a4a5c;
+   --prussian-blue: #002554;
+   --matisse: #1f6092;
+   --sky: #70c7e9;
+   --aqua: #8fb8d8;
+   --heather: #bdc9d7;
+   
+   --bronzetone: #4a3410;
+   --driftwood: #936e42;
+   --pablo: #7d7460;
+   --hillary: #af9b88;
+   --soft-amber: #cfc6b2;
+   --chino: #c8bfa9;
+   --tana: #ded5c2;
+   --chamois: #e5d3a1;
+   --albescent: #f6eccf;
+   --roti: #c9a94e;
+   
+   --porcelain: #eef0f1;
+   --mystic: #eef1f5;
+   --satin-linen: #f4f1ea;
+   --spanish-white: #f7f0e2;
+   --merino: #f3ece0;
 
    /* -------------------------------------------------------------------------
      Typography

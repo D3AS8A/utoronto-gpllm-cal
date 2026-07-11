@@ -1,8 +1,8 @@
 ![Alpine.js](https://img.shields.io/badge/Alpine.js-8BC0D0?style=flat&logo=alpinedotjs&logoColor=black) ![Astro](https://img.shields.io/badge/Astro-FF5D01?style=flat&logo=astro&logoColor=white) ![Bun](https://img.shields.io/badge/Bun-000000?style=flat&logo=bun&logoColor=white)
 
-# Astro Starter
+# UofT GPLLM Calendar
 
-A static site template repo built with [Astro](https://astro.build) and [Alpine.js](https://alpinejs.dev). Optimised for minimal Javascript footprint, performance, a11y, and SEO.
+A static site built with [Astro](https://astro.build) and [Alpine.js](https://alpinejs.dev). Optimised for minimal Javascript footprint, performance, a11y, and SEO.
 
 ## Stack
 
@@ -153,7 +153,7 @@ Configured in `astro.config.mjs`:
 
 ```js
 server: {
-  port: 14220,
+  port: 14480,
 },
 ```
 
