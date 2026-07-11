@@ -1,0 +1,48 @@
+---
+import Nav from './Nav.astro';
+import { loadGlobal } from '../lib/content';
+
+const { name } = loadGlobal();
+---
+
+<header class="site-header" role="banner">
+  <div class="container header-inner">
+    <a href="/" class="site-logo" aria-label={`${name} — go to homepage`}>
+      {name}
+    </a>
+    <Nav />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    height: var(--header-height);
+    background-color: rgb(13 14 18 / 0.85);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--tuna);
+    z-index: var(--z-header);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+  }
+
+  .site-logo {
+    font-weight: 700;
+    font-size: var(--text-lg);
+    color: var(--bone);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+    transition: color 200ms ease;
+  }
+
+  .site-logo:hover {
+    color: var(--tan);
+  }
+</style>

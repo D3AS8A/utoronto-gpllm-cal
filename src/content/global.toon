@@ -1,0 +1,6 @@
+name: Site Name
+tagline: Static site starter optimized for compatibility and performance.
+description: A fast, accessible static site template built with Astro and Alpine.js.
+url: https://example.com
+title_postfix: " — Site Name"
+og_image: /og-default.png

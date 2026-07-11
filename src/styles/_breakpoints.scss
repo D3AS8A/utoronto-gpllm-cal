@@ -1,0 +1,10 @@
+// Foundation-style breakpoint mixins
+// Usage: @include small { ... }
+
+@mixin tiny { @media (max-width: 20rem) { @content; } }      // 320px
+@mixin small { @media (max-width: 30rem) { @content; } }     // 480px
+@mixin medium { @media (max-width: 40rem) { @content; } }    // 640px
+@mixin large { @media (max-width: 48rem) { @content; } }     // 768px
+@mixin xl { @media (max-width: 64rem) { @content; } }        // 1024px
+@mixin xxl { @media (max-width: 80rem) { @content; } }       // 1280px
+@mixin xxxl { @media (max-width: 96rem) { @content; } }      // 1536px

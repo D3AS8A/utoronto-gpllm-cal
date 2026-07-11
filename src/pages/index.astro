@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadGlobal, loadPage } from '../lib/content';
+
+const global = loadGlobal();
+const { meta, content } = loadPage('home');
+const c = content as {
+  heading: string;
+  tagline: string;
+  cta_primary: string;
+  cta_primary_href: string;
+  cta_secondary: string;
+  cta_secondary_href: string;
+};
+
+const jsonLD = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: global.name,
+  description: global.description,
+  url: global.url,
+};
+---
+
+<BaseLayout
+  title={meta.title ?? undefined}
+  description={meta.description}
+  ogImage={meta.og_image}
+  jsonLD={jsonLD}
+>
+
+  <section class="hero">
+    <div class="container">
+      <h1>{c.heading}</h1>
+      <p class="hero-tagline">{c.tagline}</p>
+      <div class="hero-actions">
+        <a href={c.cta_primary_href} class="btn btn-primary magnify-onhover">{c.cta_primary}</a>
+        <a href={c.cta_secondary_href} class="btn btn-outline magnify-onhover">{c.cta_secondary}</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Example of Alpine.js interactivity with minimal footprint -->
+  <section class="demo-section">
+    <div class="container">
+      <div class="demo-card" x-data="{ count: 0 }">
+        <p>Alpine demo</p>
+        <div class="counter">
+          <button
+            class="btn btn-outline"
+            @click="count--"
+            :disabled="count <= 0"
+            aria-label="Decrement"
+            data-tooltip="Decrement"
+          >−</button>
+          <output x-text="count" aria-live="polite" aria-atomic="true">0</output>
+          <button
+            class="btn btn-outline"
+            @click="count++"
+            aria-label="Increment"
+            data-tooltip="Increment"
+          >+</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</BaseLayout>
+
+<style lang="scss">
+  @use '../styles/breakpoints' as *;
+  .hero {
+    padding-block: 6rem;
+    text-align: center;
+  }
+
+  .hero h1 {
+    margin-bottom: 1rem;
+  }
+
+  .hero-tagline {
+    font-size: var(--text-xl);
+    color: var(--sandstone);
+    max-width: 40ch;
+    margin-inline: auto;
+  }
+
+  .hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .demo-section {
+    padding-block: 4rem;
+    border-top: 1px solid var(--tuna);
+  }
+
+  .demo-card {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+    padding: 2rem;
+    border: 1px solid var(--tuna);
+    border-radius: 0.75rem;
+    background: var(--woodsmoke);
+  }
+
+  .counter {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .counter output {
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    min-width: 3ch;
+    text-align: center;
+  }
+
+  @include small {
+    .hero {
+      padding-block: 3rem;
+    }
+
+    .hero-actions {
+      flex-direction: column;
+    }
+
+    .demo-section {
+      padding-block: 2rem;
+    }
+  }
+</style>

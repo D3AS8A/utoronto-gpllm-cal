@@ -1,0 +1,14 @@
+meta:
+  title: null
+  description: A fast, accessible static site template built with Astro and Alpine.js.
+  og_image: /og-default.png
+
+options: null
+
+content:
+  heading: Site Name
+  tagline: A minimal, opinionated starting point.
+  cta_primary: Get started
+  cta_primary_href: "#"
+  cta_secondary: Learn more
+  cta_secondary_href: "#"

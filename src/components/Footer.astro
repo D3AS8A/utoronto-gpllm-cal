@@ -1,0 +1,56 @@
+---
+import { loadGlobal } from '../lib/content';
+
+const { name } = loadGlobal();
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+    <p class="footer-copy">
+      &copy; {year} {name}. All rights reserved.
+    </p>
+    <nav class="footer-nav" aria-label="Footer navigation">
+      <ul role="list">
+        <li><a href="/privacy">Privacy</a></li>
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--tuna);
+    background-color: var(--woodsmoke);
+    padding-block: 1.5rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .footer-copy {
+    font-size: var(--text-sm);
+    color: var(--sandstone);
+  }
+
+  .footer-nav ul {
+    display: flex;
+    gap: 1.25rem;
+  }
+
+  .footer-nav a {
+    font-size: var(--text-sm);
+    color: var(--sandstone);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .footer-nav a:hover {
+    color: var(--tan);
+  }
+</style>

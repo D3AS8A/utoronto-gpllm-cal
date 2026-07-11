@@ -1,0 +1,184 @@
+/* ---------------------------------------------------------------------------
+   .markdown — prose / long-form content styles
+   Apply to any element wrapping rendered markdown or rich text content.
+   Adapted from zero-core conventions (nuxt3-starter).
+--------------------------------------------------------------------------- */
+
+.markdown {
+
+  /* ---- Headings --------------------------------------------------------- */
+
+  h1, h2, h3, h4, h5, h6 {
+    margin-bottom: 1.25rem;
+  }
+
+  h1:not(:first-child),
+  h2:not(:first-child),
+  h3:not(:first-child),
+  h4:not(:first-child),
+  h5:not(:first-child),
+  h6:not(:first-child) {
+    margin-top: 3rem;
+  }
+
+  /* Heading immediately followed by a list needs a little more room */
+  h1 + ul, h1 + ol,
+  h2 + ul, h2 + ol,
+  h3 + ul, h3 + ol,
+  h4 + ul, h4 + ol {
+    margin-top: 1.5rem;
+  }
+
+  h1 { margin-bottom: 2.5rem; }
+
+  /* ---- Body text -------------------------------------------------------- */
+
+  p:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
+  a {
+    color: var(--tan);
+    text-underline-offset: 0.2em;
+  }
+
+  a:hover {
+    color: var(--buff);
+  }
+
+  /* ---- Divider ---------------------------------------------------------- */
+
+  hr {
+    border: none;
+    border-top: 1px solid var(--tuna);
+    margin-block: 2rem;
+  }
+
+  /* ---- Lists ------------------------------------------------------------ */
+
+  ul, ol {
+    padding-left: 1.5rem;
+  }
+
+  ul:not(:last-child),
+  ol:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+
+  /* Custom bullet — small dot via pseudo-element, no native marker */
+  ul li {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.375rem;
+    margin: 0;
+  }
+
+  ul li::before {
+    content: '';
+    display: block;
+    position: absolute;
+    left: 0.5rem;
+    top: 0.75em;
+    width: 5px;
+    height: 5px;
+    transform: translateY(-50%);
+    border-radius: 9999px;
+    background-color: var(--tan);
+  }
+
+  /* Second-level bullets — hollow ring */
+  ul li > ul > li::before {
+    background-color: transparent;
+    border: 1px solid var(--tan);
+  }
+
+  ol li {
+    list-style-type: decimal;
+  }
+
+  li > ul {
+    margin-top: 0;
+  }
+
+  /* ---- Blockquote ------------------------------------------------------- */
+
+  blockquote {
+    margin: 0;
+    padding-left: 2.25rem;
+    border-left: 4px solid var(--tuna);
+    color: var(--sandstone);
+  }
+
+  blockquote:not(:first-child) { margin-top: 2rem; }
+  blockquote:not(:last-child)  { margin-bottom: 2rem; }
+
+  /* ---- Tables ----------------------------------------------------------- */
+
+  table {
+    width: 100%;
+    border-top: 2px solid var(--tuna);
+    border-bottom: 2px solid var(--tuna);
+    margin-bottom: 1.25rem;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+  }
+
+  th {
+    font-weight: 600;
+    font-size: var(--text-sm);
+    letter-spacing: 0.04em;
+    padding-top: 0.75rem;
+    color: var(--sandstone);
+  }
+
+  td {
+    font-size: var(--text-sm);
+  }
+
+  thead tr {
+    background-color: var(--woodsmoke);
+  }
+
+  tbody tr:nth-child(odd)  { background-color: var(--woodsmoke); }
+  tbody tr:nth-child(even) { background-color: var(--woodsmoke); }
+  tbody tr:last-child td   { padding-bottom: 0.75rem; }
+
+  /* ---- Code ------------------------------------------------------------- */
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    color: var(--tan);
+    background-color: var(--woodsmoke);
+    padding: 0.15em 0.4em;
+    border-radius: 0.2rem;
+    white-space: break-spaces;
+  }
+
+  pre {
+    background-color: var(--woodsmoke);
+    border: 1px solid var(--tuna);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    border-radius: 0.45rem;
+    font-size: var(--text-sm);
+    line-height: 1.75;
+    font-family: var(--font-mono);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  pre code {
+    padding: 0;
+    margin: 0;
+    background-color: transparent;
+    color: var(--bone);
+    font-size: inherit;
+    border-radius: 0;
+  }
+}

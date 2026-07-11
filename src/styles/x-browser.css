@@ -1,0 +1,162 @@
+/*
+ * Cross-browser compatibility rules
+ */
+
+/* ---------------------------------------------------------------------------
+   Firefox: remove inner focus ring on buttons
+--------------------------------------------------------------------------- */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   Firefox: fix select focus ring rendering (shows dotted border by default)
+--------------------------------------------------------------------------- */
+
+select:-moz-focusring {
+  color: transparent;
+  text-shadow: 0 0 0 var(--bone);
+}
+
+/* ---------------------------------------------------------------------------
+   WebKit / Blink: style the file upload button so it inherits site fonts
+--------------------------------------------------------------------------- */
+
+::-webkit-file-upload-button {
+  -webkit-appearance: button;
+  font: inherit;
+}
+
+/* ---------------------------------------------------------------------------
+   WebKit / Blink: suppress native number-input spinners
+   (spinners clash with custom increment/decrement UI patterns)
+--------------------------------------------------------------------------- */
+
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* ---------------------------------------------------------------------------
+   WebKit: suppress native search-field decorations
+--------------------------------------------------------------------------- */
+
+input[type='search']::-webkit-search-decoration,
+input[type='search']::-webkit-search-cancel-button,
+input[type='search']::-webkit-search-results-button,
+input[type='search']::-webkit-search-results-decoration {
+  display: none;
+}
+
+/* ---------------------------------------------------------------------------
+   All browsers: cross-browser placeholder colour
+   Each selector must be its own rule; grouping breaks the block entirely.
+--------------------------------------------------------------------------- */
+
+::-webkit-input-placeholder { color: var(--sandstone); opacity: 1; }
+::-moz-placeholder           { color: var(--sandstone); opacity: 1; }
+:-ms-input-placeholder       { color: var(--sandstone); opacity: 1; }
+::placeholder                { color: var(--sandstone); opacity: 1; }
+
+/* ---------------------------------------------------------------------------
+   Safari: prevent tap highlight flash on interactive elements
+--------------------------------------------------------------------------- */
+
+a,
+button,
+[role='button'] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ---------------------------------------------------------------------------
+   iOS Safari: prevent font size inflation after orientation change
+--------------------------------------------------------------------------- */
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+   Browser specific targeting
+--------------------------------------------------------------------------- */
+
+/* Firefox only */
+@-moz-document url-prefix() {
+  main { visibility: visible; }
+}
+
+/* Safari 9+ */
+_:default:not(:root:root) {
+  main { visibility: visible; }
+}
+
+/* iOS only */
+@supports (-webkit-overflow-scrolling: touch) {
+  main { visibility: visible; }
+}
+
+/* Everything except iOS */
+@supports not (-webkit-overflow-scrolling: touch) {
+  main { visibility: visible; }
+}
+
+/* Edge (legacy) */
+@supports (-ms-ime-align: auto) {
+  main { visibility: visible; }
+}
+
+/* IE 10/11 */
+@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
+  main { visibility: visible; }
+}
+
+/* ---------------------------------------------------------------------------
+   Input capability detection
+--------------------------------------------------------------------------- */
+
+/* Device has a mouse/trackpad (desktop, laptops) */
+@media (hover: hover) {
+  main { visibility: visible; }
+}
+
+/* Device has a mouse/trackpad with precise pointing */
+@media (hover: hover) and (pointer: fine) {
+  main { visibility: visible; }
+}
+
+/* Touch-only device (phones, tablets without mouse) */
+@media (hover: none) {
+  main { visibility: visible; }
+}
+
+/* Coarse pointer (finger, stylus) */
+@media (pointer: coarse) {
+  main { visibility: visible; }
+}
+
+/* ---------------------------------------------------------------------------
+   Safari / Chrome: font smoothing (subpixel rendering looks muddy on macOS)
+--------------------------------------------------------------------------- */
+
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ---------------------------------------------------------------------------
+   Safari: fix SVG scaling in flex containers
+   Safari sometimes ignores intrinsic aspect ratio on <img> with SVG sources
+--------------------------------------------------------------------------- */
+
+img[src$=".svg"] {
+  height: auto;
+}

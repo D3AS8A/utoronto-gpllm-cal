@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadPage } from '../lib/content';
+
+const { meta, content } = loadPage('privacy');
+const c = content as {
+  heading: string;
+  sections: Array<{ heading: string; body: string }>;
+};
+---
+
+<BaseLayout
+  title={meta.title ?? undefined}
+  description={meta.description}
+  ogImage={meta.og_image}
+>
+  <section class="page-section">
+    <div class="container">
+      <h1>{c.heading}</h1>
+      <div class="markdown">
+        {c.sections.map(({ heading, body }) => (
+          <>
+            <h2>{heading}</h2>
+            <p>{body}</p>
+          </>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style lang="scss">
+  @use '../styles/breakpoints' as *;
+  .page-section {
+    padding-block: 4rem;
+  }
+
+  h1 {
+    margin-bottom: 2rem;
+  }
+
+  .markdown {
+    max-width: 68ch;
+  }
+
+  @include small {
+    .page-section {
+      padding-block: 2rem;
+    }
+  }
+</style>

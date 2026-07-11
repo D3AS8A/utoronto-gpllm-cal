@@ -1,0 +1,71 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { loadPage } from '../lib/content';
+
+const { meta, options, content } = loadPage('404');
+const c = content as {
+  code: string;
+  heading: string;
+  message: string;
+  cta: string;
+  cta_href: string;
+};
+---
+
+<BaseLayout
+  title={meta.title ?? undefined}
+  description={meta.description}
+  noindex={options?.noindex ?? false}
+>
+  <section class="error-page">
+    <div class="container">
+      <p class="error-code" aria-hidden="true">{c.code}</p>
+      <h1>{c.heading}</h1>
+      <p class="error-message">{c.message}</p>
+      <a href={c.cta_href} class="btn btn-primary magnify-onhover">{c.cta}</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style lang="scss">
+  @use '../styles/breakpoints' as *;
+  .error-page {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 6rem;
+    text-align: center;
+  }
+
+  .error-page .container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .error-code {
+    font-size: clamp(5rem, 20vw, 10rem);
+    font-weight: 700;
+    line-height: 1;
+    color: var(--tuna);
+    letter-spacing: -0.04em;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .error-message {
+    color: var(--sandstone);
+    max-width: 40ch;
+  }
+
+  @include small {
+    .error-page {
+      padding-block: 3rem;
+    }
+
+    .error-code {
+      font-size: clamp(4rem, 15vw, 6rem);
+    }
+  }
+</style>

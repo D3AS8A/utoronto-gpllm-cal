@@ -1,0 +1,14 @@
+meta:
+  title: Page not found
+  description: The page you were looking for could not be found.
+  og_image: /og-default.png
+
+options:
+  noindex: true
+
+content:
+  code: "404"
+  heading: Page not found
+  message: "Sorry, we couldn't find what you were looking for."
+  cta: Go home
+  cta_href: /

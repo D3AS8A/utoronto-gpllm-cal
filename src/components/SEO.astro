@@ -1,0 +1,52 @@
+---
+import { loadGlobal } from '../lib/content';
+
+interface Props {
+  /** Page-level title. If omitted, renders just the site name. */
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  /** Set true on pages that should not be indexed (e.g. 404, thank-you). */
+  noindex?: boolean;
+  canonicalURL?: URL | string;
+}
+
+const global = loadGlobal();
+
+const {
+  title,
+  description = global.description,
+  ogImage = global.og_image,
+  noindex = false,
+  canonicalURL,
+} = Astro.props;
+
+const fullTitle = title ? `${title}${global.title_postfix}` : global.name;
+const canonical  = canonicalURL?.toString();
+
+// OG images must be absolute. Resolve relative paths against the site origin.
+const ogImageAbs = Astro.site
+  ? new URL(ogImage, Astro.site).href
+  : ogImage;
+---
+
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+{canonical && <link rel="canonical" href={canonical} />}
+<meta name="robots" content={noindex ? 'noindex, nofollow' : 'index, follow'} />
+
+<!-- Open Graph -->
+<meta property="og:type"        content="website" />
+<meta property="og:title"       content={fullTitle} />
+<meta property="og:description" content={description} />
+{canonical && <meta property="og:url" content={canonical} />}
+<meta property="og:site_name"   content={global.name} />
+<meta property="og:image"       content={ogImageAbs} />
+<meta property="og:image:alt"   content={`${global.name} — ${description}`} />
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card"        content="summary_large_image" />
+<meta name="twitter:title"       content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image"       content={ogImageAbs} />
+<meta name="twitter:image:alt"   content={`${global.name} — ${description}`} />
