@@ -37,7 +37,7 @@ const jsonLD = {
 
     <FilterBar />
 
-    <main class="cal-main">
+    <main id="main-content" class="cal-main" tabindex="-1">
       <CalendarSection season="fall" />
       <CalendarSection season="winter" />
       <CalendarSection season="summer" />
@@ -53,6 +53,9 @@ const jsonLD = {
   /* Overrides for the calendar page — global.scss paints a dark chrome; the
      calendar's warm cream palette lives here. */
   body:has(.cal-app) {
+    /* Undo global.scss's flex-column layout — .cal-app relies on plain block
+       flow so `max-width` + `margin: 0 auto` centers as expected. */
+    display: block;
     background: var(--satin-linen);
     color: var(--prussian-blue);
     font-family: 'Archivo', system-ui, -apple-system, sans-serif;

@@ -38,10 +38,10 @@ const classChips: Chip[] = FILTERS_CLASSES.map(toChip);
 const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 ---
 
-<div class="fb">
+<aside class="fb" role="toolbar" aria-label="Calendar filters">
   <div class="fb__inner">
-    <div class="fb__row">
-      <span class="fb__label">CLASSES</span>
+    <div class="fb__row" role="group" aria-labelledby="fb-classes-label">
+      <h2 id="fb-classes-label" class="fb__label">CLASSES</h2>
       {classChips.map((c) => (
         <button
           type="button"
@@ -56,8 +56,8 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
       ))}
     </div>
 
-    <div class="fb__row">
-      <span class="fb__label">EXAMS</span>
+    <div class="fb__row" role="group" aria-labelledby="fb-exams-label">
+      <h2 id="fb-exams-label" class="fb__label">EXAMS</h2>
       {examChips.map((c) => (
         <button
           type="button"
@@ -94,7 +94,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
       </button>
     </div>
   </div>
-</div>
+</aside>
 
 <style>
   .fb {

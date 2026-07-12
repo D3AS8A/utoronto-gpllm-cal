@@ -8,14 +8,34 @@ interface Props {
 }
 const { month, monthIdx } = Astro.props;
 
-// Build the day cell grid — matches the DCLogic layout: rows*7 grid, blanks
-// before the 1st and after the last day.
+const MONTH_NUM: Record<string, number> = {
+  January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
+  July: 7, August: 8, September: 9, October: 10, November: 11, December: 12,
+};
+const monthNum = MONTH_NUM[month.name];
+const pad = (n: number) => String(n).padStart(2, '0');
+const iso = (day: number) => `${month.year}-${pad(monthNum)}-${pad(day)}`;
+
+// Day-of-week header. `<abbr>` gives screen readers the full name; visual
+// display shows the single letter.
+const DOW_ABBR: Array<{ letter: string; full: string; weekend: boolean }> = [
+  { letter: 'S', full: 'Sunday',    weekend: true  },
+  { letter: 'M', full: 'Monday',    weekend: false },
+  { letter: 'T', full: 'Tuesday',   weekend: false },
+  { letter: 'W', full: 'Wednesday', weekend: false },
+  { letter: 'T', full: 'Thursday',  weekend: false },
+  { letter: 'F', full: 'Friday',    weekend: false },
+  { letter: 'S', full: 'Saturday',  weekend: true  },
+];
+
+// Build the day cell grid — rows*7 grid, blanks before the 1st and after the last day.
 const total = month.fdow + month.days;
 const rows = Math.ceil(total / 7);
 
 type Cell = {
   blank: boolean;
   num: number | null;
+  iso: string;
   dow: number;
   cats: string[];
   hasMark: boolean;
@@ -34,7 +54,7 @@ for (let i = 0; i < rows * 7; i++) {
   const day = i - month.fdow + 1;
   const dow = i % 7;
   if (day < 1 || day > month.days) {
-    cells.push({ blank: true, num: null, dow, cats: [], hasMark: false, style: '', badge: '', detail: null });
+    cells.push({ blank: true, num: null, iso: '', dow, cats: [], hasMark: false, style: '', badge: '', detail: null });
     continue;
   }
   const cats = month.marks[day] || [];
@@ -65,27 +85,30 @@ for (let i = 0; i < rows * 7; i++) {
       headBg,
     };
   }
-  cells.push({ blank: false, num: day, dow, cats, hasMark, style, badge: v.badge, detail });
+  cells.push({ blank: false, num: day, iso: iso(day), dow, cats, hasMark, style, badge: v.badge, detail });
 }
 
 const callouts = month.callouts ?? [];
+const headingId = `month-${monthIdx}-name`;
 ---
 
-<article class="month-card">
-  <div class="month-card__head">
-    <span class="month-card__name">{month.name}</span>
-    <span class="month-card__year">{month.year}</span>
-  </div>
+<article class="month-card" aria-labelledby={headingId}>
+  <header class="month-card__head">
+    <h3 id={headingId} class="month-card__name">
+      <span>{month.name}</span>
+      <time datetime={month.year} class="month-card__year">{month.year}</time>
+    </h3>
+  </header>
 
-  <div class="month-card__dow">
-    {['S','M','T','W','T','F','S'].map((d, i) => (
-      <div class:list={['dow', i === 0 || i === 6 ? 'dow--weekend' : '']}>{d}</div>
+  <div class="month-card__dow" role="row" aria-hidden="true">
+    {DOW_ABBR.map(({ letter, full, weekend }) => (
+      <abbr class:list={['dow', weekend && 'dow--weekend']} title={full}>{letter}</abbr>
     ))}
   </div>
 
-  <div class="month-card__grid">
+  <div class="month-card__grid" role="grid" aria-label={`${month.name} ${month.year}`}>
     {cells.map((cell) => cell.blank ? (
-      <div class="cell cell--blank"></div>
+      <div class="cell cell--blank" role="gridcell" aria-hidden="true"></div>
     ) : cell.hasMark ? (
       <button
         type="button"
@@ -95,22 +118,22 @@ const callouts = month.callouts ?? [];
         :class="{ 'is-dim': isDim($el.dataset.cats) }"
         @click={`openDetail(${JSON.stringify(cell.detail)})`}
       >
-        <span>{cell.num}</span>
+        <time datetime={cell.iso}>{cell.num}</time>
         {cell.badge === 'alrw' && <span class="badge badge--alrw" aria-hidden="true"></span>}
         {cell.badge === 'dot'  && <span class="badge badge--dot"  aria-hidden="true"></span>}
       </button>
     ) : (
-      <div class:list={['cell', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']}>
-        <span>{cell.num}</span>
+      <div class:list={['cell', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']} role="gridcell">
+        <time datetime={cell.iso}>{cell.num}</time>
       </div>
     ))}
   </div>
 
   {callouts.map((co) => (
-    <div class="callout" style={calloutStyle(co.tone)}>
-      <div class="callout__label">{co.label}</div>
-      <div class="callout__detail">{co.detail}</div>
-    </div>
+    <aside class="callout" style={calloutStyle(co.tone)}>
+      <p class="callout__label">{co.label}</p>
+      <p class="callout__detail">{co.detail}</p>
+    </aside>
   ))}
 </article>
 
@@ -122,16 +145,20 @@ const callouts = month.callouts ?? [];
   }
 
   .month-card__head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
     padding: 10px 12px 8px;
     border-bottom: 1px solid var(--prussian-blue);
   }
 
   .month-card__name {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0;
     font-weight: 800;
     font-size: 15px;
+    line-height: 1.2;
+    letter-spacing: 0;
     color: var(--prussian-blue);
   }
 
@@ -155,6 +182,11 @@ const callouts = month.callouts ?? [];
     font-weight: 700;
     color: #7d8794;
     padding-bottom: 5px;
+    /* Reset <abbr> browser defaults */
+    text-decoration: none;
+    -webkit-text-decoration: none;
+    border-bottom: 0;
+    cursor: help;
   }
 
   .dow--weekend {

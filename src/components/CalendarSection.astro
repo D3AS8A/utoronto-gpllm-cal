@@ -15,12 +15,16 @@ const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
   .filter(({ month }) => month.season === season);
 ---
 
-<section id={`season-${season}`} class="season">
-  <div class="season__head">
-    <div class="season__no">{meta.no}</div>
-    <h2 class="season__name">{meta.name}</h2>
-    <div class="season__sub">{meta.sub}</div>
-  </div>
+<section
+  id={`season-${season}`}
+  class="season"
+  aria-labelledby={`season-${season}-name`}
+>
+  <header class="season__head">
+    <p class="season__no" aria-hidden="true">{meta.no}</p>
+    <h2 id={`season-${season}-name`} class="season__name">{meta.name}</h2>
+    <p class="season__sub">{meta.sub}</p>
+  </header>
 
   <div class="season__grid">
     {items.map(({ month, monthIdx }) => (

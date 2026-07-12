@@ -76,9 +76,13 @@ const canonicalURL = Astro.site
 
     {showChrome && <Header />}
 
-    <main id="main-content" tabindex="-1">
+    {showChrome ? (
+      <main id="main-content" tabindex="-1">
+        <slot />
+      </main>
+    ) : (
       <slot />
-    </main>
+    )}
 
     {showChrome && <Footer />}
 

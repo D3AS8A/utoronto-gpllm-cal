@@ -2,27 +2,33 @@
 ---
 <template x-if="detail">
   <div class="detail-scrim" @click="detail = null">
-    <div class="detail-card" @click.stop role="dialog" aria-modal="true">
-      <div class="detail-card__head" :style="`background:${detail.headBg}`">
-        <div>
-          <div class="detail-card__weekday" x-text="detail.weekday"></div>
-          <div class="detail-card__date" x-text="detail.dateLabel"></div>
-        </div>
+    <article
+      class="detail-card"
+      @click.stop
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="detail-heading"
+    >
+      <header class="detail-card__head" :style="`background:${detail.headBg}`">
+        <hgroup>
+          <p class="detail-card__weekday" x-text="detail.weekday"></p>
+          <h2 id="detail-heading" class="detail-card__date" x-text="detail.dateLabel"></h2>
+        </hgroup>
         <button type="button" class="detail-card__close" @click="detail = null" aria-label="Close">✕</button>
-      </div>
+      </header>
 
-      <div class="detail-card__body">
+      <ul class="detail-card__body">
         <template x-for="item in detail.items" :key="item.name">
-          <div class="detail-item">
-            <span class="detail-item__swatch" :style="item.swatchStyle"></span>
+          <li class="detail-item">
+            <span class="detail-item__swatch" :style="item.swatchStyle" aria-hidden="true"></span>
             <div>
-              <div class="detail-item__name" x-text="item.name"></div>
-              <div class="detail-item__time" x-text="item.time"></div>
+              <p class="detail-item__name" x-text="item.name"></p>
+              <p class="detail-item__time" x-text="item.time"></p>
             </div>
-          </div>
+          </li>
         </template>
-      </div>
-    </div>
+      </ul>
+    </article>
   </div>
 </template>
 
@@ -90,6 +96,8 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    list-style: none;
+    margin: 0;
   }
 
   .detail-item {
