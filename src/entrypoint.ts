@@ -26,9 +26,6 @@ const FILTER_KEY_TO_CATS: Record<string, string[]> = {
   dfin:      ['dfin'],
 };
 
-const CLASS_KEYS = ['reg', 'makeup', 'lmc', 'lmb', 'alrw', 'orient', 'intensive'];
-const EXAM_KEYS  = ['mid', 'dmid', 'fin', 'finc', 'dfin'];
-
 function vibrate(ms: number) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch { /* noop */ }
 }
@@ -42,10 +39,8 @@ interface CalendarDetail {
 
 export default (Alpine: Alpine) => {
   Alpine.data('calendar', () => ({
-    season: 'all' as 'all' | 'fall' | 'winter' | 'summer',
     filters: {} as Record<string, boolean>,
     rails: true,
-    keyOpen: false,
     detail: null as CalendarDetail | null,
 
     get activeCats(): Set<string> {
@@ -76,14 +71,6 @@ export default (Alpine: Alpine) => {
     toggle(key: string) {
       vibrate(6);
       this.filters = { ...this.filters, [key]: !this.filters[key] };
-    },
-
-    setGroup(group: 'classes' | 'exams', value: boolean) {
-      vibrate(6);
-      const keys = group === 'classes' ? CLASS_KEYS : EXAM_KEYS;
-      const next = { ...this.filters };
-      for (const k of keys) next[k] = value;
-      this.filters = next;
     },
 
     reset() {

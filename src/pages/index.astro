@@ -3,10 +3,8 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { loadGlobal, loadPage } from '../lib/content';
 import CalendarHeader from '../components/CalendarHeader.astro';
 import CalendarFooter from '../components/CalendarFooter.astro';
-import SeasonTabs from '../components/SeasonTabs.astro';
+import FilterBar from '../components/FilterBar.astro';
 import CalendarSection from '../components/CalendarSection.astro';
-import KeyFab from '../components/KeyFab.astro';
-import KeyDrawer from '../components/KeyDrawer.astro';
 import DetailModal from '../components/DetailModal.astro';
 
 const global = loadGlobal();
@@ -30,14 +28,14 @@ const jsonLD = {
 >
   <div
     class="cal-app"
-    :class="{ 'rails-on': rails, 'no-scroll': keyOpen || detail }"
+    :class="{ 'rails-on': rails, 'no-scroll': detail }"
     x-data="calendar"
     x-cloak
-    @keydown.escape.window="detail ? detail = null : keyOpen = false"
+    @keydown.escape.window="detail = null"
   >
     <CalendarHeader />
 
-    <SeasonTabs />
+    <FilterBar />
 
     <main class="cal-main">
       <CalendarSection season="fall" />
@@ -47,8 +45,6 @@ const jsonLD = {
 
     <CalendarFooter />
 
-    <KeyFab />
-    <KeyDrawer />
     <DetailModal />
   </div>
 </BaseLayout>

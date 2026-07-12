@@ -1,0 +1,231 @@
+---
+import type { FilterDef } from '../lib/calendar-data';
+import { FILTERS_CLASSES, FILTERS_EXAMS, META, swatchStyle } from '../lib/calendar-data';
+
+const LABEL: Record<string, string> = {
+  reg: 'Regular',
+  makeup: 'Make-Up',
+  lmc: 'LM · Cdn',
+  lmb: 'LM · Bus',
+  alrw: 'ALRW',
+  orient: 'Orient.',
+  intensive: 'Intensive',
+  mid: 'Mid-Term',
+  dmid: 'Def. Mid',
+  fin: 'Final',
+  finc: 'Final · Cdn',
+  dfin: 'Def. Final',
+};
+
+interface Chip {
+  key: string;
+  label: string;
+  swatchStyle: string;
+}
+
+function toChip(f: FilterDef): Chip {
+  const meta = f.name
+    ? { t: f.t!, c: f.c! }
+    : { t: META[f.cats[0]].t, c: META[f.cats[0]].c };
+  return {
+    key: f.key,
+    label: LABEL[f.key] ?? f.key,
+    swatchStyle: swatchStyle(meta.t, meta.c, 14),
+  };
+}
+
+const classChips: Chip[] = FILTERS_CLASSES.map(toChip);
+const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
+---
+
+<div class="fb">
+  <div class="fb__inner">
+    <div class="fb__row">
+      <span class="fb__label">CLASSES</span>
+      {classChips.map((c) => (
+        <button
+          type="button"
+          class="toggle"
+          :class={`{ 'is-on': filters['${c.key}'] }`}
+          @click={`toggle('${c.key}')`}
+          :aria-pressed={`filters['${c.key}'] ? 'true' : 'false'`}
+        >
+          <span class="toggle__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+          <span class="toggle__label">{c.label}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="fb__row">
+      <span class="fb__label">EXAMS</span>
+      {examChips.map((c) => (
+        <button
+          type="button"
+          class="toggle"
+          :class={`{ 'is-on': filters['${c.key}'] }`}
+          @click={`toggle('${c.key}')`}
+          :aria-pressed={`filters['${c.key}'] ? 'true' : 'false'`}
+        >
+          <span class="toggle__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+          <span class="toggle__label">{c.label}</span>
+        </button>
+      ))}
+    </div>
+
+    <div class="fb__row fb__row--ctl">
+      <button
+        type="button"
+        class="toggle toggle--wkd"
+        :class="{ 'is-on': rails }"
+        @click="rails = !rails"
+        :aria-pressed="rails ? 'true' : 'false'"
+      >
+        <span class="toggle__swatch toggle__swatch--wkd" aria-hidden="true"></span>
+        <span class="toggle__label">Weekend shading</span>
+      </button>
+
+      <button
+        type="button"
+        class="fb__clear"
+        @click="reset()"
+        x-show="anyFilter"
+      >
+        Clear <span x-text="activeCount"></span> filter<span x-text="activeCount === 1 ? '' : 's'"></span> ✕
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  .fb {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.94);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid var(--tana);
+    border-bottom: 1px solid var(--tana);
+    margin: 0 calc(-1 * clamp(14px, 3.5vw, 40px));
+    padding: 12px clamp(14px, 3.5vw, 40px);
+  }
+
+  .fb__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fb__row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .fb__row--ctl {
+    gap: 18px;
+    padding-top: 2px;
+  }
+
+  .fb__label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--driftwood);
+    font-weight: 700;
+    margin-right: auto;
+    padding-left: 2px;
+  }
+
+  /* ---- Toggle button — clearly pressable, obvious on/off ---- */
+
+  .toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px 7px 10px;
+    border: 1.5px solid var(--tana);
+    background: #fff;
+    color: var(--prussian-blue);
+    font-family: 'Archivo', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    box-shadow: 0 1px 0 rgba(0, 37, 84, 0.06);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      color 0.15s ease,
+      box-shadow 0.15s ease,
+      transform 0.08s ease;
+  }
+
+  .toggle:hover {
+    border-color: var(--matisse);
+    color: var(--matisse);
+  }
+
+  .toggle.is-on {
+    background: var(--prussian-blue);
+    border-color: var(--prussian-blue);
+    color: #fff;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.28);
+  }
+
+  .toggle.is-on:hover {
+    color: #fff;
+    border-color: var(--prussian-blue);
+  }
+
+  .toggle:active { transform: scale(0.97); }
+
+  .toggle__swatch {
+    display: inline-block;
+    flex: none;
+    box-sizing: border-box;
+  }
+
+  /* Give the swatch a subtle ring when the button is filled so alrw/orient
+     (transparent-ish swatches) don't disappear against the dark bg. */
+  .toggle.is-on .toggle__swatch {
+    outline: 1.5px solid rgba(255, 255, 255, 0.5);
+    outline-offset: 1px;
+  }
+
+  .toggle__swatch--wkd {
+    width: 14px;
+    height: 14px;
+    background: var(--porcelain);
+    border: 1px solid var(--tana);
+  }
+
+  /* ---- Clear link ---- */
+
+  .fb__clear {
+    background: none;
+    border: 0;
+    padding: 6px 2px;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--matisse);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+  }
+
+  .fb__clear:hover { color: var(--prussian-blue); }
+
+  /* ---- Mobile: labels go inline, rows left-align ---- */
+  @media (max-width: 720px) {
+    .fb__row { justify-content: flex-start; }
+    .fb__label { flex-basis: 100%; margin-right: 0; padding-bottom: 2px; }
+    .fb__row--ctl { justify-content: space-between; gap: 12px; }
+  }
+</style>
