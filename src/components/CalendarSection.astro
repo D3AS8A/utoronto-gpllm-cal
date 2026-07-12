@@ -1,0 +1,84 @@
+---
+import type { SeasonKey, MonthDef } from '../lib/calendar-data';
+import { MONTHS, SEASON_META } from '../lib/calendar-data';
+import CalendarMonth from './CalendarMonth.astro';
+
+interface Props {
+  season: SeasonKey;
+}
+const { season } = Astro.props;
+const meta = SEASON_META[season];
+
+// Preserve original month indices so click handlers can identify a source month.
+const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
+  .map((month, monthIdx) => ({ month, monthIdx }))
+  .filter(({ month }) => month.season === season);
+---
+
+<section
+  id={`season-${season}`}
+  class="season"
+  x-show={`season === 'all' || season === '${season}'`}
+>
+  <div class="season__head">
+    <div class="season__no">{meta.no}</div>
+    <h2 class="season__name">{meta.name}</h2>
+    <div class="season__sub">{meta.sub}</div>
+  </div>
+
+  <div class="season__grid">
+    {items.map(({ month, monthIdx }) => (
+      <CalendarMonth month={month} monthIdx={monthIdx} />
+    ))}
+  </div>
+</section>
+
+<style>
+  .season__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: clamp(12px, 1.8vw, 18px);
+    border-bottom: 1px solid var(--tana);
+    padding-bottom: 10px;
+  }
+
+  .season__no {
+    flex: none;
+    width: 34px;
+    height: 34px;
+    background: var(--matisse);
+    color: #fff;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .season__name {
+    font-weight: 800;
+    font-size: clamp(18px, 2.2vw, 24px);
+    line-height: 1;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--prussian-blue);
+    margin: 0;
+  }
+
+  .season__sub {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: clamp(10px, 1.1vw, 12px);
+    letter-spacing: 0.12em;
+    color: #8a7f68;
+    font-weight: 700;
+    margin-left: auto;
+  }
+
+  .season__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+    gap: clamp(12px, 1.4vw, 18px);
+  }
+</style>

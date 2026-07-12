@@ -1,0 +1,102 @@
+---
+const tabs: Array<{ value: 'all' | 'fall' | 'winter' | 'summer'; label: string }> = [
+  { value: 'all',    label: 'All' },
+  { value: 'fall',   label: 'Fall' },
+  { value: 'winter', label: 'Winter' },
+  { value: 'summer', label: 'Summer' },
+];
+---
+<div class="season-bar">
+  <div class="season-bar__inner gp-scroll">
+    <span class="season-bar__label">SEASON</span>
+    {tabs.map((t) => (
+      <button
+        type="button"
+        class="season-tab"
+        :class={`{ 'is-on': season === '${t.value}' }`}
+        @click={`season = '${t.value}'`}
+      >{t.label}</button>
+    ))}
+    <span class="season-bar__spacer"></span>
+    <template x-if="anyFilter">
+      <button
+        type="button"
+        class="season-bar__clear"
+        @click="reset()"
+        x-text="`Clear ${activeCount} ✕`"
+      ></button>
+    </template>
+  </div>
+</div>
+
+<style>
+  .season-bar {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.92);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-top: 1px solid var(--tana);
+    border-bottom: 1px solid var(--tana);
+    margin: 0 calc(-1 * clamp(14px, 3.5vw, 40px));
+    padding: 10px clamp(14px, 3.5vw, 40px);
+  }
+
+  .season-bar__inner {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+  }
+
+  .season-bar__label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: #8a7f68;
+    font-weight: 700;
+    flex: none;
+    padding-right: 4px;
+  }
+
+  .season-tab {
+    flex: none;
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    cursor: pointer;
+    border: 1.5px solid var(--matisse);
+    background: transparent;
+    color: var(--matisse);
+    transition: all 0.15s;
+  }
+
+  .season-tab.is-on {
+    background: var(--matisse);
+    color: #fff;
+  }
+
+  .season-tab:active { transform: scale(0.94); }
+
+  .season-bar__spacer { flex: 1; min-width: 8px; }
+
+  .season-bar__clear {
+    flex: none;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    padding: 7px 12px;
+    border: 1.5px solid var(--prussian-blue);
+    background: var(--prussian-blue);
+    color: #fff;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .season-bar__clear:active { transform: scale(0.94); }
+</style>

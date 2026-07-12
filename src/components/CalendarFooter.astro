@@ -1,0 +1,50 @@
+---
+---
+<footer class="cal-footer">
+  <div class="cal-footer__col">
+    <div class="cal-footer__label">PLEASE NOTE</div>
+    <p>
+      Dates and times herein are subject to change. For course-specific dates and times,
+      please consult syllabi on <strong>Quercus</strong>.
+    </p>
+  </div>
+  <div class="cal-footer__col">
+    <div class="cal-footer__label">MID-TERM &amp; FINAL EXAM TIMES</div>
+    <p>Weekdays 6pm – 9pm&nbsp;&nbsp;·&nbsp;&nbsp;Weekends 1pm – 4pm</p>
+  </div>
+</footer>
+
+<style>
+  .cal-footer {
+    margin-top: clamp(32px, 4.5vw, 56px);
+    border-top: 2px solid var(--prussian-blue);
+    padding-top: 18px;
+    display: flex;
+    gap: 28px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .cal-footer__col:first-child { max-width: 440px; }
+  .cal-footer__col:last-child  { max-width: 360px; }
+
+  .cal-footer__label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.16em;
+    color: var(--driftwood);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .cal-footer p {
+    font-size: 13px;
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--oxford-blue);
+  }
+
+  .cal-footer strong {
+    color: var(--prussian-blue);
+  }
+</style>

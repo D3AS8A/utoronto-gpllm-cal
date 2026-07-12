@@ -1,0 +1,115 @@
+---
+---
+<template x-if="detail">
+  <div class="detail-scrim" @click="detail = null">
+    <div class="detail-card" @click.stop role="dialog" aria-modal="true">
+      <div class="detail-card__head" :style="`background:${detail.headBg}`">
+        <div>
+          <div class="detail-card__weekday" x-text="detail.weekday"></div>
+          <div class="detail-card__date" x-text="detail.dateLabel"></div>
+        </div>
+        <button type="button" class="detail-card__close" @click="detail = null" aria-label="Close">✕</button>
+      </div>
+
+      <div class="detail-card__body">
+        <template x-for="item in detail.items" :key="item.name">
+          <div class="detail-item">
+            <span class="detail-item__swatch" :style="item.swatchStyle"></span>
+            <div>
+              <div class="detail-item__name" x-text="item.name"></div>
+              <div class="detail-item__time" x-text="item.time"></div>
+            </div>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+  .detail-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(0, 37, 84, 0.42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    animation: gpFade 0.16s ease;
+  }
+
+  .detail-card {
+    background: #fff;
+    width: 100%;
+    max-width: 400px;
+    border: 2px solid var(--prussian-blue);
+    box-shadow: 8px 8px 0 var(--prussian-blue);
+    animation: gpPop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .detail-card__head {
+    color: #fff;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .detail-card__weekday {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    opacity: 0.8;
+    font-weight: 700;
+  }
+
+  .detail-card__date {
+    font-weight: 900;
+    font-size: 26px;
+    line-height: 1;
+    margin-top: 3px;
+  }
+
+  .detail-card__close {
+    background: none;
+    border: 2px solid currentColor;
+    color: inherit;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .detail-card__close:active { transform: scale(0.9); }
+
+  .detail-card__body {
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .detail-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .detail-item__swatch { display: block; }
+
+  .detail-item__name {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--prussian-blue);
+  }
+
+  .detail-item__time {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 12px;
+    color: var(--pablo);
+    margin-top: 2px;
+  }
+</style>

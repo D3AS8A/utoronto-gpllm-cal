@@ -1,0 +1,194 @@
+// Session category metadata: display name, time string, swatch type + color
+
+export type CatKey =
+  | 'reg' | 'makeup' | 'lmc' | 'lmb' | 'alrw' | 'orient'
+  | 'intc' | 'intb'
+  | 'mid' | 'dmid' | 'fin' | 'finc' | 'dfin';
+
+export type SwatchType = 'fill' | 'outline' | 'dashed' | 'circle' | 'alrw' | 'orient';
+
+export interface CatMeta {
+  name: string;
+  time: string;
+  t: SwatchType;
+  c: string;
+}
+
+export const META: Record<CatKey, CatMeta> = {
+  reg:    { name: 'Regular Classes',            time: 'Fri 4–9pm · Sat 8:30am–6:30pm',      t: 'fill',    c: '#1f6092' },
+  makeup: { name: 'Make-Up Class',              time: 'Rescheduled session',                t: 'fill',    c: '#bdc9d7' },
+  lmc:    { name: 'Legal Methods — Cdn Law',    time: '9:30am–4:30pm',                      t: 'fill',    c: '#af9b88' },
+  lmb:    { name: 'Legal Methods — Bus Law & ILT', time: '9:30am–4:30pm',                   t: 'fill',    c: '#936e42' },
+  alrw:   { name: 'ALRW Intensive — Cdn Law',   time: '9:30am–5:30pm',                      t: 'alrw',    c: '#002554' },
+  orient: { name: 'Orientation Evening',        time: '6:00–8:00pm',                        t: 'orient',  c: '#af9b88' },
+  intc:   { name: 'Intensive Course',           time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30', t: 'fill', c: '#e5d3a1' },
+  intb:   { name: 'Intensive Course',           time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30', t: 'fill', c: '#936e42' },
+  mid:    { name: 'Mid-Term Exam',              time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'outline', c: '#1f6092' },
+  dmid:   { name: 'Deferred Mid-Term Exam',     time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'circle',  c: '#70c7e9' },
+  fin:    { name: 'Final Exam',                 time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'outline', c: '#002554' },
+  finc:   { name: 'Final Exam — Cdn Law',       time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'dashed',  c: '#002554' },
+  dfin:   { name: 'Deferred Final Exam',        time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'outline', c: '#70c7e9' },
+};
+
+export interface FilterDef {
+  key: string;
+  cats: CatKey[];
+  /** Override META fields when the filter aggregates multiple cats (e.g. intensive). */
+  name?: string;
+  time?: string;
+  t?: SwatchType;
+  c?: string;
+}
+
+export const FILTERS_CLASSES: FilterDef[] = [
+  { key: 'reg',       cats: ['reg'] },
+  { key: 'makeup',    cats: ['makeup'] },
+  { key: 'lmc',       cats: ['lmc'] },
+  { key: 'lmb',       cats: ['lmb'] },
+  { key: 'alrw',      cats: ['alrw'] },
+  { key: 'orient',    cats: ['orient'] },
+  { key: 'intensive', cats: ['intc', 'intb'], name: 'Intensive Courses',
+    time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30', t: 'fill', c: '#e5d3a1' },
+];
+
+export const FILTERS_EXAMS: FilterDef[] = [
+  { key: 'mid',  cats: ['mid'] },
+  { key: 'dmid', cats: ['dmid'] },
+  { key: 'fin',  cats: ['fin'] },
+  { key: 'finc', cats: ['finc'] },
+  { key: 'dfin', cats: ['dfin'] },
+];
+
+export type SeasonKey = 'fall' | 'winter' | 'summer';
+
+export interface MonthDef {
+  name: string;
+  year: string;
+  season: SeasonKey;
+  fdow: number; // day-of-week (0=Sun) that the 1st falls on
+  days: number;
+  marks: Record<number, CatKey[]>;
+  callouts?: Array<{ label: string; detail: string; tone: 'cream' | 'ink' | 'tan' }>;
+}
+
+export const MONTHS: MonthDef[] = [
+  { name: 'September', year: '2026', season: 'fall', fdow: 2, days: 30, marks: {
+      8: ['orient'], 9: ['orient'], 10: ['lmc'], 11: ['lmc'], 12: ['lmb', 'alrw'], 13: ['lmb', 'alrw'],
+      17: ['lmc'], 18: ['lmc'], 19: ['lmb', 'alrw'], 20: ['lmb', 'alrw'], 25: ['reg'], 26: ['reg'] },
+    callouts: [{ label: 'Orientation Evenings',
+      detail: 'Cdn Law — Sept 8, 6:00–8:00pm · Bus Law & ILT — Sept 9, 6:00–8:00pm', tone: 'tan' }] },
+  { name: 'October', year: '2026', season: 'fall', fdow: 4, days: 31, marks: {
+      2: ['reg'], 3: ['reg'], 4: ['makeup'], 16: ['reg'], 17: ['reg'],
+      23: ['reg'], 24: ['reg'], 25: ['makeup'], 31: ['mid'] } },
+  { name: 'November', year: '2026', season: 'fall', fdow: 0, days: 30, marks: {
+      1: ['mid'], 5: ['mid'], 6: ['reg', 'dmid'], 7: ['reg'], 8: ['makeup'],
+      13: ['dmid'], 20: ['reg'], 21: ['reg'], 28: ['mid'], 29: ['mid'] } },
+  { name: 'December', year: '2026', season: 'fall', fdow: 2, days: 31, marks: {
+      3: ['fin'], 4: ['intc'], 5: ['intc', 'finc'], 6: ['intc', 'finc'], 10: ['dfin'],
+      11: ['intb'], 12: ['intb'], 13: ['intb'], 17: ['dfin'], 18: ['intb'], 19: ['intb'] },
+    callouts: [{ label: 'December Intensive 1 & 2',
+      detail: 'Intensives 1 & 2 overlap. Some dates to be released — please hold for now.', tone: 'cream' }] },
+  { name: 'January', year: '2027', season: 'winter', fdow: 5, days: 31, marks: {
+      8: ['reg'], 9: ['reg'], 10: ['fin'], 22: ['reg'], 23: ['reg'], 24: ['makeup'] },
+    callouts: [{ label: 'Intensive Final Exam', detail: 'January 10.', tone: 'ink' }] },
+  { name: 'February', year: '2027', season: 'winter', fdow: 1, days: 28, marks: {
+      5: ['reg'], 6: ['reg'], 19: ['mid'], 20: ['mid'], 21: ['mid'],
+      26: ['dmid'], 27: ['reg'], 28: ['makeup'] } },
+  { name: 'March', year: '2027', season: 'winter', fdow: 1, days: 31, marks: {
+      5: ['reg', 'dmid'], 6: ['reg'], 7: ['dmid'], 19: ['reg'], 20: ['reg'], 21: ['makeup'] } },
+  { name: 'April', year: '2027', season: 'winter', fdow: 4, days: 30, marks: {
+      3: ['fin'], 4: ['fin'], 8: ['fin'], 9: ['intc'], 10: ['intc'], 11: ['intc'],
+      16: ['intc'], 17: ['intc'], 18: ['intc'], 30: ['reg'] },
+    callouts: [{ label: 'April Intensive',
+      detail: 'Some dates to be released — please hold for now.', tone: 'cream' }] },
+  { name: 'May', year: '2027', season: 'summer', fdow: 6, days: 31, marks: {
+      1: ['reg'], 7: ['reg'], 8: ['reg'], 9: ['makeup'], 14: ['reg'], 15: ['reg'],
+      16: ['fin'], 29: ['finc'], 30: ['finc'] },
+    callouts: [{ label: 'Intensive Final Exam', detail: 'May 16.', tone: 'ink' }] },
+  { name: 'June', year: '2027', season: 'summer', fdow: 2, days: 30, marks: {
+      4: ['reg'], 5: ['reg'], 6: ['fin'], 11: ['reg', 'dfin'], 12: ['reg'],
+      13: ['dmid'], 18: ['reg'], 19: ['reg'], 25: ['fin'], 26: ['fin'], 27: ['fin'] } },
+  { name: 'July', year: '2027', season: 'summer', fdow: 4, days: 31, marks: {
+      9: ['dfin'], 10: ['dfin'], 11: ['dfin'], 12: ['dfin'] } },
+];
+
+export const SEASON_ORDER: SeasonKey[] = ['fall', 'winter', 'summer'];
+
+export const SEASON_META: Record<SeasonKey, { no: string; name: string; sub: string }> = {
+  fall:   { no: '01', name: 'Fall',   sub: 'September – December 2026' },
+  winter: { no: '02', name: 'Winter', sub: 'January – April 2027' },
+  summer: { no: '03', name: 'Summer', sub: 'May – July 2027' },
+};
+
+export const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+// ---------------------------------------------------------------------------
+// Visual helpers used at build time to compute per-cell styles
+
+export function swatchStyle(t: SwatchType, c: string, size = 22): string {
+  const base = `width:${size}px;height:${size}px;flex:none;box-sizing:border-box;`;
+  if (t === 'outline') return base + `background:#fff;border:3px solid ${c};`;
+  if (t === 'dashed')  return base + `background:#fff;border:3px dashed ${c};`;
+  if (t === 'circle')  return base + `background:${c};border-radius:50%;`;
+  if (t === 'alrw')    return base + `background:#fff;border:2px dotted #002554;border-radius:50%;`;
+  if (t === 'orient')  return base + `background:#f7f0e2;border:2px solid #af9b88;`;
+  return base + `background:${c};`;
+}
+
+export interface CellVisual {
+  bg: string;
+  fg: string;
+  border: string;
+  badge: '' | 'alrw' | 'dot';
+  isBold: boolean;
+}
+
+const CLASS_COLORS: Record<string, [string, string]> = {
+  reg:    ['#1f6092', '#fff'],
+  makeup: ['#bdc9d7', '#002554'],
+  lmc:    ['#af9b88', '#2a1d0a'],
+  lmb:    ['#936e42', '#fff'],
+  intc:   ['#e5d3a1', '#4a3410'],
+  intb:   ['#936e42', '#fff'],
+};
+
+export function cellVisual(cats: CatKey[]): CellVisual {
+  const has = (k: CatKey) => cats.indexOf(k) !== -1;
+  const classKey = (['reg', 'makeup', 'lmc', 'lmb', 'intc', 'intb', 'orient'] as CatKey[]).find(has);
+  let bg = 'transparent', fg = '#002554', border = '2px solid transparent';
+  if (classKey === 'orient') { bg = '#f7f0e2'; fg = '#6b4e22'; border = '2px solid #af9b88'; }
+  else if (classKey)          { [bg, fg] = CLASS_COLORS[classKey]; }
+  else if (has('dmid'))       { bg = '#70c7e9'; fg = '#002554'; }
+  if      (has('mid'))                     border = '2px solid #1f6092';
+  else if (has('fin'))                     border = '2px solid #002554';
+  else if (has('finc'))                    border = '2px dashed #002554';
+  else if (has('dfin') && !classKey)       border = '2px solid #70c7e9';
+  let badge: '' | 'alrw' | 'dot' = '';
+  if      (has('alrw'))                            badge = 'alrw';
+  else if ((has('dmid') || has('dfin')) && classKey) badge = 'dot';
+  return { bg, fg, border, badge, isBold: !!(classKey || has('dmid')) };
+}
+
+export function countFor(cats: CatKey[]): number {
+  let n = 0;
+  for (const m of MONTHS) {
+    for (const d of Object.keys(m.marks)) {
+      if (m.marks[Number(d)].some(c => cats.includes(c))) n++;
+    }
+  }
+  return n;
+}
+
+export function calloutStyle(tone: 'cream' | 'ink' | 'tan'): string {
+  const bg  = tone === 'cream' ? '#f6eccf' : tone === 'ink' ? '#eef1f5' : '#f3ece0';
+  const bar = tone === 'cream' ? '#c9a94e' : tone === 'ink' ? '#002554' : '#af9b88';
+  return `margin:0 8px 10px;padding:9px 11px;background:${bg};border-left:3px solid ${bar}`;
+}
+
+/** Weekday name for a given month-day; uses fdow (day-of-week for the 1st). */
+export function weekdayName(fdow: number, day: number): string {
+  return DOW[(fdow + day - 1) % 7];
+}
+
+/** All (dedup) filter defs across both groups, used for the drawer + activeCats lookup. */
+export const ALL_FILTERS: FilterDef[] = [...FILTERS_CLASSES, ...FILTERS_EXAMS];

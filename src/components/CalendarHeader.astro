@@ -1,0 +1,93 @@
+---
+---
+<header class="cal-header">
+  <div class="cal-header__logos">
+    <img src="/images/gpllm-logo.png" alt="GPLLM" class="cal-header__gpllm" />
+    <img
+      src="/images/uoft-law-logo.png"
+      alt="Henry N.R. Jackman Faculty of Law, University of Toronto"
+      class="cal-header__uoft"
+    />
+  </div>
+
+  <div class="cal-header__title-row">
+    <div>
+      <div class="cal-header__year">2026 — 2027 ACADEMIC YEAR</div>
+      <h1 class="cal-header__title">Program Calendar</h1>
+    </div>
+    <p class="cal-header__desc">
+      Regular classes take place on <strong>Friday evenings</strong> (4–9pm) and
+      <strong>Saturdays</strong> (8:30am–6:30pm). Select any coloured date for details,
+      or open the key to filter by session type.
+    </p>
+  </div>
+</header>
+
+<style>
+  .cal-header {
+    padding: clamp(18px, 3vw, 32px) 0 clamp(14px, 2vw, 22px);
+  }
+
+  .cal-header__logos {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .cal-header__gpllm {
+    height: clamp(38px, 5vw, 50px);
+    width: auto;
+    display: block;
+  }
+
+  .cal-header__uoft {
+    height: clamp(26px, 3.6vw, 38px);
+    width: auto;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .cal-header__title-row {
+    margin-top: clamp(16px, 2.5vw, 28px);
+    border-top: 2px solid var(--prussian-blue);
+    padding-top: clamp(12px, 1.6vw, 18px);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  .cal-header__year {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: clamp(10px, 1.1vw, 12px);
+    letter-spacing: 0.24em;
+    color: var(--driftwood);
+    font-weight: 700;
+  }
+
+  .cal-header__title {
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    font-size: clamp(28px, 4.6vw, 46px);
+    margin-top: 6px;
+    text-transform: uppercase;
+    color: var(--prussian-blue);
+  }
+
+  .cal-header__desc {
+    max-width: 520px;
+    font-size: clamp(13px, 1.4vw, 14.5px);
+    line-height: 1.5;
+    font-weight: 500;
+    color: var(--oxford-blue);
+    padding-bottom: 4px;
+  }
+
+  .cal-header__desc strong {
+    color: var(--prussian-blue);
+  }
+</style>

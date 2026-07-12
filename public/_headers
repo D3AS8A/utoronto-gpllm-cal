@@ -5,5 +5,5 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
   # Alpine.js v3 requires 'unsafe-eval' (uses new Function() for expression evaluation).
-  # Tighten img-src / connect-src as needed for your CDN / API domains.
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
+  # Google Fonts allowed via style-src fonts.googleapis.com and font-src fonts.gstatic.com.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'

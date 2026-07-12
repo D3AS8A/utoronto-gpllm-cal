@@ -1,0 +1,238 @@
+---
+import type { MonthDef } from '../lib/calendar-data';
+import { cellVisual, swatchStyle, weekdayName, calloutStyle, META } from '../lib/calendar-data';
+
+interface Props {
+  month: MonthDef;
+  monthIdx: number;
+}
+const { month, monthIdx } = Astro.props;
+
+// Build the day cell grid — matches the DCLogic layout: rows*7 grid, blanks
+// before the 1st and after the last day.
+const total = month.fdow + month.days;
+const rows = Math.ceil(total / 7);
+
+type Cell = {
+  blank: boolean;
+  num: number | null;
+  dow: number;
+  cats: string[];
+  hasMark: boolean;
+  style: string;
+  badge: '' | 'alrw' | 'dot';
+  detail: null | {
+    weekday: string;
+    dateLabel: string;
+    items: Array<{ name: string; time: string; swatchStyle: string }>;
+    headBg: string;
+  };
+};
+
+const cells: Cell[] = [];
+for (let i = 0; i < rows * 7; i++) {
+  const day = i - month.fdow + 1;
+  const dow = i % 7;
+  if (day < 1 || day > month.days) {
+    cells.push({ blank: true, num: null, dow, cats: [], hasMark: false, style: '', badge: '', detail: null });
+    continue;
+  }
+  const cats = month.marks[day] || [];
+  const hasMark = cats.length > 0;
+  const v = cellVisual(cats);
+  const style =
+    `background:${v.bg};color:${v.fg};border:${v.border};` +
+    `font-weight:${v.isBold ? '800' : '600'};`;
+
+  let detail: Cell['detail'] = null;
+  if (hasMark) {
+    const seen = new Set<string>();
+    const items: Array<{ name: string; time: string; swatchStyle: string }> = [];
+    for (const c of cats) {
+      const key = c === 'intb' ? 'intc' : c;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      const m = META[c as keyof typeof META];
+      items.push({ name: m.name, time: m.time, swatchStyle: swatchStyle(m.t, m.c, 20) });
+    }
+    const tone = cats.some((c) => ['fin', 'mid', 'finc'].includes(c))
+      ? 'ink' : cats.some((c) => c === 'reg') ? 'blue' : 'brown';
+    const headBg = tone === 'ink' ? '#002554' : tone === 'blue' ? '#1f6092' : '#936e42';
+    detail = {
+      weekday: weekdayName(month.fdow, day),
+      dateLabel: `${month.name} ${day}`,
+      items,
+      headBg,
+    };
+  }
+  cells.push({ blank: false, num: day, dow, cats, hasMark, style, badge: v.badge, detail });
+}
+
+const callouts = month.callouts ?? [];
+---
+
+<article class="month-card">
+  <div class="month-card__head">
+    <span class="month-card__name">{month.name}</span>
+    <span class="month-card__year">{month.year}</span>
+  </div>
+
+  <div class="month-card__dow">
+    {['S','M','T','W','T','F','S'].map((d, i) => (
+      <div class:list={['dow', i === 0 || i === 6 ? 'dow--weekend' : '']}>{d}</div>
+    ))}
+  </div>
+
+  <div class="month-card__grid">
+    {cells.map((cell) => cell.blank ? (
+      <div class="cell cell--blank"></div>
+    ) : cell.hasMark ? (
+      <button
+        type="button"
+        class:list={['cell', 'cell--marked', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']}
+        style={cell.style}
+        data-cats={cell.cats.join(' ')}
+        :class="{ 'is-dim': isDim($el.dataset.cats) }"
+        @click={`openDetail(${JSON.stringify(cell.detail)})`}
+      >
+        <span>{cell.num}</span>
+        {cell.badge === 'alrw' && <span class="badge badge--alrw" aria-hidden="true"></span>}
+        {cell.badge === 'dot'  && <span class="badge badge--dot"  aria-hidden="true"></span>}
+      </button>
+    ) : (
+      <div class:list={['cell', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']}>
+        <span>{cell.num}</span>
+      </div>
+    ))}
+  </div>
+
+  {callouts.map((co) => (
+    <div class="callout" style={calloutStyle(co.tone)}>
+      <div class="callout__label">{co.label}</div>
+      <div class="callout__detail">{co.detail}</div>
+    </div>
+  ))}
+</article>
+
+<style>
+  .month-card {
+    background: #fff;
+    border: 1px solid var(--prussian-blue);
+    box-shadow: 3px 3px 0 rgba(0, 37, 84, 0.18);
+  }
+
+  .month-card__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 10px 12px 8px;
+    border-bottom: 1px solid var(--prussian-blue);
+  }
+
+  .month-card__name {
+    font-weight: 800;
+    font-size: 15px;
+    color: var(--prussian-blue);
+  }
+
+  .month-card__year {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--driftwood);
+    font-weight: 700;
+  }
+
+  .month-card__dow {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    padding: 8px 8px 0;
+  }
+
+  .dow {
+    text-align: center;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #7d8794;
+    padding-bottom: 5px;
+  }
+
+  .dow--weekend {
+    color: var(--driftwood);
+  }
+
+  .month-card__grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    padding: 0 8px 10px;
+  }
+
+  .cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    font-family: 'Archivo', sans-serif;
+    font-size: clamp(10.5px, 2.4vw, 12.5px);
+    box-sizing: border-box;
+    color: var(--prussian-blue);
+    background: transparent;
+    border: 2px solid transparent;
+    padding: 0;
+    transition: transform 0.08s ease, opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .cell--marked {
+    cursor: pointer;
+  }
+
+  .cell--marked:active {
+    transform: scale(0.86);
+  }
+
+  .cell.is-dim {
+    opacity: 0.2;
+    filter: grayscale(0.6);
+  }
+
+  /* Weekend shading — only applied to non-marked weekend cells when
+     `rails` is on. Root state adds .rails-on class; cells opt in via
+     .cell--weekend but skipped when they already have their own bg. */
+  :global(.rails-on) .cell--weekend:not(.cell--marked) {
+    background: var(--porcelain);
+  }
+
+  .badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+  }
+
+  .badge--alrw {
+    border: 1.5px dotted var(--prussian-blue);
+  }
+
+  .badge--dot {
+    background: var(--sky);
+    border: 1px solid #fff;
+  }
+
+  .callout__label {
+    font-weight: 800;
+    font-size: 11.5px;
+    letter-spacing: 0.01em;
+    color: var(--prussian-blue);
+  }
+
+  .callout__detail {
+    font-size: 11px;
+    line-height: 1.35;
+    margin-top: 2px;
+    color: #4a4230;
+  }
+</style>

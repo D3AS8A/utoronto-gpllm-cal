@@ -17,6 +17,8 @@ interface Props {
    * Should be developer-supplied data only — never pass raw user input here.
    */
   jsonLD?: Record<string, unknown>;
+  /** Render the site Header + Footer chrome (default true). Off for the calendar page. */
+  showChrome?: boolean;
 }
 
 const {
@@ -25,6 +27,7 @@ const {
   ogImage,
   noindex = false,
   jsonLD,
+  showChrome = true,
 } = Astro.props;
 
 // Build the canonical URL. Requires `site` to be set in astro.config.mjs.
@@ -57,19 +60,27 @@ const canonicalURL = Astro.site
 
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
+    />
   </head>
 
   <body>
     <!-- Skip-to-content — first focusable element, visible on keyboard focus -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <Header />
+    {showChrome && <Header />}
 
     <main id="main-content" tabindex="-1">
       <slot />
     </main>
 
-    <Footer />
+    {showChrome && <Footer />}
 
     <script>
       document.addEventListener("click", (e) => {

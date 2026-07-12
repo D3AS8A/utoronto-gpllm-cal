@@ -1,0 +1,380 @@
+---
+import type { FilterDef } from '../lib/calendar-data';
+import { FILTERS_CLASSES, FILTERS_EXAMS, META, swatchStyle, countFor } from '../lib/calendar-data';
+
+// Build the render-time rows for each filter, so we don't recompute in Alpine.
+type Row = {
+  key: string;
+  name: string;
+  time: string;
+  count: number;
+  swatchStyle: string;
+};
+
+function toRow(f: FilterDef): Row {
+  const primary = f.name
+    ? { name: f.name, time: f.time!, t: f.t!, c: f.c! }
+    : { ...META[f.cats[0]] };
+  return {
+    key: f.key,
+    name: primary.name,
+    time: primary.time,
+    count: countFor(f.cats),
+    swatchStyle: swatchStyle(primary.t, primary.c, 24),
+  };
+}
+
+const classRows: Row[] = FILTERS_CLASSES.map(toRow);
+const examRows:  Row[] = FILTERS_EXAMS.map(toRow);
+---
+
+<template x-if="keyOpen">
+  <div class="drawer-scrim" @click="keyOpen = false">
+    <div
+      class="drawer gp-scroll"
+      @click.stop
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="drawer-title"
+    >
+      <div class="drawer__head">
+        <div>
+          <div class="drawer__eyebrow">SESSION KEY</div>
+          <div id="drawer-title" class="drawer__title">Filters &amp; Display</div>
+        </div>
+        <button type="button" class="drawer__close" @click="keyOpen = false" aria-label="Close">✕</button>
+      </div>
+
+      <p class="drawer__intro">
+        Toggle session types to highlight their dates on the calendar. Counts show the number of dates of each type.
+      </p>
+
+      <section class="drawer__section">
+        <div class="drawer__section-head">
+          <div class="drawer__section-label">CLASSES &amp; SESSIONS</div>
+          <div class="drawer__quick">
+            <button type="button" class="quick" @click="setGroup('classes', true)">All</button>
+            <button type="button" class="quick" @click="setGroup('classes', false)">None</button>
+          </div>
+        </div>
+        <div class="drawer__rows">
+          {classRows.map((r) => (
+            <button
+              type="button"
+              class="filter-row"
+              :class={`{ 'is-on': filters['${r.key}'] }`}
+              @click={`toggle('${r.key}')`}
+            >
+              <span class="filter-row__swatch" style={r.swatchStyle}></span>
+              <span class="filter-row__body">
+                <span class="filter-row__name">{r.name}</span>
+                <span class="filter-row__time">{r.time}</span>
+              </span>
+              <span
+                class="filter-row__count"
+                :class={`{ 'is-on': filters['${r.key}'] }`}
+              >{r.count}</span>
+              <span class="switch" :class={`{ 'is-on': filters['${r.key}'] }`}>
+                <span class="switch__knob"></span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section class="drawer__section">
+        <div class="drawer__section-head">
+          <div class="drawer__section-label">EXAMS</div>
+          <div class="drawer__quick">
+            <button type="button" class="quick" @click="setGroup('exams', true)">All</button>
+            <button type="button" class="quick" @click="setGroup('exams', false)">None</button>
+          </div>
+        </div>
+        <div class="drawer__rows">
+          {examRows.map((r) => (
+            <button
+              type="button"
+              class="filter-row"
+              :class={`{ 'is-on': filters['${r.key}'] }`}
+              @click={`toggle('${r.key}')`}
+            >
+              <span class="filter-row__swatch" style={r.swatchStyle}></span>
+              <span class="filter-row__body">
+                <span class="filter-row__name">{r.name}</span>
+                <span class="filter-row__time">{r.time}</span>
+              </span>
+              <span
+                class="filter-row__count"
+                :class={`{ 'is-on': filters['${r.key}'] }`}
+              >{r.count}</span>
+              <span class="switch" :class={`{ 'is-on': filters['${r.key}'] }`}>
+                <span class="switch__knob"></span>
+              </span>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section class="drawer__section drawer__section--display">
+        <div class="drawer__section-label">DISPLAY</div>
+        <button type="button" class="display-row" @click="rails = !rails">
+          <span class="display-row__body">
+            <span class="filter-row__name">Weekend shading</span>
+            <span class="filter-row__time">Grey tint on Sat &amp; Sun columns</span>
+          </span>
+          <span class="switch" :class="{ 'is-on': rails }">
+            <span class="switch__knob"></span>
+          </span>
+        </button>
+
+        <template x-if="anyFilter">
+          <button type="button" class="drawer__clear" @click="reset()">Clear all filters</button>
+        </template>
+      </section>
+    </div>
+  </div>
+</template>
+
+<style>
+  .drawer-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    background: rgba(0, 37, 84, 0.38);
+    animation: gpFade 0.18s ease;
+  }
+
+  .drawer {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(408px, 100%);
+    background: var(--satin-linen);
+    border-left: 1px solid var(--prussian-blue);
+    box-shadow: -12px 0 40px rgba(0, 37, 84, 0.28);
+    overflow-y: auto;
+    animation: gpDrawer 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .drawer__head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: var(--prussian-blue);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+  }
+
+  .drawer__eyebrow {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--aqua);
+    font-weight: 700;
+  }
+
+  .drawer__title {
+    font-weight: 800;
+    font-size: 18px;
+    line-height: 1;
+    margin-top: 3px;
+    text-transform: uppercase;
+  }
+
+  .drawer__close {
+    background: none;
+    border: 1.5px solid #fff;
+    color: #fff;
+    width: 34px;
+    height: 34px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .drawer__close:active { transform: scale(0.9); }
+
+  .drawer__intro {
+    padding: 14px 18px 0;
+    font-size: 12.5px;
+    line-height: 1.5;
+    color: #5a5342;
+    font-weight: 500;
+  }
+
+  .drawer__section {
+    padding: 16px 18px 4px;
+  }
+
+  .drawer__section--display {
+    padding-bottom: 22px;
+  }
+
+  .drawer__section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 9px;
+  }
+
+  .drawer__section-label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.16em;
+    color: var(--driftwood);
+    font-weight: 700;
+    margin-bottom: 9px;
+  }
+
+  .drawer__quick {
+    display: flex;
+    gap: 5px;
+  }
+
+  .quick {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    padding: 4px 9px;
+    border: 1px solid #b9ae97;
+    background: #fff;
+    color: #5a5342;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+
+  .quick:active { transform: scale(0.94); }
+
+  .drawer__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .filter-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    text-align: left;
+    padding: 9px 11px;
+    cursor: pointer;
+    font-family: 'Archivo', sans-serif;
+    border: 1px solid var(--tana);
+    background: #fff;
+    transition: all 0.14s;
+  }
+
+  .filter-row.is-on {
+    border-color: var(--matisse);
+  }
+
+  .filter-row:active { transform: scale(0.985); }
+
+  .filter-row__swatch {
+    display: block;
+    flex: none;
+  }
+
+  .filter-row__body {
+    flex: 1;
+    text-align: left;
+    min-width: 0;
+  }
+
+  .filter-row__name {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--prussian-blue);
+  }
+
+  .filter-row__time {
+    display: block;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    color: var(--pablo);
+    margin-top: 1px;
+  }
+
+  .filter-row__count {
+    flex: none;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: #a99e86;
+    min-width: 20px;
+    text-align: right;
+  }
+
+  .filter-row__count.is-on { color: var(--matisse); }
+
+  .switch {
+    flex: none;
+    position: relative;
+    width: 38px;
+    height: 21px;
+    box-sizing: border-box;
+    border: 1px solid #b9ae97;
+    background: #ddd6c6;
+    transition: all 0.15s;
+    display: inline-block;
+  }
+
+  .switch.is-on {
+    border-color: var(--matisse);
+    background: var(--matisse);
+  }
+
+  .switch__knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 15px;
+    height: 15px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(0, 37, 84, 0.3);
+    transition: left 0.15s;
+  }
+
+  .switch.is-on .switch__knob { left: 19px; }
+
+  .display-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    cursor: pointer;
+    border: 1px solid var(--tana);
+    background: #faf8f2;
+    font-family: 'Archivo', sans-serif;
+  }
+
+  .display-row:active { transform: scale(0.985); }
+
+  .display-row__body { flex: 1; min-width: 0; }
+
+  .drawer__clear {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: 1.5px solid var(--prussian-blue);
+    background: var(--prussian-blue);
+    color: #fff;
+    font-weight: 800;
+    font-size: 12.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    font-family: 'Archivo', sans-serif;
+  }
+
+  .drawer__clear:active { transform: scale(0.98); }
+</style>
