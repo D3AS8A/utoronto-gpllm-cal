@@ -12,6 +12,13 @@
     <div class="cal-footer__label">MID-TERM &amp; FINAL EXAM TIMES</div>
     <p>Weekdays 6pm – 9pm&nbsp;&nbsp;·&nbsp;&nbsp;Weekends 1pm – 4pm</p>
   </div>
+  <div class="cal-footer__mark">
+    <img
+      src="/images/uoft-law-logo.png"
+      alt="Henry N.R. Jackman Faculty of Law, University of Toronto"
+      class="cal-footer__uoft"
+    />
+  </div>
 </footer>
 
 <style>
@@ -46,5 +53,27 @@
 
   .cal-footer strong {
     color: var(--prussian-blue);
+  }
+
+  .cal-footer__mark {
+    flex: 1 0 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+
+  .cal-footer__uoft {
+    height: clamp(34px, 4vw, 46px);
+    width: auto;
+    display: block;
+    opacity: 0.9;
+  }
+
+  @media (min-width: 900px) {
+    .cal-footer__mark {
+      flex: 0 0 auto;
+      align-items: flex-end;
+      margin-top: 0;
+    }
   }
 </style>
