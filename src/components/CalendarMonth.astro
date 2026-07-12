@@ -119,8 +119,8 @@ const headingId = `month-${monthIdx}-name`;
         @click={`openDetail(${JSON.stringify(cell.detail)})`}
       >
         <time datetime={cell.iso}>{cell.num}</time>
-        {cell.badge === 'alrw' && <span class="badge badge--alrw" aria-hidden="true"></span>}
-        {cell.badge === 'dot'  && <span class="badge badge--dot"  aria-hidden="true"></span>}
+        {cell.badge === 'alrw' && <span class="cell-badge cell-badge--alrw" aria-hidden="true"></span>}
+        {cell.badge === 'dot'  && <span class="cell-badge cell-badge--dot"  aria-hidden="true"></span>}
       </button>
     ) : (
       <div class:list={['cell', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']} role="gridcell">
@@ -236,7 +236,7 @@ const headingId = `month-${monthIdx}-name`;
     background: var(--porcelain);
   }
 
-  .badge {
+  .cell-badge {
     position: absolute;
     top: 2px;
     right: 2px;
@@ -245,11 +245,11 @@ const headingId = `month-${monthIdx}-name`;
     border-radius: 50%;
   }
 
-  .badge--alrw {
+  .cell-badge--alrw {
     border: 1.5px dotted var(--prussian-blue);
   }
 
-  .badge--dot {
+  .cell-badge--dot {
     background: var(--sky);
     border: 1px solid #fff;
   }
