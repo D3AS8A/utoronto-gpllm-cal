@@ -1,7 +1,7 @@
 meta:
   title: Page not found
   description: The page you were looking for could not be found.
-  og_image: /og-default.png
+  og_image: /images/og-image.png
 
 options:
   noindex: true

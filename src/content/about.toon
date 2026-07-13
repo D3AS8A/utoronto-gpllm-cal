@@ -1,7 +1,7 @@
 meta:
   title: About
   description: Learn more about who we are and what we do.
-  og_image: /og-default.png
+  og_image: /images/og-image.png
 
 options: null
 

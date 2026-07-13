@@ -1,14 +1,14 @@
 meta:
   title: null
-  description: A fast, accessible static site template built with Astro and Alpine.js.
-  og_image: /og-default.png
+  description: An interactive academic calendar for the GPLLM program at the UofT Jackman faculty of law.
+  og_image: /images/og-image.png
 
 options: null
 
 content:
-  heading: Site Name
-  tagline: A minimal, opinionated starting point.
-  cta_primary: Get started
+  heading: UofT GPLLM Calendar
+  tagline: Interactive academic calendar for the GPLLM program.
+  cta_primary: View calendar
   cta_primary_href: "#"
   cta_secondary: Learn more
   cta_secondary_href: "#"

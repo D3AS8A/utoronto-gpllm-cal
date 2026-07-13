@@ -1,6 +1,6 @@
 name: UofT GPLLM Calendar
 tagline: 2026 — 2027 Global Professional LL.M. program calendar.
-description: Program calendar for the 2026 — 2027 academic year of the University of Toronto Faculty of Law Global Professional LL.M.
+description: An interactive academic calendar for the GPLLM program at the UofT Jackman faculty of law.
 url: https://example.com
 title_postfix: " — UofT GPLLM Calendar"
-og_image: /og-default.png
+og_image: /images/og-image.png
