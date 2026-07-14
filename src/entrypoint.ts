@@ -8,6 +8,7 @@
  */
 
 import type { Alpine } from 'alpinejs';
+import { createEvent, type DateArray } from 'ics';
 
 // Filter key → cats mapping. Mirrors FILTERS_CLASSES + FILTERS_EXAMS in
 // src/lib/calendar-data.ts. Kept in sync manually; small and easy to spot-check.
@@ -30,11 +31,67 @@ function vibrate(ms: number) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch { /* noop */ }
 }
 
+interface DetailItem {
+  name: string;
+  time: string;
+  swatchStyle: string;
+  /** Naive America/Toronto local ISO — null when the session has no set hours. */
+  isoStart: string | null;
+  isoEnd:   string | null;
+}
+
 interface CalendarDetail {
   weekday: string;
   dateLabel: string;
   headBg: string;
-  items: Array<{ name: string; time: string; swatchStyle: string }>;
+  items: DetailItem[];
+}
+
+/**
+ * America/Toronto DST cutovers within the program calendar range
+ * (Sep 2026 – Jul 2027). Events don't happen during the 2am transition
+ * window so this coarse date check is safe here.
+ */
+function torontoOffsetHours(dateStr: string): number {
+  return (dateStr >= '2026-11-01' && dateStr <= '2027-03-13') ? -5 : -4;
+}
+
+/** Naive Toronto-local ISO → UTC DateArray for the `ics` package. */
+function torontoToUtcArray(isoLocal: string): DateArray {
+  const dateStr = isoLocal.slice(0, 10);
+  const [y, mo, d] = dateStr.split('-').map(Number);
+  const [h, mi]    = isoLocal.slice(11, 16).split(':').map(Number);
+  const offset = torontoOffsetHours(dateStr);
+  // local = utc + offset  →  utc = local - offset  (offset is negative here)
+  const utc = new Date(Date.UTC(y, mo - 1, d, h - offset, mi));
+  return [
+    utc.getUTCFullYear(),
+    utc.getUTCMonth() + 1,
+    utc.getUTCDate(),
+    utc.getUTCHours(),
+    utc.getUTCMinutes(),
+  ];
+}
+
+/** "2026-09-08T18:00:00" → "20260908T180000" for Google Calendar's `dates=` param. */
+function toGcalStamp(iso: string): string {
+  return iso.replace(/[-:]/g, '').slice(0, 15);
+}
+
+function safeFilename(name: string): string {
+  return name.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'event';
+}
+
+function triggerDownload(text: string, filename: string) {
+  const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 200);
 }
 
 export default (Alpine: Alpine) => {
@@ -81,6 +138,41 @@ export default (Alpine: Alpine) => {
     openDetail(detail: CalendarDetail) {
       vibrate(9);
       this.detail = detail;
+    },
+
+    /** Google Calendar "add event" URL for one detail item. */
+    googleCalUrl(item: DetailItem): string | null {
+      if (!item.isoStart || !item.isoEnd) return null;
+      const params = new URLSearchParams({
+        action: 'TEMPLATE',
+        text: item.name,
+        dates: `${toGcalStamp(item.isoStart)}/${toGcalStamp(item.isoEnd)}`,
+        ctz: 'America/Toronto',
+        details: 'UofT GPLLM program calendar',
+      });
+      return `https://calendar.google.com/calendar/render?${params.toString()}`;
+    },
+
+    /** Generate a single-event .ics file and trigger a download. */
+    downloadIcs(item: DetailItem) {
+      if (!item.isoStart || !item.isoEnd) return;
+      vibrate(6);
+      createEvent({
+        start: torontoToUtcArray(item.isoStart),
+        end:   torontoToUtcArray(item.isoEnd),
+        startInputType:  'utc',
+        startOutputType: 'utc',
+        endInputType:    'utc',
+        endOutputType:   'utc',
+        title: item.name,
+        description: 'UofT GPLLM program calendar',
+        productId: 'utoronto-gpllm-cal/ics',
+        calName: 'UofT GPLLM Calendar',
+      }, (error, value) => {
+        if (error) { console.error('ics error', error); return; }
+        const day = item.isoStart!.slice(0, 10);
+        triggerDownload(value, `${day}-${safeFilename(item.name)}.ics`);
+      });
     },
   }));
 };

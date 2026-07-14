@@ -21,9 +21,24 @@
         <template x-for="item in detail.items" :key="item.name">
           <li class="detail-item">
             <span class="detail-item__swatch" :style="item.swatchStyle" aria-hidden="true"></span>
-            <div>
+            <div class="detail-item__body">
               <p class="detail-item__name" x-text="item.name"></p>
               <p class="detail-item__time" x-text="item.time"></p>
+              <div class="detail-item__cta" x-show="item.isoStart">
+                <span class="detail-item__cta-label">Add to:</span>
+                <a
+                  class="cta"
+                  target="_blank"
+                  rel="noopener"
+                  :href="googleCalUrl(item)"
+                >Google Cal</a>
+                <button
+                  type="button"
+                  class="cta"
+                  @click="downloadIcs(item)"
+                  title="Download an .ics file for Apple Calendar, Outlook, or any CalDAV client"
+                >Other Calendar</button>
+              </div>
             </div>
           </li>
         </template>
@@ -120,4 +135,53 @@
     color: var(--pablo);
     margin-top: 2px;
   }
+
+  .detail-item__body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+
+  .detail-item__cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+
+  .detail-item__cta-label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--driftwood);
+    font-weight: 700;
+  }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border: 1.5px solid var(--tana);
+    background: #fff;
+    color: var(--prussian-blue);
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.14s, background 0.14s, color 0.14s;
+  }
+
+  .cta:hover {
+    border-color: var(--matisse);
+    color: var(--matisse);
+  }
+
+  .cta:active { transform: scale(0.97); }
 </style>
