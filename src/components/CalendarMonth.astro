@@ -1,6 +1,9 @@
 ---
 import type { MonthDef } from '../lib/calendar-data';
-import { cellVisual, swatchStyle, weekdayName, calloutStyle, META } from '../lib/calendar-data';
+import {
+  cellVisual, swatchStyle, weekdayName, calloutStyle,
+  META, pickHours, fmtHours, toLocalIso,
+} from '../lib/calendar-data';
 
 interface Props {
   month: MonthDef;
@@ -41,10 +44,18 @@ type Cell = {
   hasMark: boolean;
   style: string;
   badge: '' | 'alrw' | 'dot';
+  ariaLabel: string;
   detail: null | {
     weekday: string;
     dateLabel: string;
-    items: Array<{ name: string; time: string; swatchStyle: string }>;
+    items: Array<{
+      name: string;
+      time: string;
+      swatchStyle: string;
+      /** Naive local ISO strings (America/Toronto assumed). Null when no hours. */
+      isoStart: string | null;
+      isoEnd: string | null;
+    }>;
     headBg: string;
   };
 };
@@ -54,7 +65,7 @@ for (let i = 0; i < rows * 7; i++) {
   const day = i - month.fdow + 1;
   const dow = i % 7;
   if (day < 1 || day > month.days) {
-    cells.push({ blank: true, num: null, iso: '', dow, cats: [], hasMark: false, style: '', badge: '', detail: null });
+    cells.push({ blank: true, num: null, iso: '', dow, cats: [], hasMark: false, style: '', badge: '', ariaLabel: '', detail: null });
     continue;
   }
   const cats = month.marks[day] || [];
@@ -63,29 +74,43 @@ for (let i = 0; i < rows * 7; i++) {
   const style =
     `background:${v.bg};color:${v.fg};border:${v.border};` +
     `font-weight:${v.isBold ? '800' : '600'};`;
+  const dateIso = iso(day);
+  const weekday = weekdayName(month.fdow, day);
 
   let detail: Cell['detail'] = null;
+  let ariaLabel = `${weekday}, ${month.name} ${day}`;
   if (hasMark) {
     const seen = new Set<string>();
-    const items: Array<{ name: string; time: string; swatchStyle: string }> = [];
+    const items: NonNullable<Cell['detail']>['items'] = [];
+    const ariaParts: string[] = [];
     for (const c of cats) {
       const key = c === 'intb' ? 'intc' : c;
       if (seen.has(key)) continue;
       seen.add(key);
       const m = META[c as keyof typeof META];
-      items.push({ name: m.name, time: m.time, swatchStyle: swatchStyle(m.t, m.c, 20) });
+      const specific = pickHours(m.hours, dow);
+      const time = specific ? fmtHours(specific) : m.time;
+      items.push({
+        name: m.name,
+        time,
+        swatchStyle: swatchStyle(m.t, m.c, 20),
+        isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
+        isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
+      });
+      ariaParts.push(specific ? `${m.name}, ${time}` : m.name);
     }
     const tone = cats.some((c) => ['fin', 'mid', 'finc'].includes(c))
       ? 'ink' : cats.some((c) => c === 'reg') ? 'blue' : 'brown';
     const headBg = tone === 'ink' ? '#002554' : tone === 'blue' ? '#1f6092' : '#936e42';
     detail = {
-      weekday: weekdayName(month.fdow, day),
+      weekday,
       dateLabel: `${month.name} ${day}`,
       items,
       headBg,
     };
+    ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaParts.join('; ')}`;
   }
-  cells.push({ blank: false, num: day, iso: iso(day), dow, cats, hasMark, style, badge: v.badge, detail });
+  cells.push({ blank: false, num: day, iso: dateIso, dow, cats, hasMark, style, badge: v.badge, ariaLabel, detail });
 }
 
 const callouts = month.callouts ?? [];
@@ -115,6 +140,7 @@ const headingId = `month-${monthIdx}-name`;
         class:list={['cell', 'cell--marked', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']}
         style={cell.style}
         data-cats={cell.cats.join(' ')}
+        aria-label={cell.ariaLabel}
         :class="{ 'is-dim': isDim($el.dataset.cats) }"
         @click={`openDetail(${JSON.stringify(cell.detail)})`}
       >

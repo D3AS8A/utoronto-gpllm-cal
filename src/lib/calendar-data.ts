@@ -7,28 +7,120 @@ export type CatKey =
 
 export type SwatchType = 'fill' | 'outline' | 'dashed' | 'circle' | 'alrw' | 'orient';
 
-export interface CatMeta {
-  name: string;
-  time: string;
-  t: SwatchType;
-  c: string;
+/** [hour 0-23, minute 0-59] — naive, timezone applied downstream. */
+export type HourMin = [number, number];
+export interface Hours { start: HourMin; end: HourMin }
+
+/**
+ * Per-day-of-week hours mapping. `pickHours()` matches most-specific first:
+ * fri/sat/sun beat weekday/weekend which beat `any`. Missing keys mean no
+ * scheduled time for that day (e.g. make-up classes are always TBD).
+ */
+export interface HoursByDow {
+  fri?: Hours;
+  sat?: Hours;
+  sun?: Hours;
+  weekday?: Hours;
+  weekend?: Hours;
+  any?: Hours;
 }
 
-export const META: Record<CatKey, CatMeta> = {
-  reg:    { name: 'Regular Classes',            time: 'Fri 4–9pm · Sat 8:30am–6:30pm',      t: 'fill',    c: '#1f6092' },
-  makeup: { name: 'Make-Up Class',              time: 'Rescheduled session',                t: 'fill',    c: '#bdc9d7' },
-  lmc:    { name: 'Legal Methods — Cdn Law',    time: '9:30am–4:30pm',                      t: 'fill',    c: '#af9b88' },
-  lmb:    { name: 'Legal Methods — Bus Law & ILT', time: '9:30am–4:30pm',                   t: 'fill',    c: '#936e42' },
-  alrw:   { name: 'ALRW Intensive — Cdn Law',   time: '9:30am–5:30pm',                      t: 'alrw',    c: '#002554' },
-  orient: { name: 'Orientation Evening',        time: '6:00–8:00pm',                        t: 'orient',  c: '#af9b88' },
-  intc:   { name: 'Intensive Course',           time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30', t: 'fill', c: '#e5d3a1' },
-  intb:   { name: 'Intensive Course',           time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30', t: 'fill', c: '#936e42' },
-  mid:    { name: 'Mid-Term Exam',              time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'outline', c: '#1f6092' },
-  dmid:   { name: 'Deferred Mid-Term Exam',     time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'circle',  c: '#70c7e9' },
-  fin:    { name: 'Final Exam',                 time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'outline', c: '#002554' },
-  finc:   { name: 'Final Exam — Cdn Law',       time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'dashed',  c: '#002554' },
-  dfin:   { name: 'Deferred Final Exam',        time: 'Weekdays 6–9pm · Weekends 1–4pm',    t: 'outline', c: '#70c7e9' },
+export interface CatMeta {
+  name: string;
+  time: string;   // human-readable description — the string shown pre-hours
+  t: SwatchType;
+  c: string;
+  hours: HoursByDow;
+}
+
+// Reused blocks
+const EXAM_HOURS: HoursByDow = {
+  weekday: { start: [18, 0], end: [21, 0] },
+  weekend: { start: [13, 0], end: [16, 0] },
 };
+
+const INTENSIVE_HOURS: HoursByDow = {
+  fri: { start: [16, 0], end: [21, 0] },
+  sat: { start: [8, 30], end: [17, 30] },
+  sun: { start: [9, 0], end: [13, 30] },
+};
+
+export const META: Record<CatKey, CatMeta> = {
+  reg: {
+    name: 'Regular Classes', time: 'Fri 4–9pm · Sat 8:30am–6:30pm',
+    t: 'fill', c: '#1f6092',
+    hours: {
+      fri: { start: [16, 0], end: [21, 0] },
+      sat: { start: [8, 30], end: [18, 30] },
+    },
+  },
+  makeup: {
+    name: 'Make-Up Class', time: 'Rescheduled session',
+    t: 'fill', c: '#bdc9d7',
+    hours: {},
+  },
+  lmc: {
+    name: 'Legal Methods — Cdn Law', time: '9:30am–4:30pm',
+    t: 'fill', c: '#af9b88',
+    hours: { any: { start: [9, 30], end: [16, 30] } },
+  },
+  lmb: {
+    name: 'Legal Methods — Bus Law & ILT', time: '9:30am–4:30pm',
+    t: 'fill', c: '#936e42',
+    hours: { any: { start: [9, 30], end: [16, 30] } },
+  },
+  alrw: {
+    name: 'ALRW Intensive — Cdn Law', time: '9:30am–5:30pm',
+    t: 'alrw', c: '#002554',
+    hours: { any: { start: [9, 30], end: [17, 30] } },
+  },
+  orient: {
+    name: 'Orientation Evening', time: '6:00–8:00pm',
+    t: 'orient', c: '#af9b88',
+    hours: { any: { start: [18, 0], end: [20, 0] } },
+  },
+  intc: {
+    name: 'Intensive Course', time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30',
+    t: 'fill', c: '#e5d3a1',
+    hours: INTENSIVE_HOURS,
+  },
+  intb: {
+    name: 'Intensive Course', time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30',
+    t: 'fill', c: '#936e42',
+    hours: INTENSIVE_HOURS,
+  },
+  mid:  { name: 'Mid-Term Exam',           time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#1f6092', hours: EXAM_HOURS },
+  dmid: { name: 'Deferred Mid-Term Exam',  time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'circle',  c: '#70c7e9', hours: EXAM_HOURS },
+  fin:  { name: 'Final Exam',              time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#002554', hours: EXAM_HOURS },
+  finc: { name: 'Final Exam — Cdn Law',    time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'dashed',  c: '#002554', hours: EXAM_HOURS },
+  dfin: { name: 'Deferred Final Exam',     time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#70c7e9', hours: EXAM_HOURS },
+};
+
+/** dow: 0=Sun … 6=Sat. Returns null when no rule matches (session has no set time). */
+export function pickHours(h: HoursByDow, dow: number): Hours | null {
+  if (dow === 5 && h.fri) return h.fri;
+  if (dow === 6 && h.sat) return h.sat;
+  if (dow === 0 && h.sun) return h.sun;
+  if ((dow === 0 || dow === 6) && h.weekend) return h.weekend;
+  if (dow >= 1 && dow <= 5 && h.weekday) return h.weekday;
+  return h.any ?? null;
+}
+
+/** 24h → 12h with am/pm; drops :00 minutes for compactness. */
+export function fmtTime([h, m]: HourMin): string {
+  const suffix = h >= 12 ? 'pm' : 'am';
+  const hh = h % 12 === 0 ? 12 : h % 12;
+  return m === 0 ? `${hh}${suffix}` : `${hh}:${String(m).padStart(2, '0')}${suffix}`;
+}
+
+export function fmtHours(h: Hours): string {
+  return `${fmtTime(h.start)}–${fmtTime(h.end)}`;
+}
+
+/** Naive local-time ISO stamp (no timezone offset). Consumer applies TZ. */
+export function toLocalIso(dateIso: string, [h, m]: HourMin): string {
+  return `${dateIso}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
+}
 
 export interface FilterDef {
   key: string;

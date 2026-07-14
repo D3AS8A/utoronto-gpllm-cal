@@ -2,7 +2,7 @@
 
 # UofT GPLLM Calendar
 
-![Graph image]](./public/images/gpllm-logo.png)
+<img src="/public/images/og-image.png" alt="graph image" width="500">
 
 A simple static website for the University of Toronto GPLLM program calendar. 
 
