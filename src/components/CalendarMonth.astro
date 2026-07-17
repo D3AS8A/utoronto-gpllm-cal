@@ -99,8 +99,9 @@ for (let i = 0; i < rows * 7; i++) {
       });
       ariaParts.push(specific ? `${m.name}, ${time}` : m.name);
     }
-    const tone = cats.some((c) => ['fin', 'mid', 'finc'].includes(c))
-      ? 'ink' : cats.some((c) => c === 'reg') ? 'blue' : 'brown';
+    const tone = cats.includes('reg') ? 'blue'
+      : cats.some((c) => ['fin', 'mid', 'finc', 'dmid', 'dfin'].includes(c)) ? 'ink'
+      : 'brown';
     const headBg = tone === 'ink' ? '#002554' : tone === 'blue' ? '#1f6092' : '#936e42';
     detail = {
       weekday,
