@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Update this URL to match your production domain
-Sitemap: https://example.com/sitemap-index.xml
+Sitemap: https://gpllm.pages.dev/sitemap-index.xml

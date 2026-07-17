@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
   // Set this to your production domain — required for sitemap + canonical URLs
-  site: 'https://foo.com',
+  site: 'https://gpllm.pages.dev',
 
   output: 'static',
 
