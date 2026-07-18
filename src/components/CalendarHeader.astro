@@ -32,7 +32,7 @@
 
   .cal-header__logos {
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
     gap: 16px;
     flex-wrap: wrap;
@@ -61,12 +61,17 @@
     flex-wrap: wrap;
   }
 
+  .cal-header__title-row hgroup {
+    margin: 0;
+  }
+
   .cal-header__year {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: clamp(10px, 1.1vw, 12px);
     letter-spacing: 0.24em;
     color: var(--driftwood);
     font-weight: 700;
+    margin: 0;
   }
 
   .cal-header__title {
@@ -74,7 +79,7 @@
     line-height: 0.95;
     letter-spacing: -0.015em;
     font-size: clamp(25px, 3.9vw, 39px);
-    margin-top: 6px;
+    margin: 6px 0 0;
     text-transform: uppercase;
     color: var(--prussian-blue);
   }
@@ -82,10 +87,11 @@
   .cal-header__desc {
     max-width: 520px;
     font-size: clamp(13px, 1.4vw, 14.5px);
-    line-height: 1.5;
+    line-height: 1.35;
     font-weight: 500;
     color: var(--oxford-blue);
-    padding-bottom: 4px;
+    margin: 3rem 0 -0.25rem;
+    align-self: flex-end;
   }
 
   .cal-header__desc strong {

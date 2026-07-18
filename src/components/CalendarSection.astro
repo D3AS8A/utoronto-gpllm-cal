@@ -55,12 +55,13 @@ const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 0;
   }
 
   .season__name {
     font-weight: 800;
     font-size: clamp(18px, 2.2vw, 24px);
-    line-height: 1;
+    line-height: 34px;
     letter-spacing: 0.01em;
     text-transform: uppercase;
     color: var(--prussian-blue);
@@ -70,10 +71,11 @@ const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
   .season__sub {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: clamp(10px, 1.1vw, 12px);
+    line-height: 34px;
     letter-spacing: 0.12em;
     color: #8a7f68;
     font-weight: 700;
-    margin-left: auto;
+    margin: 0 0 0 auto;
   }
 
   .season__grid {
