@@ -1,0 +1,162 @@
+---
+---
+<template x-if="tooltip">
+  <div
+    id="cal-tooltip"
+    class="cal-tt"
+    role="tooltip"
+    :style="`--tt-x:${tooltip.x}px;--tt-top:${tooltip.yTop}px;--tt-bottom:${tooltip.yBottom}px;--tt-head:${tooltip.detail.headBg}`"
+    :class="{ 'cal-tt--below': tooltip.yTop < 180 }"
+    @mouseenter="cancelHideTooltip()"
+    @mouseleave="hideTooltip(0)"
+    @click="openTooltipDetail()"
+  >
+    <p class="cal-tt__date">
+      <span x-text="tooltip.detail.weekday"></span>
+      <span class="cal-tt__sep" aria-hidden="true">·</span>
+      <span x-text="tooltip.detail.dateLabel"></span>
+    </p>
+    <ul class="cal-tt__list">
+      <template x-for="item in tooltip.detail.items" :key="item.name">
+        <li class="cal-tt__item">
+          <span class="cal-tt__swatch" :style="item.swatchStyle" aria-hidden="true"></span>
+          <span class="cal-tt__body">
+            <span class="cal-tt__name" x-text="item.name"></span>
+            <span class="cal-tt__time" x-text="item.time"></span>
+          </span>
+        </li>
+      </template>
+    </ul>
+    <p class="cal-tt__hint" aria-hidden="true">Click for details</p>
+  </div>
+</template>
+
+<style>
+  .cal-tt {
+    position: fixed;
+    left: var(--tt-x);
+    top: var(--tt-top);
+    transform: translate(-50%, calc(-100% - 10px));
+    z-index: 60;
+    min-width: 200px;
+    max-width: 280px;
+    background: #fff;
+    border: 1.5px solid var(--prussian-blue);
+    border-top: 4px solid var(--tt-head, var(--prussian-blue));
+    box-shadow: 0 6px 18px rgba(0, 37, 84, 0.16);
+    padding: 10px 12px 8px;
+    cursor: pointer;
+    pointer-events: auto;
+    animation: gpFade 0.12s ease;
+  }
+
+  /* Flip below the cell when the cell is near the top of the viewport. */
+  .cal-tt--below {
+    top: var(--tt-bottom);
+    transform: translate(-50%, 10px);
+  }
+
+  /* Small arrow pointing at the cell */
+  .cal-tt::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -7px;
+    transform: translateX(-50%) rotate(45deg);
+    width: 10px;
+    height: 10px;
+    background: #fff;
+    border-right: 1.5px solid var(--prussian-blue);
+    border-bottom: 1.5px solid var(--prussian-blue);
+  }
+
+  .cal-tt--below::after {
+    bottom: auto;
+    top: -7px;
+    border-right: none;
+    border-bottom: none;
+    border-left: 1.5px solid var(--prussian-blue);
+    border-top: 4px solid var(--tt-head, var(--prussian-blue));
+  }
+
+  .cal-tt__date {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--driftwood);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin: 0 0 6px;
+  }
+
+  .cal-tt__date > span:last-child {
+    color: var(--prussian-blue);
+    letter-spacing: 0.02em;
+  }
+
+  .cal-tt__sep { opacity: 0.5; }
+
+  .cal-tt__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .cal-tt__item {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .cal-tt__swatch {
+    display: block;
+    flex: none;
+    margin-top: 2px;
+  }
+
+  .cal-tt__body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .cal-tt__name {
+    font-weight: 700;
+    font-size: 13px;
+    line-height: 1.25;
+    color: var(--prussian-blue);
+  }
+
+  .cal-tt__time {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--pablo);
+    margin-top: 1px;
+  }
+
+  .cal-tt__hint {
+    margin: 8px 0 0;
+    padding-top: 6px;
+    border-top: 1px dashed var(--tana);
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--driftwood);
+    font-weight: 700;
+    text-align: center;
+  }
+
+  /* Desktop-only: hide on touch / coarse pointers and narrow viewports.
+     The showTooltip() method also gates on matchMedia — this is the visual
+     safety net. */
+  @media (hover: none), (pointer: coarse), (max-width: 719px) {
+    .cal-tt { display: none; }
+  }
+</style>

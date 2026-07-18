@@ -47,6 +47,17 @@ interface CalendarDetail {
   items: DetailItem[];
 }
 
+interface TooltipState {
+  iso: string;
+  detail: CalendarDetail;
+  /** Center-x of the source cell, viewport coords. */
+  x: number;
+  /** Top-y of the source cell, viewport coords. Tooltip renders above this. */
+  yTop: number;
+  /** Bottom-y of the source cell, for below-cell fallback when near top of viewport. */
+  yBottom: number;
+}
+
 /**
  * America/Toronto DST cutovers within the program calendar range
  * (Sep 2026 – Jul 2027). Events don't happen during the 2am transition
@@ -99,6 +110,16 @@ export default (Alpine: Alpine) => {
     filters: {} as Record<string, boolean>,
     rails: true,
     detail: null as CalendarDetail | null,
+    tooltip: null as TooltipState | null,
+    _ttHideTimer: 0 as ReturnType<typeof setTimeout> | 0,
+
+    init() {
+      // Fixed-position tooltip references cell viewport coords; drop it on
+      // any scroll/resize so it doesn't hang in a stale spot.
+      const drop = () => this.hideTooltip(0);
+      window.addEventListener('scroll', drop, { passive: true, capture: true });
+      window.addEventListener('resize', drop, { passive: true });
+    },
 
     get activeCats(): Set<string> {
       const s = new Set<string>();
@@ -138,6 +159,38 @@ export default (Alpine: Alpine) => {
     openDetail(detail: CalendarDetail) {
       vibrate(9);
       this.detail = detail;
+      this.tooltip = null;
+      if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
+    },
+
+    /**
+     * Fine-pointer hover / keyboard-focus preview. Skips touch and coarse
+     * pointers so mobile taps go straight to the modal instead of showing
+     * a tooltip that a finger can't hover.
+     */
+    showTooltip(iso: string, detail: CalendarDetail, rect: DOMRect) {
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
+      this.tooltip = {
+        iso, detail,
+        x: rect.left + rect.width / 2,
+        yTop: rect.top,
+        yBottom: rect.bottom,
+      };
+    },
+
+    hideTooltip(delay = 140) {
+      if (this._ttHideTimer) clearTimeout(this._ttHideTimer);
+      this._ttHideTimer = setTimeout(() => { this.tooltip = null; this._ttHideTimer = 0; }, delay);
+    },
+
+    cancelHideTooltip() {
+      if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
+    },
+
+    openTooltipDetail() {
+      if (!this.tooltip) return;
+      this.openDetail(this.tooltip.detail);
     },
 
     /** Google Calendar "add event" URL for one detail item. */

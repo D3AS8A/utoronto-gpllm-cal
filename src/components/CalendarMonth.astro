@@ -141,9 +141,15 @@ const headingId = `month-${monthIdx}-name`;
         class:list={['cell', 'cell--marked', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']}
         style={cell.style}
         data-cats={cell.cats.join(' ')}
+        data-iso={cell.iso}
         aria-label={cell.ariaLabel}
         :class="{ 'is-dim': isDim($el.dataset.cats) }"
+        :aria-describedby={`tooltip && tooltip.iso === '${cell.iso}' ? 'cal-tooltip' : null`}
         @click={`openDetail(${JSON.stringify(cell.detail)})`}
+        @mouseenter={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
+        @mouseleave="hideTooltip()"
+        @focus={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
+        @blur="hideTooltip(0)"
       >
         <time datetime={cell.iso}>{cell.num}</time>
         {cell.badge === 'alrw' && <span class="cell-badge cell-badge--alrw" aria-hidden="true"></span>}

@@ -6,6 +6,7 @@ import CalendarFooter from '../components/CalendarFooter.astro';
 import FilterBar from '../components/FilterBar.astro';
 import CalendarSection from '../components/CalendarSection.astro';
 import DetailModal from '../components/DetailModal.astro';
+import CalendarTooltip from '../components/CalendarTooltip.astro';
 
 const global = loadGlobal();
 const { meta } = loadPage('home');
@@ -31,7 +32,7 @@ const jsonLD = {
     :class="{ 'rails-on': rails, 'no-scroll': detail }"
     x-data="calendar"
     x-cloak
-    @keydown.escape.window="detail = null"
+    @keydown.escape.window="detail = null; tooltip = null"
   >
     <CalendarHeader />
 
@@ -46,6 +47,7 @@ const jsonLD = {
     <CalendarFooter />
 
     <DetailModal />
+    <CalendarTooltip />
   </div>
 </BaseLayout>
 
