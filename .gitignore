@@ -94,10 +94,13 @@ dist
 
 # IDE / Editor
 .idea
+.playwright*
 .editorconfig
-.claude
+.cursorrules
 .cursor
+.claude
 .vscode
+
 
 # Service worker
 sw.*

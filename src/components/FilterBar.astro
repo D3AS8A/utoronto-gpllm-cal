@@ -40,54 +40,58 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 
 <aside class="fb" role="toolbar" aria-label="Calendar filters">
   <div class="fb__inner">
-    <div class="fb__row" role="group" aria-labelledby="fb-classes-label">
-      <h2 id="fb-classes-label" class="fb__label">CLASSES</h2>
-      {classChips.map((c) => (
-        <button
-          type="button"
-          class="switch"
-          role="switch"
-          :class={`{ 'is-on': filters['${c.key}'] }`}
-          @click={`toggle('${c.key}')`}
-          :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
-        >
-          <span class="switch__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-          <span class="switch__label">{c.label}</span>
-          <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
-        </button>
-      ))}
+    <div class="fb__row">
+      <div class="fb__group" role="group" aria-labelledby="fb-classes-label">
+        <h2 id="fb-classes-label" class="fb__label">CLASSES</h2>
+        {classChips.map((c) => (
+          <button
+            type="button"
+            class="tog"
+            role="switch"
+            :class={`{ 'is-on': filters['${c.key}'] }`}
+            @click={`toggle('${c.key}')`}
+            :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
+          >
+            <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+            <span class="tog__label">{c.label}</span>
+            <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
+          </button>
+        ))}
+      </div>
     </div>
 
-    <div class="fb__row" role="group" aria-labelledby="fb-exams-label">
-      <h2 id="fb-exams-label" class="fb__label">EXAMS</h2>
-      {examChips.map((c) => (
-        <button
-          type="button"
-          class="switch"
-          role="switch"
-          :class={`{ 'is-on': filters['${c.key}'] }`}
-          @click={`toggle('${c.key}')`}
-          :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
-        >
-          <span class="switch__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-          <span class="switch__label">{c.label}</span>
-          <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
-        </button>
-      ))}
+    <div class="fb__row">
+      <div class="fb__group" role="group" aria-labelledby="fb-exams-label">
+        <h2 id="fb-exams-label" class="fb__label">EXAMS</h2>
+        {examChips.map((c) => (
+          <button
+            type="button"
+            class="tog"
+            role="switch"
+            :class={`{ 'is-on': filters['${c.key}'] }`}
+            @click={`toggle('${c.key}')`}
+            :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
+          >
+            <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+            <span class="tog__label">{c.label}</span>
+            <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
+          </button>
+        ))}
+      </div>
     </div>
 
     <div class="fb__row fb__row--ctl">
       <button
         type="button"
-        class="switch switch--wkd"
+        class="tog tog--wkd"
         role="switch"
         :class="{ 'is-on': rails }"
         @click="rails = !rails"
         :aria-checked="rails ? 'true' : 'false'"
       >
-        <span class="switch__swatch switch__swatch--wkd" aria-hidden="true"></span>
-        <span class="switch__label">Weekend shading</span>
-        <span class="switch__track" aria-hidden="true"><span class="switch__thumb"></span></span>
+        <span class="tog__swatch tog__swatch--wkd" aria-hidden="true"></span>
+        <span class="tog__label">Weekend shading</span>
+        <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
       </button>
 
       <button
@@ -135,19 +139,33 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     padding-top: 2px;
   }
 
+  .fb__group {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    padding: 4px 6px 4px 14px;
+    border: 1px solid rgba(0, 37, 84, 0.10);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
   .fb__label {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 10px;
+    line-height: 1;
     letter-spacing: 0.2em;
     color: var(--driftwood);
     font-weight: 700;
-    margin: 0 4px 0 0;
-    padding-left: 2px;
+    margin: 0 8px 0 0;
+    padding: 0;
+    white-space: nowrap;
+    align-self: center;
   }
 
   /* ---- Filter switch: [swatch] [label] [track+thumb] ---- */
 
-  .switch {
+  .tog {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -167,34 +185,34 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
       color 0.15s ease;
   }
 
-  .switch:hover {
+  .tog:hover {
     background: rgba(0, 37, 84, 0.04);
     border-color: rgba(0, 37, 84, 0.08);
   }
 
-  .switch:focus-visible {
+  .tog:focus-visible {
     outline: 2px solid var(--matisse);
     outline-offset: 2px;
   }
 
-  .switch.is-on {
+  .tog.is-on {
     background: rgba(0, 37, 84, 0.06);
     border-color: rgba(0, 37, 84, 0.12);
     font-weight: 700;
   }
 
-  .switch__swatch {
+  .tog__swatch {
     display: inline-block;
     flex: none;
     box-sizing: border-box;
   }
 
-  .switch__label {
+  .tog__label {
     white-space: nowrap;
     line-height: 1;
   }
 
-  .switch__track {
+  .tog__track {
     position: relative;
     display: inline-block;
     width: 26px;
@@ -205,7 +223,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     transition: background 0.18s ease;
   }
 
-  .switch__thumb {
+  .tog__thumb {
     position: absolute;
     top: 2px;
     left: 2px;
@@ -217,15 +235,15 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     transition: left 0.18s ease;
   }
 
-  .switch.is-on .switch__track {
+  .tog.is-on .tog__track {
     background: var(--prussian-blue);
   }
 
-  .switch.is-on .switch__thumb {
+  .tog.is-on .tog__thumb {
     left: 14px;
   }
 
-  .switch__swatch--wkd {
+  .tog__swatch--wkd {
     width: 14px;
     height: 14px;
     background: var(--porcelain);
