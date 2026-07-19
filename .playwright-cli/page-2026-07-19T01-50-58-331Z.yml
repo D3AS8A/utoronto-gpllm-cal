@@ -1,0 +1,985 @@
+- generic [active] [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+  - generic [ref=e3]:
+    - banner [ref=e4]:
+      - generic [ref=e5]:
+        - img "GPLLM" [ref=e6]
+        - img "Henry N.R. Jackman Faculty of Law, University of Toronto" [ref=e7]
+      - generic [ref=e8]:
+        - generic [ref=e9]:
+          - paragraph [ref=e10]:
+            - time [ref=e11]: 2026 — 2027 ACADEMIC YEAR
+          - heading "Program Calendar" [level=1] [ref=e12]
+        - paragraph [ref=e13]:
+          - text: Regular classes take place on
+          - strong [ref=e14]: Friday evenings
+          - text: (4–9pm) and
+          - strong [ref=e15]: Saturdays
+          - text: (8:30am–6:30pm). Select any coloured date for details, or open the key to filter by session type.
+    - toolbar "Calendar filters" [ref=e16]:
+      - generic [ref=e17]:
+        - group "CLASSES" [ref=e18]:
+          - heading "CLASSES" [level=2] [ref=e19]
+          - button "Regular" [ref=e20] [cursor=pointer]:
+            - generic [ref=e22]: Regular
+          - button "Make-Up" [ref=e23] [cursor=pointer]:
+            - generic [ref=e25]: Make-Up
+          - button "LM · Cdn" [ref=e26] [cursor=pointer]:
+            - generic [ref=e28]: LM · Cdn
+          - button "LM · Bus" [ref=e29] [cursor=pointer]:
+            - generic [ref=e31]: LM · Bus
+          - button "ALRW" [ref=e32] [cursor=pointer]:
+            - generic [ref=e34]: ALRW
+          - button "Orient." [ref=e35] [cursor=pointer]:
+            - generic [ref=e37]: Orient.
+          - button "Intensive" [ref=e38] [cursor=pointer]:
+            - generic [ref=e40]: Intensive
+        - group "EXAMS" [ref=e41]:
+          - heading "EXAMS" [level=2] [ref=e42]
+          - button "Mid-Term" [ref=e43] [cursor=pointer]:
+            - generic [ref=e45]: Mid-Term
+          - button "Def. Mid" [ref=e46] [cursor=pointer]:
+            - generic [ref=e48]: Def. Mid
+          - button "Final" [ref=e49] [cursor=pointer]:
+            - generic [ref=e51]: Final
+          - button "Final · Cdn" [ref=e52] [cursor=pointer]:
+            - generic [ref=e54]: Final · Cdn
+          - button "Def. Final" [ref=e55] [cursor=pointer]:
+            - generic [ref=e57]: Def. Final
+        - button "Weekend shading" [pressed] [ref=e59] [cursor=pointer]:
+          - generic [ref=e61]: Weekend shading
+    - main [ref=e62]:
+      - region "Fall" [ref=e63]:
+        - generic [ref=e64]:
+          - paragraph [ref=e65]: "01"
+          - heading "Fall" [level=2] [ref=e66]
+          - paragraph [ref=e67]: September – December 2026
+        - generic [ref=e68]:
+          - article "September 2026" [ref=e69]:
+            - heading "September 2026" [level=3] [ref=e71]:
+              - generic [ref=e72]: September
+              - time [ref=e73]: "2026"
+            - row [ref=e74]:
+              - generic [ref=e75]: S
+              - generic [ref=e76]: M
+              - generic [ref=e77]: T
+              - generic [ref=e78]: W
+              - generic [ref=e79]: T
+              - generic [ref=e80]: F
+              - generic [ref=e81]: S
+            - grid "September 2026" [ref=e82]:
+              - gridcell [ref=e83]
+              - gridcell [ref=e84]
+              - gridcell "1" [ref=e85]:
+                - time [ref=e86]: "1"
+              - gridcell "2" [ref=e87]:
+                - time [ref=e88]: "2"
+              - gridcell "3" [ref=e89]:
+                - time [ref=e90]: "3"
+              - gridcell "4" [ref=e91]:
+                - time [ref=e92]: "4"
+              - gridcell "5" [ref=e93]:
+                - time [ref=e94]: "5"
+              - gridcell "6" [ref=e95]:
+                - time [ref=e96]: "6"
+              - gridcell "7" [ref=e97]:
+                - time [ref=e98]: "7"
+              - button "Tuesday, September 8 — Orientation Evening, 6pm–8pm" [ref=e99] [cursor=pointer]:
+                - time [ref=e100]: "8"
+              - button "Wednesday, September 9 — Orientation Evening, 6pm–8pm" [ref=e101] [cursor=pointer]:
+                - time [ref=e102]: "9"
+              - button "Thursday, September 10 — Legal Methods — Cdn Law, 9:30am–4:30pm" [ref=e103] [cursor=pointer]:
+                - time [ref=e104]: "10"
+              - button "Friday, September 11 — Legal Methods — Cdn Law, 9:30am–4:30pm" [ref=e105] [cursor=pointer]:
+                - time [ref=e106]: "11"
+              - button "Saturday, September 12 — Legal Methods — Bus Law & ILT, 9:30am–4:30pm; ALRW Intensive — Cdn Law, 9:30am–5:30pm" [ref=e107] [cursor=pointer]:
+                - time [ref=e108]: "12"
+              - button "Sunday, September 13 — Legal Methods — Bus Law & ILT, 9:30am–4:30pm; ALRW Intensive — Cdn Law, 9:30am–5:30pm" [ref=e110] [cursor=pointer]:
+                - time [ref=e111]: "13"
+              - gridcell "14" [ref=e113]:
+                - time [ref=e114]: "14"
+              - gridcell "15" [ref=e115]:
+                - time [ref=e116]: "15"
+              - gridcell "16" [ref=e117]:
+                - time [ref=e118]: "16"
+              - button "Thursday, September 17 — Legal Methods — Cdn Law, 9:30am–4:30pm" [ref=e119] [cursor=pointer]:
+                - time [ref=e120]: "17"
+              - button "Friday, September 18 — Legal Methods — Cdn Law, 9:30am–4:30pm" [ref=e121] [cursor=pointer]:
+                - time [ref=e122]: "18"
+              - button "Saturday, September 19 — Legal Methods — Bus Law & ILT, 9:30am–4:30pm; ALRW Intensive — Cdn Law, 9:30am–5:30pm" [ref=e123] [cursor=pointer]:
+                - time [ref=e124]: "19"
+              - button "Sunday, September 20 — Legal Methods — Bus Law & ILT, 9:30am–4:30pm; ALRW Intensive — Cdn Law, 9:30am–5:30pm" [ref=e126] [cursor=pointer]:
+                - time [ref=e127]: "20"
+              - gridcell "21" [ref=e129]:
+                - time [ref=e130]: "21"
+              - gridcell "22" [ref=e131]:
+                - time [ref=e132]: "22"
+              - gridcell "23" [ref=e133]:
+                - time [ref=e134]: "23"
+              - gridcell "24" [ref=e135]:
+                - time [ref=e136]: "24"
+              - button "Friday, September 25 — Regular Classes, 4pm–9pm" [ref=e137] [cursor=pointer]:
+                - time [ref=e138]: "25"
+              - button "Saturday, September 26 — Regular Classes, 8:30am–6:30pm" [ref=e139] [cursor=pointer]:
+                - time [ref=e140]: "26"
+              - gridcell "27" [ref=e141]:
+                - time [ref=e142]: "27"
+              - gridcell "28" [ref=e143]:
+                - time [ref=e144]: "28"
+              - gridcell "29" [ref=e145]:
+                - time [ref=e146]: "29"
+              - gridcell "30" [ref=e147]:
+                - time [ref=e148]: "30"
+              - gridcell [ref=e149]
+              - gridcell [ref=e150]
+              - gridcell [ref=e151]
+            - complementary [ref=e152]:
+              - paragraph [ref=e153]: Orientation Evenings
+              - paragraph [ref=e154]: Cdn Law — Sept 8, 6:00–8:00pm · Bus Law & ILT — Sept 9, 6:00–8:00pm
+          - article "October 2026" [ref=e155]:
+            - heading "October 2026" [level=3] [ref=e157]:
+              - generic [ref=e158]: October
+              - time [ref=e159]: "2026"
+            - row [ref=e160]:
+              - generic [ref=e161]: S
+              - generic [ref=e162]: M
+              - generic [ref=e163]: T
+              - generic [ref=e164]: W
+              - generic [ref=e165]: T
+              - generic [ref=e166]: F
+              - generic [ref=e167]: S
+            - grid "October 2026" [ref=e168]:
+              - gridcell [ref=e169]
+              - gridcell [ref=e170]
+              - gridcell [ref=e171]
+              - gridcell [ref=e172]
+              - gridcell "1" [ref=e173]:
+                - time [ref=e174]: "1"
+              - button "Friday, October 2 — Regular Classes, 4pm–9pm" [ref=e175] [cursor=pointer]:
+                - time [ref=e176]: "2"
+              - button "Saturday, October 3 — Regular Classes, 8:30am–6:30pm" [ref=e177] [cursor=pointer]:
+                - time [ref=e178]: "3"
+              - button "Sunday, October 4 — Make-Up Class" [ref=e179] [cursor=pointer]:
+                - time [ref=e180]: "4"
+              - gridcell "5" [ref=e181]:
+                - time [ref=e182]: "5"
+              - gridcell "6" [ref=e183]:
+                - time [ref=e184]: "6"
+              - gridcell "7" [ref=e185]:
+                - time [ref=e186]: "7"
+              - gridcell "8" [ref=e187]:
+                - time [ref=e188]: "8"
+              - gridcell "9" [ref=e189]:
+                - time [ref=e190]: "9"
+              - gridcell "10" [ref=e191]:
+                - time [ref=e192]: "10"
+              - gridcell "11" [ref=e193]:
+                - time [ref=e194]: "11"
+              - gridcell "12" [ref=e195]:
+                - time [ref=e196]: "12"
+              - gridcell "13" [ref=e197]:
+                - time [ref=e198]: "13"
+              - gridcell "14" [ref=e199]:
+                - time [ref=e200]: "14"
+              - gridcell "15" [ref=e201]:
+                - time [ref=e202]: "15"
+              - button "Friday, October 16 — Regular Classes, 4pm–9pm" [ref=e203] [cursor=pointer]:
+                - time [ref=e204]: "16"
+              - button "Saturday, October 17 — Regular Classes, 8:30am–6:30pm" [ref=e205] [cursor=pointer]:
+                - time [ref=e206]: "17"
+              - gridcell "18" [ref=e207]:
+                - time [ref=e208]: "18"
+              - gridcell "19" [ref=e209]:
+                - time [ref=e210]: "19"
+              - gridcell "20" [ref=e211]:
+                - time [ref=e212]: "20"
+              - gridcell "21" [ref=e213]:
+                - time [ref=e214]: "21"
+              - gridcell "22" [ref=e215]:
+                - time [ref=e216]: "22"
+              - button "Friday, October 23 — Regular Classes, 4pm–9pm" [ref=e217] [cursor=pointer]:
+                - time [ref=e218]: "23"
+              - button "Saturday, October 24 — Regular Classes, 8:30am–6:30pm" [ref=e219] [cursor=pointer]:
+                - time [ref=e220]: "24"
+              - button "Sunday, October 25 — Make-Up Class" [ref=e221] [cursor=pointer]:
+                - time [ref=e222]: "25"
+              - gridcell "26" [ref=e223]:
+                - time [ref=e224]: "26"
+              - gridcell "27" [ref=e225]:
+                - time [ref=e226]: "27"
+              - gridcell "28" [ref=e227]:
+                - time [ref=e228]: "28"
+              - gridcell "29" [ref=e229]:
+                - time [ref=e230]: "29"
+              - gridcell "30" [ref=e231]:
+                - time [ref=e232]: "30"
+              - button "Saturday, October 31 — Mid-Term Exam, 1pm–4pm" [ref=e233] [cursor=pointer]:
+                - time [ref=e234]: "31"
+          - article "November 2026" [ref=e235]:
+            - heading "November 2026" [level=3] [ref=e237]:
+              - generic [ref=e238]: November
+              - time [ref=e239]: "2026"
+            - row [ref=e240]:
+              - generic [ref=e241]: S
+              - generic [ref=e242]: M
+              - generic [ref=e243]: T
+              - generic [ref=e244]: W
+              - generic [ref=e245]: T
+              - generic [ref=e246]: F
+              - generic [ref=e247]: S
+            - grid "November 2026" [ref=e248]:
+              - button "Sunday, November 1 — Mid-Term Exam, 1pm–4pm" [ref=e249] [cursor=pointer]:
+                - time [ref=e250]: "1"
+              - gridcell "2" [ref=e251]:
+                - time [ref=e252]: "2"
+              - gridcell "3" [ref=e253]:
+                - time [ref=e254]: "3"
+              - gridcell "4" [ref=e255]:
+                - time [ref=e256]: "4"
+              - button "Thursday, November 5 — Mid-Term Exam, 6pm–9pm" [ref=e257] [cursor=pointer]:
+                - time [ref=e258]: "5"
+              - button "Friday, November 6 — Regular Classes, 4pm–9pm; Deferred Mid-Term Exam, 6pm–9pm" [ref=e259] [cursor=pointer]:
+                - time [ref=e260]: "6"
+              - button "Saturday, November 7 — Regular Classes, 8:30am–6:30pm" [ref=e262] [cursor=pointer]:
+                - time [ref=e263]: "7"
+              - button "Sunday, November 8 — Make-Up Class" [ref=e264] [cursor=pointer]:
+                - time [ref=e265]: "8"
+              - gridcell "9" [ref=e266]:
+                - time [ref=e267]: "9"
+              - gridcell "10" [ref=e268]:
+                - time [ref=e269]: "10"
+              - gridcell "11" [ref=e270]:
+                - time [ref=e271]: "11"
+              - gridcell "12" [ref=e272]:
+                - time [ref=e273]: "12"
+              - button "Friday, November 13 — Deferred Mid-Term Exam, 6pm–9pm" [ref=e274] [cursor=pointer]:
+                - time [ref=e275]: "13"
+              - gridcell "14" [ref=e276]:
+                - time [ref=e277]: "14"
+              - gridcell "15" [ref=e278]:
+                - time [ref=e279]: "15"
+              - gridcell "16" [ref=e280]:
+                - time [ref=e281]: "16"
+              - gridcell "17" [ref=e282]:
+                - time [ref=e283]: "17"
+              - gridcell "18" [ref=e284]:
+                - time [ref=e285]: "18"
+              - gridcell "19" [ref=e286]:
+                - time [ref=e287]: "19"
+              - button "Friday, November 20 — Regular Classes, 4pm–9pm" [ref=e288] [cursor=pointer]:
+                - time [ref=e289]: "20"
+              - button "Saturday, November 21 — Regular Classes, 8:30am–6:30pm" [ref=e290] [cursor=pointer]:
+                - time [ref=e291]: "21"
+              - gridcell "22" [ref=e292]:
+                - time [ref=e293]: "22"
+              - gridcell "23" [ref=e294]:
+                - time [ref=e295]: "23"
+              - gridcell "24" [ref=e296]:
+                - time [ref=e297]: "24"
+              - gridcell "25" [ref=e298]:
+                - time [ref=e299]: "25"
+              - gridcell "26" [ref=e300]:
+                - time [ref=e301]: "26"
+              - gridcell "27" [ref=e302]:
+                - time [ref=e303]: "27"
+              - button "Saturday, November 28 — Mid-Term Exam, 1pm–4pm" [ref=e304] [cursor=pointer]:
+                - time [ref=e305]: "28"
+              - button "Sunday, November 29 — Mid-Term Exam, 1pm–4pm" [ref=e306] [cursor=pointer]:
+                - time [ref=e307]: "29"
+              - gridcell "30" [ref=e308]:
+                - time [ref=e309]: "30"
+              - gridcell [ref=e310]
+              - gridcell [ref=e311]
+              - gridcell [ref=e312]
+              - gridcell [ref=e313]
+              - gridcell [ref=e314]
+          - article "December 2026" [ref=e315]:
+            - heading "December 2026" [level=3] [ref=e317]:
+              - generic [ref=e318]: December
+              - time [ref=e319]: "2026"
+            - row [ref=e320]:
+              - generic [ref=e321]: S
+              - generic [ref=e322]: M
+              - generic [ref=e323]: T
+              - generic [ref=e324]: W
+              - generic [ref=e325]: T
+              - generic [ref=e326]: F
+              - generic [ref=e327]: S
+            - grid "December 2026" [ref=e328]:
+              - gridcell [ref=e329]
+              - gridcell [ref=e330]
+              - gridcell "1" [ref=e331]:
+                - time [ref=e332]: "1"
+              - gridcell "2" [ref=e333]:
+                - time [ref=e334]: "2"
+              - button "Thursday, December 3 — Final Exam, 6pm–9pm" [ref=e335] [cursor=pointer]:
+                - time [ref=e336]: "3"
+              - button "Friday, December 4 — Intensive Course, 4pm–9pm" [ref=e337] [cursor=pointer]:
+                - time [ref=e338]: "4"
+              - button "Saturday, December 5 — Intensive Course, 8:30am–5:30pm; Final Exam — Cdn Law, 1pm–4pm" [ref=e339] [cursor=pointer]:
+                - time [ref=e340]: "5"
+              - button "Sunday, December 6 — Intensive Course, 9am–1:30pm; Final Exam — Cdn Law, 1pm–4pm" [ref=e341] [cursor=pointer]:
+                - time [ref=e342]: "6"
+              - gridcell "7" [ref=e343]:
+                - time [ref=e344]: "7"
+              - gridcell "8" [ref=e345]:
+                - time [ref=e346]: "8"
+              - gridcell "9" [ref=e347]:
+                - time [ref=e348]: "9"
+              - button "Thursday, December 10 — Deferred Final Exam, 6pm–9pm" [ref=e349] [cursor=pointer]:
+                - time [ref=e350]: "10"
+              - button "Friday, December 11 — Intensive Course, 4pm–9pm" [ref=e351] [cursor=pointer]:
+                - time [ref=e352]: "11"
+              - button "Saturday, December 12 — Intensive Course, 8:30am–5:30pm" [ref=e353] [cursor=pointer]:
+                - time [ref=e354]: "12"
+              - button "Sunday, December 13 — Intensive Course, 9am–1:30pm" [ref=e355] [cursor=pointer]:
+                - time [ref=e356]: "13"
+              - gridcell "14" [ref=e357]:
+                - time [ref=e358]: "14"
+              - gridcell "15" [ref=e359]:
+                - time [ref=e360]: "15"
+              - gridcell "16" [ref=e361]:
+                - time [ref=e362]: "16"
+              - button "Thursday, December 17 — Deferred Final Exam, 6pm–9pm" [ref=e363] [cursor=pointer]:
+                - time [ref=e364]: "17"
+              - button "Friday, December 18 — Intensive Course, 4pm–9pm" [ref=e365] [cursor=pointer]:
+                - time [ref=e366]: "18"
+              - button "Saturday, December 19 — Intensive Course, 8:30am–5:30pm" [ref=e367] [cursor=pointer]:
+                - time [ref=e368]: "19"
+              - gridcell "20" [ref=e369]:
+                - time [ref=e370]: "20"
+              - gridcell "21" [ref=e371]:
+                - time [ref=e372]: "21"
+              - gridcell "22" [ref=e373]:
+                - time [ref=e374]: "22"
+              - gridcell "23" [ref=e375]:
+                - time [ref=e376]: "23"
+              - gridcell "24" [ref=e377]:
+                - time [ref=e378]: "24"
+              - gridcell "25" [ref=e379]:
+                - time [ref=e380]: "25"
+              - gridcell "26" [ref=e381]:
+                - time [ref=e382]: "26"
+              - gridcell "27" [ref=e383]:
+                - time [ref=e384]: "27"
+              - gridcell "28" [ref=e385]:
+                - time [ref=e386]: "28"
+              - gridcell "29" [ref=e387]:
+                - time [ref=e388]: "29"
+              - gridcell "30" [ref=e389]:
+                - time [ref=e390]: "30"
+              - gridcell "31" [ref=e391]:
+                - time [ref=e392]: "31"
+              - gridcell [ref=e393]
+              - gridcell [ref=e394]
+            - complementary [ref=e395]:
+              - paragraph [ref=e396]: December Intensive 1 & 2
+              - paragraph [ref=e397]: Intensives 1 & 2 overlap. Some dates to be released — please hold for now.
+      - region "Winter" [ref=e398]:
+        - generic [ref=e399]:
+          - paragraph [ref=e400]: "02"
+          - heading "Winter" [level=2] [ref=e401]
+          - paragraph [ref=e402]: January – April 2027
+        - generic [ref=e403]:
+          - article "January 2027" [ref=e404]:
+            - heading "January 2027" [level=3] [ref=e406]:
+              - generic [ref=e407]: January
+              - time [ref=e408]: "2027"
+            - row [ref=e409]:
+              - generic [ref=e410]: S
+              - generic [ref=e411]: M
+              - generic [ref=e412]: T
+              - generic [ref=e413]: W
+              - generic [ref=e414]: T
+              - generic [ref=e415]: F
+              - generic [ref=e416]: S
+            - grid "January 2027" [ref=e417]:
+              - gridcell [ref=e418]
+              - gridcell [ref=e419]
+              - gridcell [ref=e420]
+              - gridcell [ref=e421]
+              - gridcell [ref=e422]
+              - gridcell "1" [ref=e423]:
+                - time [ref=e424]: "1"
+              - gridcell "2" [ref=e425]:
+                - time [ref=e426]: "2"
+              - gridcell "3" [ref=e427]:
+                - time [ref=e428]: "3"
+              - gridcell "4" [ref=e429]:
+                - time [ref=e430]: "4"
+              - gridcell "5" [ref=e431]:
+                - time [ref=e432]: "5"
+              - gridcell "6" [ref=e433]:
+                - time [ref=e434]: "6"
+              - gridcell "7" [ref=e435]:
+                - time [ref=e436]: "7"
+              - button "Friday, January 8 — Regular Classes, 4pm–9pm" [ref=e437] [cursor=pointer]:
+                - time [ref=e438]: "8"
+              - button "Saturday, January 9 — Regular Classes, 8:30am–6:30pm" [ref=e439] [cursor=pointer]:
+                - time [ref=e440]: "9"
+              - button "Sunday, January 10 — Final Exam, 1pm–4pm" [ref=e441] [cursor=pointer]:
+                - time [ref=e442]: "10"
+              - gridcell "11" [ref=e443]:
+                - time [ref=e444]: "11"
+              - gridcell "12" [ref=e445]:
+                - time [ref=e446]: "12"
+              - gridcell "13" [ref=e447]:
+                - time [ref=e448]: "13"
+              - gridcell "14" [ref=e449]:
+                - time [ref=e450]: "14"
+              - gridcell "15" [ref=e451]:
+                - time [ref=e452]: "15"
+              - gridcell "16" [ref=e453]:
+                - time [ref=e454]: "16"
+              - gridcell "17" [ref=e455]:
+                - time [ref=e456]: "17"
+              - gridcell "18" [ref=e457]:
+                - time [ref=e458]: "18"
+              - gridcell "19" [ref=e459]:
+                - time [ref=e460]: "19"
+              - gridcell "20" [ref=e461]:
+                - time [ref=e462]: "20"
+              - gridcell "21" [ref=e463]:
+                - time [ref=e464]: "21"
+              - button "Friday, January 22 — Regular Classes, 4pm–9pm" [ref=e465] [cursor=pointer]:
+                - time [ref=e466]: "22"
+              - button "Saturday, January 23 — Regular Classes, 8:30am–6:30pm" [ref=e467] [cursor=pointer]:
+                - time [ref=e468]: "23"
+              - button "Sunday, January 24 — Make-Up Class" [ref=e469] [cursor=pointer]:
+                - time [ref=e470]: "24"
+              - gridcell "25" [ref=e471]:
+                - time [ref=e472]: "25"
+              - gridcell "26" [ref=e473]:
+                - time [ref=e474]: "26"
+              - gridcell "27" [ref=e475]:
+                - time [ref=e476]: "27"
+              - gridcell "28" [ref=e477]:
+                - time [ref=e478]: "28"
+              - gridcell "29" [ref=e479]:
+                - time [ref=e480]: "29"
+              - gridcell "30" [ref=e481]:
+                - time [ref=e482]: "30"
+              - gridcell "31" [ref=e483]:
+                - time [ref=e484]: "31"
+              - gridcell [ref=e485]
+              - gridcell [ref=e486]
+              - gridcell [ref=e487]
+              - gridcell [ref=e488]
+              - gridcell [ref=e489]
+              - gridcell [ref=e490]
+            - complementary [ref=e491]:
+              - paragraph [ref=e492]: Intensive Final Exam
+              - paragraph [ref=e493]: January 10.
+          - article "February 2027" [ref=e494]:
+            - heading "February 2027" [level=3] [ref=e496]:
+              - generic [ref=e497]: February
+              - time [ref=e498]: "2027"
+            - row [ref=e499]:
+              - generic [ref=e500]: S
+              - generic [ref=e501]: M
+              - generic [ref=e502]: T
+              - generic [ref=e503]: W
+              - generic [ref=e504]: T
+              - generic [ref=e505]: F
+              - generic [ref=e506]: S
+            - grid "February 2027" [ref=e507]:
+              - gridcell [ref=e508]
+              - gridcell "1" [ref=e509]:
+                - time [ref=e510]: "1"
+              - gridcell "2" [ref=e511]:
+                - time [ref=e512]: "2"
+              - gridcell "3" [ref=e513]:
+                - time [ref=e514]: "3"
+              - gridcell "4" [ref=e515]:
+                - time [ref=e516]: "4"
+              - button "Friday, February 5 — Regular Classes, 4pm–9pm" [ref=e517] [cursor=pointer]:
+                - time [ref=e518]: "5"
+              - button "Saturday, February 6 — Regular Classes, 8:30am–6:30pm" [ref=e519] [cursor=pointer]:
+                - time [ref=e520]: "6"
+              - gridcell "7" [ref=e521]:
+                - time [ref=e522]: "7"
+              - gridcell "8" [ref=e523]:
+                - time [ref=e524]: "8"
+              - gridcell "9" [ref=e525]:
+                - time [ref=e526]: "9"
+              - gridcell "10" [ref=e527]:
+                - time [ref=e528]: "10"
+              - gridcell "11" [ref=e529]:
+                - time [ref=e530]: "11"
+              - gridcell "12" [ref=e531]:
+                - time [ref=e532]: "12"
+              - gridcell "13" [ref=e533]:
+                - time [ref=e534]: "13"
+              - gridcell "14" [ref=e535]:
+                - time [ref=e536]: "14"
+              - gridcell "15" [ref=e537]:
+                - time [ref=e538]: "15"
+              - gridcell "16" [ref=e539]:
+                - time [ref=e540]: "16"
+              - gridcell "17" [ref=e541]:
+                - time [ref=e542]: "17"
+              - gridcell "18" [ref=e543]:
+                - time [ref=e544]: "18"
+              - button "Friday, February 19 — Mid-Term Exam, 6pm–9pm" [ref=e545] [cursor=pointer]:
+                - time [ref=e546]: "19"
+              - button "Saturday, February 20 — Mid-Term Exam, 1pm–4pm" [ref=e547] [cursor=pointer]:
+                - time [ref=e548]: "20"
+              - button "Sunday, February 21 — Mid-Term Exam, 1pm–4pm" [ref=e549] [cursor=pointer]:
+                - time [ref=e550]: "21"
+              - gridcell "22" [ref=e551]:
+                - time [ref=e552]: "22"
+              - gridcell "23" [ref=e553]:
+                - time [ref=e554]: "23"
+              - gridcell "24" [ref=e555]:
+                - time [ref=e556]: "24"
+              - gridcell "25" [ref=e557]:
+                - time [ref=e558]: "25"
+              - button "Friday, February 26 — Deferred Mid-Term Exam, 6pm–9pm" [ref=e559] [cursor=pointer]:
+                - time [ref=e560]: "26"
+              - button "Saturday, February 27 — Regular Classes, 8:30am–6:30pm" [ref=e561] [cursor=pointer]:
+                - time [ref=e562]: "27"
+              - button "Sunday, February 28 — Make-Up Class" [ref=e563] [cursor=pointer]:
+                - time [ref=e564]: "28"
+              - gridcell [ref=e565]
+              - gridcell [ref=e566]
+              - gridcell [ref=e567]
+              - gridcell [ref=e568]
+              - gridcell [ref=e569]
+              - gridcell [ref=e570]
+          - article "March 2027" [ref=e571]:
+            - heading "March 2027" [level=3] [ref=e573]:
+              - generic [ref=e574]: March
+              - time [ref=e575]: "2027"
+            - row [ref=e576]:
+              - generic [ref=e577]: S
+              - generic [ref=e578]: M
+              - generic [ref=e579]: T
+              - generic [ref=e580]: W
+              - generic [ref=e581]: T
+              - generic [ref=e582]: F
+              - generic [ref=e583]: S
+            - grid "March 2027" [ref=e584]:
+              - gridcell [ref=e585]
+              - gridcell "1" [ref=e586]:
+                - time [ref=e587]: "1"
+              - gridcell "2" [ref=e588]:
+                - time [ref=e589]: "2"
+              - gridcell "3" [ref=e590]:
+                - time [ref=e591]: "3"
+              - gridcell "4" [ref=e592]:
+                - time [ref=e593]: "4"
+              - button "Friday, March 5 — Regular Classes, 4pm–9pm; Deferred Mid-Term Exam, 6pm–9pm" [ref=e594] [cursor=pointer]:
+                - time [ref=e595]: "5"
+              - button "Saturday, March 6 — Regular Classes, 8:30am–6:30pm" [ref=e597] [cursor=pointer]:
+                - time [ref=e598]: "6"
+              - button "Sunday, March 7 — Deferred Mid-Term Exam, 1pm–4pm" [ref=e599] [cursor=pointer]:
+                - time [ref=e600]: "7"
+              - gridcell "8" [ref=e601]:
+                - time [ref=e602]: "8"
+              - gridcell "9" [ref=e603]:
+                - time [ref=e604]: "9"
+              - gridcell "10" [ref=e605]:
+                - time [ref=e606]: "10"
+              - gridcell "11" [ref=e607]:
+                - time [ref=e608]: "11"
+              - gridcell "12" [ref=e609]:
+                - time [ref=e610]: "12"
+              - gridcell "13" [ref=e611]:
+                - time [ref=e612]: "13"
+              - gridcell "14" [ref=e613]:
+                - time [ref=e614]: "14"
+              - gridcell "15" [ref=e615]:
+                - time [ref=e616]: "15"
+              - gridcell "16" [ref=e617]:
+                - time [ref=e618]: "16"
+              - gridcell "17" [ref=e619]:
+                - time [ref=e620]: "17"
+              - gridcell "18" [ref=e621]:
+                - time [ref=e622]: "18"
+              - button "Friday, March 19 — Regular Classes, 4pm–9pm" [ref=e623] [cursor=pointer]:
+                - time [ref=e624]: "19"
+              - button "Saturday, March 20 — Regular Classes, 8:30am–6:30pm" [ref=e625] [cursor=pointer]:
+                - time [ref=e626]: "20"
+              - button "Sunday, March 21 — Make-Up Class" [ref=e627] [cursor=pointer]:
+                - time [ref=e628]: "21"
+              - gridcell "22" [ref=e629]:
+                - time [ref=e630]: "22"
+              - gridcell "23" [ref=e631]:
+                - time [ref=e632]: "23"
+              - gridcell "24" [ref=e633]:
+                - time [ref=e634]: "24"
+              - gridcell "25" [ref=e635]:
+                - time [ref=e636]: "25"
+              - gridcell "26" [ref=e637]:
+                - time [ref=e638]: "26"
+              - gridcell "27" [ref=e639]:
+                - time [ref=e640]: "27"
+              - gridcell "28" [ref=e641]:
+                - time [ref=e642]: "28"
+              - gridcell "29" [ref=e643]:
+                - time [ref=e644]: "29"
+              - gridcell "30" [ref=e645]:
+                - time [ref=e646]: "30"
+              - gridcell "31" [ref=e647]:
+                - time [ref=e648]: "31"
+              - gridcell [ref=e649]
+              - gridcell [ref=e650]
+              - gridcell [ref=e651]
+          - article "April 2027" [ref=e652]:
+            - heading "April 2027" [level=3] [ref=e654]:
+              - generic [ref=e655]: April
+              - time [ref=e656]: "2027"
+            - row [ref=e657]:
+              - generic [ref=e658]: S
+              - generic [ref=e659]: M
+              - generic [ref=e660]: T
+              - generic [ref=e661]: W
+              - generic [ref=e662]: T
+              - generic [ref=e663]: F
+              - generic [ref=e664]: S
+            - grid "April 2027" [ref=e665]:
+              - gridcell [ref=e666]
+              - gridcell [ref=e667]
+              - gridcell [ref=e668]
+              - gridcell [ref=e669]
+              - gridcell "1" [ref=e670]:
+                - time [ref=e671]: "1"
+              - gridcell "2" [ref=e672]:
+                - time [ref=e673]: "2"
+              - button "Saturday, April 3 — Final Exam, 1pm–4pm" [ref=e674] [cursor=pointer]:
+                - time [ref=e675]: "3"
+              - button "Sunday, April 4 — Final Exam, 1pm–4pm" [ref=e676] [cursor=pointer]:
+                - time [ref=e677]: "4"
+              - gridcell "5" [ref=e678]:
+                - time [ref=e679]: "5"
+              - gridcell "6" [ref=e680]:
+                - time [ref=e681]: "6"
+              - gridcell "7" [ref=e682]:
+                - time [ref=e683]: "7"
+              - button "Thursday, April 8 — Final Exam, 6pm–9pm" [ref=e684] [cursor=pointer]:
+                - time [ref=e685]: "8"
+              - button "Friday, April 9 — Intensive Course, 4pm–9pm" [ref=e686] [cursor=pointer]:
+                - time [ref=e687]: "9"
+              - button "Saturday, April 10 — Intensive Course, 8:30am–5:30pm" [ref=e688] [cursor=pointer]:
+                - time [ref=e689]: "10"
+              - button "Sunday, April 11 — Intensive Course, 9am–1:30pm" [ref=e690] [cursor=pointer]:
+                - time [ref=e691]: "11"
+              - gridcell "12" [ref=e692]:
+                - time [ref=e693]: "12"
+              - gridcell "13" [ref=e694]:
+                - time [ref=e695]: "13"
+              - gridcell "14" [ref=e696]:
+                - time [ref=e697]: "14"
+              - gridcell "15" [ref=e698]:
+                - time [ref=e699]: "15"
+              - button "Friday, April 16 — Intensive Course, 4pm–9pm" [ref=e700] [cursor=pointer]:
+                - time [ref=e701]: "16"
+              - button "Saturday, April 17 — Intensive Course, 8:30am–5:30pm" [ref=e702] [cursor=pointer]:
+                - time [ref=e703]: "17"
+              - button "Sunday, April 18 — Intensive Course, 9am–1:30pm" [ref=e704] [cursor=pointer]:
+                - time [ref=e705]: "18"
+              - gridcell "19" [ref=e706]:
+                - time [ref=e707]: "19"
+              - gridcell "20" [ref=e708]:
+                - time [ref=e709]: "20"
+              - gridcell "21" [ref=e710]:
+                - time [ref=e711]: "21"
+              - gridcell "22" [ref=e712]:
+                - time [ref=e713]: "22"
+              - gridcell "23" [ref=e714]:
+                - time [ref=e715]: "23"
+              - gridcell "24" [ref=e716]:
+                - time [ref=e717]: "24"
+              - gridcell "25" [ref=e718]:
+                - time [ref=e719]: "25"
+              - gridcell "26" [ref=e720]:
+                - time [ref=e721]: "26"
+              - gridcell "27" [ref=e722]:
+                - time [ref=e723]: "27"
+              - gridcell "28" [ref=e724]:
+                - time [ref=e725]: "28"
+              - gridcell "29" [ref=e726]:
+                - time [ref=e727]: "29"
+              - button "Friday, April 30 — Regular Classes, 4pm–9pm" [ref=e728] [cursor=pointer]:
+                - time [ref=e729]: "30"
+              - gridcell [ref=e730]
+            - complementary [ref=e731]:
+              - paragraph [ref=e732]: April Intensive
+              - paragraph [ref=e733]: Some dates to be released — please hold for now.
+      - region "Summer" [ref=e734]:
+        - generic [ref=e735]:
+          - paragraph [ref=e736]: "03"
+          - heading "Summer" [level=2] [ref=e737]
+          - paragraph [ref=e738]: May – July 2027
+        - generic [ref=e739]:
+          - article "May 2027" [ref=e740]:
+            - heading "May 2027" [level=3] [ref=e742]:
+              - generic [ref=e743]: May
+              - time [ref=e744]: "2027"
+            - row [ref=e745]:
+              - generic [ref=e746]: S
+              - generic [ref=e747]: M
+              - generic [ref=e748]: T
+              - generic [ref=e749]: W
+              - generic [ref=e750]: T
+              - generic [ref=e751]: F
+              - generic [ref=e752]: S
+            - grid "May 2027" [ref=e753]:
+              - gridcell [ref=e754]
+              - gridcell [ref=e755]
+              - gridcell [ref=e756]
+              - gridcell [ref=e757]
+              - gridcell [ref=e758]
+              - gridcell [ref=e759]
+              - button "Saturday, May 1 — Regular Classes, 8:30am–6:30pm" [ref=e760] [cursor=pointer]:
+                - time [ref=e761]: "1"
+              - gridcell "2" [ref=e762]:
+                - time [ref=e763]: "2"
+              - gridcell "3" [ref=e764]:
+                - time [ref=e765]: "3"
+              - gridcell "4" [ref=e766]:
+                - time [ref=e767]: "4"
+              - gridcell "5" [ref=e768]:
+                - time [ref=e769]: "5"
+              - gridcell "6" [ref=e770]:
+                - time [ref=e771]: "6"
+              - button "Friday, May 7 — Regular Classes, 4pm–9pm" [ref=e772] [cursor=pointer]:
+                - time [ref=e773]: "7"
+              - button "Saturday, May 8 — Regular Classes, 8:30am–6:30pm" [ref=e774] [cursor=pointer]:
+                - time [ref=e775]: "8"
+              - button "Sunday, May 9 — Make-Up Class" [ref=e776] [cursor=pointer]:
+                - time [ref=e777]: "9"
+              - gridcell "10" [ref=e778]:
+                - time [ref=e779]: "10"
+              - gridcell "11" [ref=e780]:
+                - time [ref=e781]: "11"
+              - gridcell "12" [ref=e782]:
+                - time [ref=e783]: "12"
+              - gridcell "13" [ref=e784]:
+                - time [ref=e785]: "13"
+              - button "Friday, May 14 — Regular Classes, 4pm–9pm" [ref=e786] [cursor=pointer]:
+                - time [ref=e787]: "14"
+              - button "Saturday, May 15 — Regular Classes, 8:30am–6:30pm" [ref=e788] [cursor=pointer]:
+                - time [ref=e789]: "15"
+              - button "Sunday, May 16 — Final Exam, 1pm–4pm" [ref=e790] [cursor=pointer]:
+                - time [ref=e791]: "16"
+              - gridcell "17" [ref=e792]:
+                - time [ref=e793]: "17"
+              - gridcell "18" [ref=e794]:
+                - time [ref=e795]: "18"
+              - gridcell "19" [ref=e796]:
+                - time [ref=e797]: "19"
+              - gridcell "20" [ref=e798]:
+                - time [ref=e799]: "20"
+              - gridcell "21" [ref=e800]:
+                - time [ref=e801]: "21"
+              - gridcell "22" [ref=e802]:
+                - time [ref=e803]: "22"
+              - gridcell "23" [ref=e804]:
+                - time [ref=e805]: "23"
+              - gridcell "24" [ref=e806]:
+                - time [ref=e807]: "24"
+              - gridcell "25" [ref=e808]:
+                - time [ref=e809]: "25"
+              - gridcell "26" [ref=e810]:
+                - time [ref=e811]: "26"
+              - gridcell "27" [ref=e812]:
+                - time [ref=e813]: "27"
+              - gridcell "28" [ref=e814]:
+                - time [ref=e815]: "28"
+              - button "Saturday, May 29 — Final Exam — Cdn Law, 1pm–4pm" [ref=e816] [cursor=pointer]:
+                - time [ref=e817]: "29"
+              - button "Sunday, May 30 — Final Exam — Cdn Law, 1pm–4pm" [ref=e818] [cursor=pointer]:
+                - time [ref=e819]: "30"
+              - gridcell "31" [ref=e820]:
+                - time [ref=e821]: "31"
+              - gridcell [ref=e822]
+              - gridcell [ref=e823]
+              - gridcell [ref=e824]
+              - gridcell [ref=e825]
+              - gridcell [ref=e826]
+            - complementary [ref=e827]:
+              - paragraph [ref=e828]: Intensive Final Exam
+              - paragraph [ref=e829]: May 16.
+          - article "June 2027" [ref=e830]:
+            - heading "June 2027" [level=3] [ref=e832]:
+              - generic [ref=e833]: June
+              - time [ref=e834]: "2027"
+            - row [ref=e835]:
+              - generic [ref=e836]: S
+              - generic [ref=e837]: M
+              - generic [ref=e838]: T
+              - generic [ref=e839]: W
+              - generic [ref=e840]: T
+              - generic [ref=e841]: F
+              - generic [ref=e842]: S
+            - grid "June 2027" [ref=e843]:
+              - gridcell [ref=e844]
+              - gridcell [ref=e845]
+              - gridcell "1" [ref=e846]:
+                - time [ref=e847]: "1"
+              - gridcell "2" [ref=e848]:
+                - time [ref=e849]: "2"
+              - gridcell "3" [ref=e850]:
+                - time [ref=e851]: "3"
+              - button "Friday, June 4 — Regular Classes, 4pm–9pm" [ref=e852] [cursor=pointer]:
+                - time [ref=e853]: "4"
+              - button "Saturday, June 5 — Regular Classes, 8:30am–6:30pm" [ref=e854] [cursor=pointer]:
+                - time [ref=e855]: "5"
+              - button "Sunday, June 6 — Final Exam, 1pm–4pm" [ref=e856] [cursor=pointer]:
+                - time [ref=e857]: "6"
+              - gridcell "7" [ref=e858]:
+                - time [ref=e859]: "7"
+              - gridcell "8" [ref=e860]:
+                - time [ref=e861]: "8"
+              - gridcell "9" [ref=e862]:
+                - time [ref=e863]: "9"
+              - gridcell "10" [ref=e864]:
+                - time [ref=e865]: "10"
+              - button "Friday, June 11 — Regular Classes, 4pm–9pm; Deferred Final Exam, 6pm–9pm" [ref=e866] [cursor=pointer]:
+                - time [ref=e867]: "11"
+              - button "Saturday, June 12 — Regular Classes, 8:30am–6:30pm" [ref=e869] [cursor=pointer]:
+                - time [ref=e870]: "12"
+              - button "Sunday, June 13 — Deferred Mid-Term Exam, 1pm–4pm" [ref=e871] [cursor=pointer]:
+                - time [ref=e872]: "13"
+              - gridcell "14" [ref=e873]:
+                - time [ref=e874]: "14"
+              - gridcell "15" [ref=e875]:
+                - time [ref=e876]: "15"
+              - gridcell "16" [ref=e877]:
+                - time [ref=e878]: "16"
+              - gridcell "17" [ref=e879]:
+                - time [ref=e880]: "17"
+              - button "Friday, June 18 — Regular Classes, 4pm–9pm" [ref=e881] [cursor=pointer]:
+                - time [ref=e882]: "18"
+              - button "Saturday, June 19 — Regular Classes, 8:30am–6:30pm" [ref=e883] [cursor=pointer]:
+                - time [ref=e884]: "19"
+              - gridcell "20" [ref=e885]:
+                - time [ref=e886]: "20"
+              - gridcell "21" [ref=e887]:
+                - time [ref=e888]: "21"
+              - gridcell "22" [ref=e889]:
+                - time [ref=e890]: "22"
+              - gridcell "23" [ref=e891]:
+                - time [ref=e892]: "23"
+              - gridcell "24" [ref=e893]:
+                - time [ref=e894]: "24"
+              - button "Friday, June 25 — Final Exam, 6pm–9pm" [ref=e895] [cursor=pointer]:
+                - time [ref=e896]: "25"
+              - button "Saturday, June 26 — Final Exam, 1pm–4pm" [ref=e897] [cursor=pointer]:
+                - time [ref=e898]: "26"
+              - button "Sunday, June 27 — Final Exam, 1pm–4pm" [ref=e899] [cursor=pointer]:
+                - time [ref=e900]: "27"
+              - gridcell "28" [ref=e901]:
+                - time [ref=e902]: "28"
+              - gridcell "29" [ref=e903]:
+                - time [ref=e904]: "29"
+              - gridcell "30" [ref=e905]:
+                - time [ref=e906]: "30"
+              - gridcell [ref=e907]
+              - gridcell [ref=e908]
+              - gridcell [ref=e909]
+          - article "July 2027" [ref=e910]:
+            - heading "July 2027" [level=3] [ref=e912]:
+              - generic [ref=e913]: July
+              - time [ref=e914]: "2027"
+            - row [ref=e915]:
+              - generic [ref=e916]: S
+              - generic [ref=e917]: M
+              - generic [ref=e918]: T
+              - generic [ref=e919]: W
+              - generic [ref=e920]: T
+              - generic [ref=e921]: F
+              - generic [ref=e922]: S
+            - grid "July 2027" [ref=e923]:
+              - gridcell [ref=e924]
+              - gridcell [ref=e925]
+              - gridcell [ref=e926]
+              - gridcell [ref=e927]
+              - gridcell "1" [ref=e928]:
+                - time [ref=e929]: "1"
+              - gridcell "2" [ref=e930]:
+                - time [ref=e931]: "2"
+              - gridcell "3" [ref=e932]:
+                - time [ref=e933]: "3"
+              - gridcell "4" [ref=e934]:
+                - time [ref=e935]: "4"
+              - gridcell "5" [ref=e936]:
+                - time [ref=e937]: "5"
+              - gridcell "6" [ref=e938]:
+                - time [ref=e939]: "6"
+              - gridcell "7" [ref=e940]:
+                - time [ref=e941]: "7"
+              - gridcell "8" [ref=e942]:
+                - time [ref=e943]: "8"
+              - button "Friday, July 9 — Deferred Final Exam, 6pm–9pm" [ref=e944] [cursor=pointer]:
+                - time [ref=e945]: "9"
+              - button "Saturday, July 10 — Deferred Final Exam, 1pm–4pm" [ref=e946] [cursor=pointer]:
+                - time [ref=e947]: "10"
+              - button "Sunday, July 11 — Deferred Final Exam, 1pm–4pm" [ref=e948] [cursor=pointer]:
+                - time [ref=e949]: "11"
+              - button "Monday, July 12 — Deferred Final Exam, 6pm–9pm" [ref=e950] [cursor=pointer]:
+                - time [ref=e951]: "12"
+              - gridcell "13" [ref=e952]:
+                - time [ref=e953]: "13"
+              - gridcell "14" [ref=e954]:
+                - time [ref=e955]: "14"
+              - gridcell "15" [ref=e956]:
+                - time [ref=e957]: "15"
+              - gridcell "16" [ref=e958]:
+                - time [ref=e959]: "16"
+              - gridcell "17" [ref=e960]:
+                - time [ref=e961]: "17"
+              - gridcell "18" [ref=e962]:
+                - time [ref=e963]: "18"
+              - gridcell "19" [ref=e964]:
+                - time [ref=e965]: "19"
+              - gridcell "20" [ref=e966]:
+                - time [ref=e967]: "20"
+              - gridcell "21" [ref=e968]:
+                - time [ref=e969]: "21"
+              - gridcell "22" [ref=e970]:
+                - time [ref=e971]: "22"
+              - gridcell "23" [ref=e972]:
+                - time [ref=e973]: "23"
+              - gridcell "24" [ref=e974]:
+                - time [ref=e975]: "24"
+              - gridcell "25" [ref=e976]:
+                - time [ref=e977]: "25"
+              - gridcell "26" [ref=e978]:
+                - time [ref=e979]: "26"
+              - gridcell "27" [ref=e980]:
+                - time [ref=e981]: "27"
+              - gridcell "28" [ref=e982]:
+                - time [ref=e983]: "28"
+              - gridcell "29" [ref=e984]:
+                - time [ref=e985]: "29"
+              - gridcell "30" [ref=e986]:
+                - time [ref=e987]: "30"
+              - gridcell "31" [ref=e988]:
+                - time [ref=e989]: "31"
+    - contentinfo [ref=e990]:
+      - region "PLEASE NOTE" [ref=e991]:
+        - heading "PLEASE NOTE" [level=2] [ref=e992]
+        - paragraph [ref=e993]:
+          - text: Dates and times herein are subject to change. For course-specific dates and times, please consult syllabi on
+          - strong [ref=e994]: Quercus
+          - text: .
+      - region "MID-TERM & FINAL EXAM TIMES" [ref=e995]:
+        - heading "MID-TERM & FINAL EXAM TIMES" [level=2] [ref=e996]
+        - paragraph [ref=e997]: Weekdays 6pm – 9pm · Weekends 1pm – 4pm
+      - img "Henry N.R. Jackman Faculty of Law, University of Toronto" [ref=e999]
+  - generic [ref=e1002]:
+    - button "Menu" [ref=e1003]:
+      - img [ref=e1005]
+      - generic: Menu
+    - button "Inspect" [ref=e1009]:
+      - img [ref=e1011]
+      - generic: Inspect
+    - button "Audit" [ref=e1013]:
+      - img [ref=e1015]
+      - generic: Audit
+    - button "Settings" [ref=e1018]:
+      - img [ref=e1020]
+      - generic: Settings
