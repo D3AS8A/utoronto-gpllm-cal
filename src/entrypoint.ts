@@ -93,6 +93,53 @@ function safeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'event';
 }
 
+const FILTER_URL_KEYS: Record<string, string> = {
+  reg:       'reg-class',
+  makeup:    'makeup-class',
+  lmc:       'legal-methods-cdn',
+  lmb:       'legal-methods-bus',
+  alrw:      'alrw',
+  orient:    'orient',
+  intensive: 'intensive',
+  mid:       'midterms',
+  dmid:      'def-midterms',
+  fin:       'finals',
+  finc:      'finals-cdn',
+  dfin:      'def-finals',
+};
+
+const FILTER_URL_KEYS_REV: Record<string, string> = Object.fromEntries(
+  Object.entries(FILTER_URL_KEYS).map(([k, v]) => [v, k])
+);
+
+function readFiltersFromUrl(): Record<string, boolean> | null {
+  const p = new URLSearchParams(window.location.search);
+  if (!p.has('f')) return null;
+  const active = new Set(p.get('f')!.split(',').filter(Boolean));
+  const next: Record<string, boolean> = {};
+  for (const [urlKey, internal] of Object.entries(FILTER_URL_KEYS_REV)) {
+    if (active.has(urlKey)) next[internal] = true;
+  }
+  return next;
+}
+
+function syncFiltersToUrl(filters: Record<string, boolean>) {
+  const active: string[] = [];
+  for (const key of Object.keys(FILTER_URL_KEYS)) {
+    if (filters[key]) active.push(FILTER_URL_KEYS[key]);
+  }
+  const params = new URLSearchParams(window.location.search);
+  const isDefault = active.length === 1 && active[0] === FILTER_URL_KEYS.reg;
+  if (isDefault) {
+    params.delete('f');
+  } else {
+    params.set('f', active.join(','));
+  }
+  const q = params.toString().replace(/%2C/g, ',');
+  const url = q ? `${window.location.pathname}?${q}` : window.location.pathname;
+  window.history.replaceState(null, '', url);
+}
+
 function triggerDownload(text: string, filename: string) {
   const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -120,6 +167,9 @@ export default (Alpine: Alpine) => {
       const drop = () => this.hideTooltip(0);
       window.addEventListener('scroll', drop, { passive: true, capture: true });
       window.addEventListener('resize', drop, { passive: true });
+
+      const fromUrl = readFiltersFromUrl();
+      if (fromUrl !== null) this.filters = fromUrl;
     },
 
     get activeCats(): Set<string> {
@@ -155,11 +205,13 @@ export default (Alpine: Alpine) => {
     toggle(key: string) {
       vibrate(6);
       this.filters = { ...this.filters, [key]: !this.filters[key] };
+      syncFiltersToUrl(this.filters);
     },
 
     reset() {
       vibrate(6);
       this.filters = {};
+      syncFiltersToUrl(this.filters);
     },
 
     openDetail(detail: CalendarDetail) {
