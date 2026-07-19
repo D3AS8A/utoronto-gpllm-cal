@@ -28,8 +28,8 @@ const jsonLD = {
   showChrome={false}
 >
   <div
-    class="cal-app"
-    :class="{ 'rails-on': rails, 'no-scroll': detail }"
+    class="cal-app rails-on"
+    :class="{ 'no-scroll': detail }"
     x-data="calendar"
     x-cloak
     @keydown.escape.window="detail = null; tooltip = null"

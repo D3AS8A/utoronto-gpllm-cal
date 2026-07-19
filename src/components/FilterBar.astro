@@ -3,18 +3,18 @@ import type { FilterDef } from '../lib/calendar-data';
 import { FILTERS_CLASSES, FILTERS_EXAMS, META, swatchStyle } from '../lib/calendar-data';
 
 const LABEL: Record<string, string> = {
-  reg: 'Regular',
-  makeup: 'Make-Up',
-  lmc: 'LM · Cdn',
-  lmb: 'LM · Bus',
-  alrw: 'ALRW',
-  orient: 'Orient.',
-  intensive: 'Intensive',
-  mid: 'Mid-Term',
-  dmid: 'Def. Mid',
-  fin: 'Final',
-  finc: 'Final · Cdn',
-  dfin: 'Def. Final',
+  reg: 'Regular Classes',
+  makeup: 'Make-Up Classes',
+  lmc: 'Legal Methods (Canadian Law)',
+  lmb: 'Legal Methods (Business Law & ILT)',
+  alrw: 'Applied Legal Research & Writing (ALRW)',
+  orient: 'Orientation Evenings',
+  intensive: 'Intensive Courses',
+  mid: 'Mid-Term Exams',
+  dmid: 'Deferred Mid-Term Exams',
+  fin: 'Final Exams',
+  finc: 'Final Exams (Canadian Law)',
+  dfin: 'Deferred Final Exams',
 };
 
 interface Chip {
@@ -41,66 +41,79 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 <aside class="fb" role="toolbar" aria-label="Calendar filters">
   <div class="fb__inner">
     <div class="fb__row">
-      <div class="fb__group" role="group" aria-labelledby="fb-classes-label">
-        <h2 id="fb-classes-label" class="fb__label">CLASSES</h2>
-        {classChips.map((c) => (
-          <button
-            type="button"
-            class="tog"
-            role="switch"
-            :class={`{ 'is-on': filters['${c.key}'] }`}
-            @click={`toggle('${c.key}')`}
-            :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
-          >
-            <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-            <span class="tog__label">{c.label}</span>
-            <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
-          </button>
-        ))}
+      <div class="fb__group" :class="{ 'is-open': classesOpen }">
+        <button
+          type="button"
+          class="fb__label"
+          @click="classesOpen = !classesOpen"
+          :aria-expanded="classesOpen ? 'true' : 'false'"
+          aria-controls="fb-classes-content"
+        >
+          <span class="fb__label-text">CLASSES</span>
+          <span class="fb__caret" aria-hidden="true"></span>
+        </button>
+        <div id="fb-classes-content" class="fb__collapse">
+          <div class="fb__switches">
+            {classChips.map((c) => (
+              <button
+                type="button"
+                class="tog"
+                role="switch"
+                :class={`{ 'is-on': filters['${c.key}'] }`}
+                @click={`toggle('${c.key}')`}
+                :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
+              >
+                <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+                <span class="tog__label">{c.label}</span>
+                <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="fb__row">
-      <div class="fb__group" role="group" aria-labelledby="fb-exams-label">
-        <h2 id="fb-exams-label" class="fb__label">EXAMS</h2>
-        {examChips.map((c) => (
-          <button
-            type="button"
-            class="tog"
-            role="switch"
-            :class={`{ 'is-on': filters['${c.key}'] }`}
-            @click={`toggle('${c.key}')`}
-            :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
-          >
-            <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-            <span class="tog__label">{c.label}</span>
-            <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
-          </button>
-        ))}
+      <div class="fb__group" :class="{ 'is-open': examsOpen }">
+        <button
+          type="button"
+          class="fb__label"
+          @click="examsOpen = !examsOpen"
+          :aria-expanded="examsOpen ? 'true' : 'false'"
+          aria-controls="fb-exams-content"
+        >
+          <span class="fb__label-text">EXAMS</span>
+          <span class="fb__caret" aria-hidden="true"></span>
+        </button>
+        <div id="fb-exams-content" class="fb__collapse">
+          <div class="fb__switches">
+            {examChips.map((c) => (
+              <button
+                type="button"
+                class="tog"
+                role="switch"
+                :class={`{ 'is-on': filters['${c.key}'] }`}
+                @click={`toggle('${c.key}')`}
+                :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
+              >
+                <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+                <span class="tog__label">{c.label}</span>
+                <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="fb__row fb__row--ctl">
       <button
         type="button"
-        class="tog tog--wkd"
-        role="switch"
-        :class="{ 'is-on': rails }"
-        @click="rails = !rails"
-        :aria-checked="rails ? 'true' : 'false'"
-      >
-        <span class="tog__swatch tog__swatch--wkd" aria-hidden="true"></span>
-        <span class="tog__label">Weekend shading</span>
-        <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
-      </button>
-
-      <button
-        type="button"
         class="fb__clear"
         @click="reset()"
-        x-show="anyFilter"
+        x-show="anyFilter && !isDefault"
       >
-        Clear <span x-text="activeCount"></span> filter<span x-text="activeCount === 1 ? '' : 's'"></span> ✕
+        clear <span x-text="activeCount"></span> filter<span x-text="activeCount === 1 ? '' : 's'"></span> ✕
       </button>
     </div>
   </div>
@@ -127,49 +140,100 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
   }
 
   .fb__row {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: block;
   }
 
   .fb__row--ctl {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     gap: 18px;
     padding-top: 2px;
   }
 
   .fb__group {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 2px;
-    padding: 4px 6px 4px 14px;
+    display: block;
+    padding: 6px 10px;
     border: 1px solid rgba(0, 37, 84, 0.10);
     border-radius: 10px;
     background: rgba(255, 255, 255, 0.55);
   }
 
+  .fb__collapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.3s linear;
+  }
+
+  .fb__collapse > .fb__switches {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .fb__group.is-open .fb__collapse {
+    grid-template-rows: 1fr;
+  }
+
+  .fb__switches {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2px 16px;
+    margin-top: 6px;
+  }
+
   .fb__label {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 10px;
     line-height: 1;
     letter-spacing: 0.2em;
     color: var(--driftwood);
     font-weight: 700;
-    margin: 0 8px 0 0;
-    padding: 0;
+    margin: 0;
+    padding: 4px;
     white-space: nowrap;
-    align-self: center;
+    cursor: pointer;
+    user-select: none;
+    border: 0;
+    background: transparent;
+    border-radius: 4px;
+    text-align: left;
+  }
+
+  .fb__label:hover { color: var(--prussian-blue); }
+
+  .fb__label:focus-visible {
+    outline: 2px solid var(--matisse);
+    outline-offset: 2px;
+  }
+
+  .fb__caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid currentColor;
+    transition: transform 0.3s linear;
+    transform: rotate(-90deg);
+  }
+
+  .fb__group.is-open .fb__caret {
+    transform: rotate(0deg);
   }
 
   /* ---- Filter switch: [swatch] [label] [track+thumb] ---- */
 
   .tog {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     gap: 8px;
     padding: 6px 8px 6px 10px;
+    min-width: 0;
     border: 1px solid transparent;
     border-radius: 8px;
     background: transparent;
@@ -179,11 +243,15 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     font-weight: 600;
     letter-spacing: 0.01em;
     cursor: pointer;
+    text-align: left;
     transition:
-      background 0.15s ease,
-      border-color 0.15s ease,
-      color 0.15s ease;
+      background 0.3s linear,
+      border-color 0.3s linear,
+      color 0.3s linear;
   }
+
+  .tog .tog__label { flex: 1; }
+  .tog .tog__track { margin-left: 8px; }
 
   .tog:hover {
     background: rgba(0, 37, 84, 0.04);
@@ -208,8 +276,8 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
   }
 
   .tog__label {
-    white-space: nowrap;
-    line-height: 1;
+    line-height: 1.2;
+    min-width: 0;
   }
 
   .tog__track {
@@ -220,7 +288,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     border-radius: 999px;
     background: var(--tana);
     flex: none;
-    transition: background 0.18s ease;
+    transition: background 0.3s linear;
   }
 
   .tog__thumb {
@@ -232,7 +300,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     border-radius: 50%;
     background: #fff;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-    transition: left 0.18s ease;
+    transition: left 0.3s linear;
   }
 
   .tog.is-on .tog__track {
@@ -243,12 +311,6 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     left: 14px;
   }
 
-  .tog__swatch--wkd {
-    width: 14px;
-    height: 14px;
-    background: var(--porcelain);
-    border: 1px solid var(--tana);
-  }
 
   /* ---- Clear link ---- */
 
@@ -258,9 +320,8 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     padding: 6px 2px;
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    font-weight: 400;
+    letter-spacing: 0.05em;
     color: var(--matisse);
     cursor: pointer;
     text-decoration: underline;

@@ -107,8 +107,9 @@ function triggerDownload(text: string, filename: string) {
 
 export default (Alpine: Alpine) => {
   Alpine.data('calendar', () => ({
-    filters: {} as Record<string, boolean>,
-    rails: true,
+    filters: { reg: true } as Record<string, boolean>,
+    classesOpen: true,
+    examsOpen: false,
     detail: null as CalendarDetail | null,
     tooltip: null as TooltipState | null,
     _ttHideTimer: 0 as ReturnType<typeof setTimeout> | 0,
@@ -136,6 +137,11 @@ export default (Alpine: Alpine) => {
 
     get activeCount(): number {
       return Object.values(this.filters).filter(Boolean).length;
+    },
+
+    get isDefault(): boolean {
+      const on = Object.keys(this.filters).filter((k) => this.filters[k]);
+      return on.length === 1 && on[0] === 'reg';
     },
 
     /** Dim a cell whose `data-cats` doesn't intersect the active filter set. */
