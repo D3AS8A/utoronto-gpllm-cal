@@ -157,6 +157,7 @@ export default (Alpine: Alpine) => {
     filters: { reg: true } as Record<string, boolean>,
     classesOpen: true,
     examsOpen: false,
+    fbHidden: false,
     detail: null as CalendarDetail | null,
     tooltip: null as TooltipState | null,
     _ttHideTimer: 0 as ReturnType<typeof setTimeout> | 0,
@@ -170,6 +171,21 @@ export default (Alpine: Alpine) => {
 
       const fromUrl = readFiltersFromUrl();
       if (fromUrl !== null) this.filters = fromUrl;
+
+      // Hide filter bar on scroll-down (past its natural position), show on scroll-up.
+      const fbEl = document.querySelector<HTMLElement>('.fb');
+      if (fbEl) {
+        let threshold = fbEl.offsetTop;
+        let lastY = window.scrollY;
+        const recompute = () => { threshold = fbEl.offsetTop; };
+        window.addEventListener('resize', recompute, { passive: true });
+        window.addEventListener('scroll', () => {
+          const y = window.scrollY;
+          if (y > threshold && y > lastY + 4) this.fbHidden = true;
+          else if (y < lastY - 4 || y <= threshold) this.fbHidden = false;
+          lastY = y;
+        }, { passive: true });
+      }
     },
 
     get activeCats(): Set<string> {

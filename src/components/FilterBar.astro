@@ -38,7 +38,7 @@ const classChips: Chip[] = FILTERS_CLASSES.map(toChip);
 const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 ---
 
-<aside class="fb" role="toolbar" aria-label="Calendar filters">
+<aside class="fb" :data-tucked="fbHidden ? 'true' : null" role="toolbar" aria-label="Calendar filters">
   <div class="fb__inner">
     <div class="fb__row">
       <div class="fb__group" :class="{ 'is-open': classesOpen }">
@@ -131,6 +131,12 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     border-bottom: 1px solid var(--tana);
     margin: 0 calc(-1 * clamp(14px, 3.5vw, 40px));
     padding: 12px clamp(14px, 3.5vw, 40px);
+    transition: transform 250ms ease;
+    will-change: transform;
+  }
+
+  .fb[data-tucked='true'] {
+    transform: translateY(-100%);
   }
 
   .fb__inner {
