@@ -53,21 +53,23 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
           <span class="fb__caret" aria-hidden="true"></span>
         </button>
         <div id="fb-classes-content" class="fb__collapse">
-          <div class="fb__switches">
-            {classChips.map((c) => (
-              <button
-                type="button"
-                class="tog"
-                role="switch"
-                :class={`{ 'is-on': filters['${c.key}'] }`}
-                @click={`toggle('${c.key}')`}
-                :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
-              >
-                <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-                <span class="tog__label">{c.label}</span>
-                <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
-              </button>
-            ))}
+          <div class="fb__collapse-inner">
+            <div class="fb__switches">
+              {classChips.map((c) => (
+                <button
+                  type="button"
+                  class="tog"
+                  role="switch"
+                  :class={`{ 'is-on': filters['${c.key}'] }`}
+                  @click={`toggle('${c.key}')`}
+                  :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
+                >
+                  <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+                  <span class="tog__label">{c.label}</span>
+                  <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -86,21 +88,26 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
           <span class="fb__caret" aria-hidden="true"></span>
         </button>
         <div id="fb-exams-content" class="fb__collapse">
-          <div class="fb__switches">
-            {examChips.map((c) => (
-              <button
-                type="button"
-                class="tog"
-                role="switch"
-                :class={`{ 'is-on': filters['${c.key}'] }`}
-                @click={`toggle('${c.key}')`}
-                :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
-              >
-                <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-                <span class="tog__label">{c.label}</span>
-                <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
-              </button>
-            ))}
+          <div class="fb__collapse-inner">
+            <div class="fb__switches">
+              {examChips.map((c) => (
+                <button
+                  type="button"
+                  class="tog"
+                  role="switch"
+                  :class={`{ 'is-on': filters['${c.key}'] }`}
+                  @click={`toggle('${c.key}')`}
+                  :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
+                >
+                  <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
+                  <span class="tog__label">{c.label}</span>
+                  <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
+                </button>
+              ))}
+            </div>
+            <p class="fb__note">
+              Exam times: weekdays 6pm–9pm · weekends 1pm–4pm
+            </p>
           </div>
         </div>
       </div>
@@ -171,9 +178,10 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     transition: grid-template-rows 0.3s linear;
   }
 
-  .fb__collapse > .fb__switches {
+  .fb__collapse > .fb__collapse-inner {
     min-height: 0;
     overflow: hidden;
+    margin-top: 6px;
   }
 
   .fb__group.is-open .fb__collapse {
@@ -184,7 +192,14 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 2px 16px;
-    margin-top: 6px;
+  }
+
+  .fb__note {
+    margin: 8px 4px 2px;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+    color: var(--driftwood);
   }
 
   .fb__label {

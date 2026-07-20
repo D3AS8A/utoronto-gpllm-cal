@@ -5,12 +5,14 @@
     <h2 id="footer-note-label" class="cal-footer__label">PLEASE NOTE</h2>
     <p>
       Dates and times herein are subject to change. For course-specific dates and times,
-      please consult syllabi on <strong>Quercus</strong>.
+      please consult syllabi on <a href="https://idpz.utorauth.utoronto.ca/idp/profile/SAML2/Redirect/SSO?execution=e1s1" target="_blank" rel="noopener"><strong>Quercus</strong></a>.
     </p>
   </section>
-  <section class="cal-footer__col" aria-labelledby="footer-times-label">
-    <h2 id="footer-times-label" class="cal-footer__label">MID-TERM &amp; FINAL EXAM TIMES</h2>
-    <p>Weekdays 6pm – 9pm&nbsp;&nbsp;·&nbsp;&nbsp;Weekends 1pm – 4pm</p>
+  <section class="cal-footer__col cal-footer__col--mobile" aria-labelledby="footer-viewport-label">
+    <h2 id="footer-viewport-label" class="cal-footer__label">VIEWPORT</h2>
+    <p>
+      This calendar is fully functional on mobile devices; a tablet or desktop display is recommended for the most complete view of the academic year.
+    </p>
   </section>
   <div class="cal-footer__mark">
     <img
@@ -34,6 +36,12 @@
 
   .cal-footer__col:first-child { max-width: 440px; }
   .cal-footer__col:last-child  { max-width: 360px; }
+
+  .cal-footer__col--mobile { display: none; }
+
+  @media (max-width: 720px) {
+    .cal-footer__col--mobile { display: block; }
+  }
 
   .cal-footer__label {
     font-family: 'Space Mono', ui-monospace, monospace;
