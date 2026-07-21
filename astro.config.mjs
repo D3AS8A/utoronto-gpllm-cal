@@ -8,6 +8,10 @@ export default defineConfig({
 
   output: 'static',
 
+  devToolbar: {
+    enabled: false,
+  },
+
   integrations: [
     alpinejs({ entrypoint: '/src/entrypoint' }),
     sitemap(),
