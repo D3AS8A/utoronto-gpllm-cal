@@ -372,13 +372,33 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 
   .fb__clear:hover { color: var(--prussian-blue); }
 
-  /* ---- Mobile: force 2 columns, ignore JS-measured cell width ---- */
+  /* ---- Mobile: 2 columns, dial down weight/size, stretch label so tracks
+     right-align consistently rather than clinging to variable text width. ---- */
   @media (max-width: 720px) {
     .fb__switches {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: 18px;
+    }
+    .tog {
+      font-size: 11px;
+      font-weight: 400;
+      padding: 5px 6px 5px 8px;
+      gap: 6px;
     }
     .tog .tog__label {
       width: auto;
+      flex: 1;
+    }
+    .tog__track {
+      width: 22px;
+      height: 12px;
+    }
+    .tog__thumb {
+      width: 8px;
+      height: 8px;
+    }
+    .tog.is-on .tog__thumb {
+      left: 12px;
     }
   }
 </style>
