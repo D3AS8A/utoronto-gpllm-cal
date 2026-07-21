@@ -208,17 +208,28 @@ export default (Alpine: Alpine) => {
       this.$watch('classesOpen', (v: boolean) => { if (v) scheduleMeasure(); });
       this.$watch('examsOpen', (v: boolean) => { if (v) scheduleMeasure(); });
 
-      // Hide filter bar on scroll-down (past its natural position), show on scroll-up.
-      const fbEl = document.querySelector<HTMLElement>('.fb');
-      if (fbEl) {
-        let threshold = fbEl.offsetTop;
+      // Hide filter bar on scroll-down, show on scroll-up — but only once the
+      // viewport has scrolled past the first calendar section (FALL). Above
+      // that, keep the filter bar in its natural sticky behavior with no
+      // transform, so we don't leave a gap where its doc-space used to be.
+      const fallEl = document.querySelector<HTMLElement>('#season-fall');
+      if (fallEl) {
+        let threshold = 0;
         let lastY = window.scrollY;
-        const recompute = () => { threshold = fbEl.offsetTop; };
+        const recompute = () => { threshold = fallEl.offsetTop; };
+        // Defer initial measure past x-cloak / initial paint so offsetTop is real.
+        requestAnimationFrame(recompute);
         window.addEventListener('resize', recompute, { passive: true });
         window.addEventListener('scroll', () => {
           const y = window.scrollY;
-          if (y > threshold && y > lastY + 4) this.fbHidden = true;
-          else if (y < lastY - 4 || y <= threshold) this.fbHidden = false;
+          if (!threshold) recompute();
+          if (y <= threshold) {
+            this.fbHidden = false;
+          } else if (y > lastY + 4) {
+            this.fbHidden = true;
+          } else if (y < lastY - 4) {
+            this.fbHidden = false;
+          }
           lastY = y;
         }, { passive: true });
       }
