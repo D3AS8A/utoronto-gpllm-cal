@@ -231,7 +231,10 @@ export interface CellVisual {
   bg: string;
   fg: string;
   border: string;
-  badge: '' | 'alrw' | 'dot';
+  /** Layered outline (overlaid on top of the border for the ALRW dotted pattern) */
+  outline?: string;
+  /** Bottom-right triangular overlay color for class + deferred-exam days */
+  cornerColor?: string;
   isBold: boolean;
 }
 
@@ -244,21 +247,32 @@ const CLASS_COLORS: Record<string, [string, string]> = {
   intb:   ['#936e42', '#fff'],
 };
 
+const DEFERRED_COLOR = '#70c7e9';
+
 export function cellVisual(cats: CatKey[]): CellVisual {
   const has = (k: CatKey) => cats.indexOf(k) !== -1;
   const classKey = (['reg', 'makeup', 'lmc', 'lmb', 'intc', 'intb', 'orient'] as CatKey[]).find(has);
+  const hasDeferred = has('dmid') || has('dfin');
   let bg = 'transparent', fg = '#002554', border = '2px solid transparent';
+  let outline: string | undefined;
   if (classKey === 'orient') { bg = '#f7f0e2'; fg = '#6b4e22'; border = '2px solid #af9b88'; }
   else if (classKey)          { [bg, fg] = CLASS_COLORS[classKey]; }
-  else if (has('dmid'))       { bg = '#70c7e9'; fg = '#002554'; }
+  else if (has('dmid'))       { bg = DEFERRED_COLOR; fg = '#002554'; }
   if      (has('mid'))                     border = '2px solid #1f6092';
   else if (has('fin'))                     border = '2px solid #002554';
   else if (has('finc'))                    border = '2px dashed #002554';
   else if (has('dfin') && !classKey)       border = '2px solid #70c7e9';
-  let badge: '' | 'alrw' | 'dot' = '';
-  if      (has('alrw'))                            badge = 'alrw';
-  else if ((has('dmid') || has('dfin')) && classKey) badge = 'dot';
-  return { bg, fg, border, badge, isBold: !!(classKey || has('dmid')) };
+  // ALRW → white solid inner border + blue dotted outline on top of it.
+  if (has('alrw')) {
+    border = '2px solid #fff';
+    outline = '2px dotted #002554';
+  }
+  // Class + deferred exam → BR corner triangle in deferred color; kill the
+  // border so the triangle sits flush with the cell edge (a transparent
+  // border leaves 2px of class-color showing around the triangle).
+  const cornerColor = classKey && hasDeferred ? DEFERRED_COLOR : undefined;
+  if (cornerColor) border = '0';
+  return { bg, fg, border, outline, cornerColor, isBold: !!(classKey || has('dmid')) };
 }
 
 export function countFor(cats: CatKey[]): number {

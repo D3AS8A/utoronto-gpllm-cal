@@ -9,6 +9,7 @@
 
 import type { Alpine } from 'alpinejs';
 import { createEvent, type DateArray } from 'ics';
+import { cellVisual, type CatKey } from './lib/calendar-data';
 
 // Filter key → cats mapping. Mirrors FILTERS_CLASSES + FILTERS_EXAMS in
 // src/lib/calendar-data.ts. Kept in sync manually; small and easy to spot-check.
@@ -263,6 +264,25 @@ export default (Alpine: Alpine) => {
       if (active.size === 0) return false;
       const cats = (catsAttr || '').split(/\s+/).filter(Boolean);
       return cats.length > 0 && !cats.some((c) => active.has(c));
+    },
+
+    /**
+     * Live visual style for a cell — recomputes when filters change so a class
+     * + deferred-exam day only shows the corner split when BOTH categories are
+     * currently on. If only one is on, that one's plain style is used.
+     */
+    cellStyle(catsAttr: string): string {
+      const all = ((catsAttr || '').split(/\s+/).filter(Boolean)) as CatKey[];
+      if (all.length === 0) return '';
+      const active = this.activeCats;
+      const relevant = active.size === 0 ? all : all.filter((c) => active.has(c));
+      const v = cellVisual(relevant.length ? relevant : all);
+      return (
+        `background:${v.bg};color:${v.fg};border:${v.border};` +
+        (v.outline ? `outline:${v.outline};outline-offset:-2px;` : '') +
+        `font-weight:${v.isBold ? '800' : '600'};` +
+        `--corner-color:${v.cornerColor ?? 'transparent'};`
+      );
     },
 
     toggle(key: string) {

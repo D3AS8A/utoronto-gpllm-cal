@@ -43,7 +43,7 @@ type Cell = {
   cats: string[];
   hasMark: boolean;
   style: string;
-  badge: '' | 'alrw' | 'dot';
+  cornerColor?: string;
   ariaLabel: string;
   detail: null | {
     weekday: string;
@@ -65,7 +65,7 @@ for (let i = 0; i < rows * 7; i++) {
   const day = i - month.fdow + 1;
   const dow = i % 7;
   if (day < 1 || day > month.days) {
-    cells.push({ blank: true, num: null, iso: '', dow, cats: [], hasMark: false, style: '', badge: '', ariaLabel: '', detail: null });
+    cells.push({ blank: true, num: null, iso: '', dow, cats: [], hasMark: false, style: '', ariaLabel: '', detail: null });
     continue;
   }
   const cats = month.marks[day] || [];
@@ -73,7 +73,9 @@ for (let i = 0; i < rows * 7; i++) {
   const v = cellVisual(cats);
   const style =
     `background:${v.bg};color:${v.fg};border:${v.border};` +
-    `font-weight:${v.isBold ? '800' : '600'};`;
+    (v.outline ? `outline:${v.outline};outline-offset:-2px;` : '') +
+    `font-weight:${v.isBold ? '800' : '600'};` +
+    `--corner-color:${v.cornerColor ?? 'transparent'};`;
   const dateIso = iso(day);
   const weekday = weekdayName(month.fdow, day);
 
@@ -111,7 +113,7 @@ for (let i = 0; i < rows * 7; i++) {
     };
     ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaParts.join('; ')}`;
   }
-  cells.push({ blank: false, num: day, iso: dateIso, dow, cats, hasMark, style, badge: v.badge, ariaLabel, detail });
+  cells.push({ blank: false, num: day, iso: dateIso, dow, cats, hasMark, style, cornerColor: v.cornerColor, ariaLabel, detail });
 }
 
 const callouts = month.callouts ?? [];
@@ -144,6 +146,7 @@ const headingId = `month-${monthIdx}-name`;
         data-iso={cell.iso}
         aria-label={cell.ariaLabel}
         :class="{ 'is-dim': isDim($el.dataset.cats) }"
+        :style="cellStyle($el.dataset.cats)"
         :aria-describedby={`tooltip && tooltip.iso === '${cell.iso}' ? 'cal-tooltip' : null`}
         @click={`openDetail(${JSON.stringify(cell.detail)})`}
         @mouseenter={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
@@ -151,9 +154,8 @@ const headingId = `month-${monthIdx}-name`;
         @focus={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
         @blur="hideTooltip(0)"
       >
+        {cell.cornerColor && <span class="cell__corner" aria-hidden="true"></span>}
         <time datetime={cell.iso}>{cell.num}</time>
-        {cell.badge === 'alrw' && <span class="cell-badge cell-badge--alrw" aria-hidden="true"></span>}
-        {cell.badge === 'dot'  && <span class="cell-badge cell-badge--dot"  aria-hidden="true"></span>}
       </button>
     ) : (
       <div class:list={['cell', (cell.dow === 0 || cell.dow === 6) && 'cell--weekend']} role="gridcell">
@@ -246,7 +248,22 @@ const headingId = `month-${monthIdx}-name`;
     background: transparent;
     border: 2px solid transparent;
     padding: 0;
+    overflow: hidden;
     transition: transform 0.08s ease, opacity 0.2s ease, filter 0.2s ease;
+  }
+
+  .cell > time {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cell__corner {
+    position: absolute;
+    inset: 0;
+    background: var(--corner-color);
+    clip-path: polygon(100% 4px, 100% 100%, 4px 100%);
+    z-index: 1;
+    pointer-events: none;
   }
 
   .cell--marked {
@@ -267,24 +284,6 @@ const headingId = `month-${monthIdx}-name`;
      .cell--weekend but skipped when they already have their own bg. */
   :global(.rails-on) .cell--weekend:not(.cell--marked) {
     background: var(--porcelain);
-  }
-
-  .cell-badge {
-    position: absolute;
-    top: 2px;
-    right: 2px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-  }
-
-  .cell-badge--alrw {
-    border: 1.5px dotted var(--prussian-blue);
-  }
-
-  .cell-badge--dot {
-    background: var(--sky);
-    border: 1px solid #fff;
   }
 
   .callout__label {
