@@ -200,6 +200,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     display: grid;
     grid-template-columns: repeat(auto-fill, var(--tog-cell-w, 14rem));
     gap: 2px 4px;
+    justify-content: space-between;
   }
 
   .fb__note {
@@ -371,10 +372,13 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 
   .fb__clear:hover { color: var(--prussian-blue); }
 
-  /* ---- Mobile: labels go inline, rows left-align ---- */
+  /* ---- Mobile: force 2 columns, ignore JS-measured cell width ---- */
   @media (max-width: 720px) {
-    .fb__row { justify-content: flex-start; }
-    .fb__label { flex-basis: 100%; margin-right: 0; padding-bottom: 2px; }
-    .fb__row--ctl { justify-content: space-between; gap: 12px; }
+    .fb__switches {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .tog .tog__label {
+      width: auto;
+    }
   }
 </style>
