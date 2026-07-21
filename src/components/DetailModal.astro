@@ -32,13 +32,12 @@
                   rel="noopener"
                   :href="googleCalUrl(item)"
                 >Google Cal</a>
-                <button
-                  type="button"
+                <a
                   class="cta"
                   x-show="isApple"
-                  @click="openInAppleCalendar(item)"
+                  :href="appleCalUrl(item)"
                   title="Open this event in the built-in Calendar app"
-                >iCal</button>
+                >iCal</a>
                 <button
                   type="button"
                   class="cta"

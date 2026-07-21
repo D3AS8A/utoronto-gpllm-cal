@@ -353,16 +353,16 @@ export default (Alpine: Alpine) => {
     },
 
     /**
-     * Open the .ics as an inline Blob URL so iOS/macOS routes it to Calendar
-     * via the OS handler for text/calendar (instead of downloading a file).
+     * webcal:// URL to the pre-built static .ics for this event. All iOS/macOS
+     * browsers (Safari, Chrome, Firefox, etc.) hand webcal:// off to the OS
+     * Calendar handler — Blob URLs only work in Safari.
      */
-    openInAppleCalendar(item: DetailItem) {
-      this._withIcs(item, (value) => {
-        const blob = new Blob([value], { type: 'text/calendar;charset=utf-8' });
-        const url = URL.createObjectURL(blob);
-        window.location.href = url;
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      });
+    appleCalUrl(item: DetailItem): string {
+      if (!item.isoStart) return '';
+      const day = item.isoStart.slice(0, 10);
+      const slug = `${day}-${safeFilename(item.name)}`;
+      const host = window.location.host;
+      return `webcal://${host}/ics/${slug}.ics`;
     },
 
     _withIcs(item: DetailItem, cb: (value: string, filename: string) => void) {
