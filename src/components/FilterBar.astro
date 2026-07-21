@@ -46,6 +46,17 @@ const classChips: Chip[] = FILTERS_CLASSES.map(toChip);
 const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 ---
 
+<div class="fb__topbar">
+  <button
+    type="button"
+    class="fb__clear"
+    @click="reset()"
+    x-show="anyFilter && !isDefault"
+  >
+    <span class="fb__clear-text">clear <span x-text="activeCount"></span> filter<span x-text="activeCount === 1 ? '' : 's'"></span></span> <span class="fb__clear-x">✕</span>
+  </button>
+</div>
+
 <aside class="fb" :data-tucked="fbHidden ? 'true' : null" role="toolbar" aria-label="Calendar filters">
   <div class="fb__inner">
     <div class="fb__row">
@@ -127,16 +138,6 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
       </div>
     </div>
 
-    <div class="fb__row fb__row--ctl">
-      <button
-        type="button"
-        class="fb__clear"
-        @click="reset()"
-        x-show="anyFilter && !isDefault"
-      >
-        clear <span x-text="activeCount"></span> filter<span x-text="activeCount === 1 ? '' : 's'"></span> ✕
-      </button>
-    </div>
   </div>
 </aside>
 
@@ -170,13 +171,6 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     display: block;
   }
 
-  .fb__row--ctl {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 18px;
-    padding-top: 2px;
-  }
 
   .fb__group {
     display: block;
@@ -342,19 +336,37 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 
   /* ---- Clear link ---- */
 
+  .fb__topbar {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-height: 18px;
+    padding: 4px clamp(14px, 3.5vw, 40px) 0;
+    margin: 0 calc(-1 * clamp(14px, 3.5vw, 40px));
+  }
+
   .fb__clear {
     background: none;
     border: 0;
-    padding: 6px 2px;
+    padding: 4px 2px;
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 11px;
     font-weight: 400;
-    letter-spacing: 0.05em;
+    letter-spacing: 0;
     color: var(--matisse);
     cursor: pointer;
+    text-decoration: none;
+  }
+
+  .fb__clear-text {
     text-decoration: underline;
-    text-decoration-thickness: 1.5px;
+    text-decoration-thickness: 1px;
     text-underline-offset: 3px;
+  }
+
+  .fb__clear-x {
+    display: inline-block;
+    margin-left: 4px;
   }
 
   .fb__clear:hover { color: var(--prussian-blue); }
