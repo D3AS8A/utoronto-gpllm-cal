@@ -35,9 +35,16 @@
                 <button
                   type="button"
                   class="cta"
+                  x-show="isApple"
+                  @click="openInAppleCalendar(item)"
+                  title="Open this event in the built-in Calendar app"
+                >iCal</button>
+                <button
+                  type="button"
+                  class="cta"
                   @click="downloadIcs(item)"
-                  title="Download an .ics file for Apple Calendar, Outlook, or any CalDAV client"
-                >Other Calendar</button>
+                  title="Download an .ics file for any other calendar app"
+                >.ics</button>
               </div>
             </div>
           </li>
@@ -184,4 +191,14 @@
   }
 
   .cta:active { transform: scale(0.97); }
+
+  @media (max-width: 480px) {
+    .detail-item__cta { gap: 6px; }
+    .detail-item__cta-label { font-size: 9.5px; letter-spacing: 0.1em; }
+    .cta {
+      padding: 4px 7px;
+      font-size: 10px;
+      letter-spacing: 0.02em;
+    }
+  }
 </style>

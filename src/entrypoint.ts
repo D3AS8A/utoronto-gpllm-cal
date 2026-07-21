@@ -349,6 +349,23 @@ export default (Alpine: Alpine) => {
 
     /** Generate a single-event .ics file and trigger a download. */
     downloadIcs(item: DetailItem) {
+      this._withIcs(item, (value, filename) => triggerDownload(value, filename));
+    },
+
+    /**
+     * Open the .ics as an inline Blob URL so iOS/macOS routes it to Calendar
+     * via the OS handler for text/calendar (instead of downloading a file).
+     */
+    openInAppleCalendar(item: DetailItem) {
+      this._withIcs(item, (value) => {
+        const blob = new Blob([value], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        window.location.href = url;
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
+      });
+    },
+
+    _withIcs(item: DetailItem, cb: (value: string, filename: string) => void) {
       if (!item.isoStart || !item.isoEnd) return;
       vibrate(6);
       createEvent({
@@ -365,8 +382,17 @@ export default (Alpine: Alpine) => {
       }, (error, value) => {
         if (error) { console.error('ics error', error); return; }
         const day = item.isoStart!.slice(0, 10);
-        triggerDownload(value, `${day}-${safeFilename(item.name)}.ics`);
+        cb(value, `${day}-${safeFilename(item.name)}.ics`);
       });
+    },
+
+    /** iOS/iPadOS/macOS: show a dedicated "iCal" CTA that opens the event in Calendar.app. */
+    get isApple(): boolean {
+      if (typeof navigator === 'undefined') return false;
+      const ua = navigator.userAgent;
+      // iPadOS 13+ reports Macintosh + touch — include maxTouchPoints > 1 to catch it.
+      const iPadMasqueradingAsMac = ua.includes('Macintosh') && navigator.maxTouchPoints > 1;
+      return /iPhone|iPad|iPod|Macintosh/.test(ua) || iPadMasqueradingAsMac;
     },
   }));
 };
