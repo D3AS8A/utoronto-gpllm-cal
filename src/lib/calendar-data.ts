@@ -60,17 +60,17 @@ export const META: Record<CatKey, CatMeta> = {
     hours: {},
   },
   lmc: {
-    name: 'Legal Methods — Cdn Law', time: '9:30am–4:30pm',
+    name: 'Legal Methods — Canadian Law', time: '9:30am–4:30pm',
     t: 'fill', c: '#af9b88',
     hours: { any: { start: [9, 30], end: [16, 30] } },
   },
   lmb: {
-    name: 'Legal Methods — Bus Law & ILT', time: '9:30am–4:30pm',
+    name: 'Legal Methods — Business Law & Innovation, Law & Technology', time: '9:30am–4:30pm',
     t: 'fill', c: '#936e42',
     hours: { any: { start: [9, 30], end: [16, 30] } },
   },
   alrw: {
-    name: 'ALRW Intensive — Cdn Law', time: '9:30am–5:30pm',
+    name: 'Applied Legal Research & Writing Intensive — Canadian Law', time: '9:30am–5:30pm',
     t: 'alrw', c: '#002554',
     hours: { any: { start: [9, 30], end: [17, 30] } },
   },
@@ -92,7 +92,7 @@ export const META: Record<CatKey, CatMeta> = {
   mid:  { name: 'Mid-Term Exam',           time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#1f6092', hours: EXAM_HOURS },
   dmid: { name: 'Deferred Mid-Term Exam',  time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'circle',  c: '#70c7e9', hours: EXAM_HOURS },
   fin:  { name: 'Final Exam',              time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#002554', hours: EXAM_HOURS },
-  finc: { name: 'Final Exam — Cdn Law',    time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'dashed',  c: '#002554', hours: EXAM_HOURS },
+  finc: { name: 'Final Exam — Canadian Law',    time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'dashed',  c: '#002554', hours: EXAM_HOURS },
   dfin: { name: 'Deferred Final Exam',     time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#70c7e9', hours: EXAM_HOURS },
 };
 
