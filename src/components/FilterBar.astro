@@ -19,7 +19,8 @@ const LABEL: Record<string, string> = {
 
 interface Chip {
   key: string;
-  label: string;
+  labelHead: string;
+  labelTail: string | null;
   swatchStyle: string;
 }
 
@@ -27,9 +28,16 @@ function toChip(f: FilterDef): Chip {
   const meta = f.name
     ? { t: f.t!, c: f.c! }
     : { t: META[f.cats[0]].t, c: META[f.cats[0]].c };
+  const raw = LABEL[f.key] ?? f.key;
+  const idx = raw.indexOf('(');
+  const tail = idx > 0 ? raw.slice(idx) : null;
+  const wrap = tail !== null && !/^\(\w+\)$/.test(tail);
+  const labelHead = wrap ? raw.slice(0, idx).trimEnd() : raw;
+  const labelTail = wrap ? tail : null;
   return {
     key: f.key,
-    label: LABEL[f.key] ?? f.key,
+    labelHead,
+    labelTail,
     swatchStyle: swatchStyle(meta.t, meta.c, 14),
   };
 }
@@ -41,7 +49,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 <aside class="fb" :data-tucked="fbHidden ? 'true' : null" role="toolbar" aria-label="Calendar filters">
   <div class="fb__inner">
     <div class="fb__row">
-      <div class="fb__group" :class="{ 'is-open': classesOpen }">
+      <div class="fb__group" :class="{ 'is-open': classesOpen }" data-fb-group="classes">
         <button
           type="button"
           class="fb__label"
@@ -65,7 +73,10 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
                   :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
                 >
                   <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-                  <span class="tog__label">{c.label}</span>
+                  <span class="tog__label">
+                  {c.labelHead}
+                  {c.labelTail && <><br />{c.labelTail}</>}
+                </span>
                   <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
                 </button>
               ))}
@@ -76,7 +87,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     </div>
 
     <div class="fb__row">
-      <div class="fb__group" :class="{ 'is-open': examsOpen }">
+      <div class="fb__group" :class="{ 'is-open': examsOpen }" data-fb-group="exams">
         <button
           type="button"
           class="fb__label"
@@ -100,7 +111,10 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
                   :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
                 >
                   <span class="tog__swatch" style={c.swatchStyle} aria-hidden="true"></span>
-                  <span class="tog__label">{c.label}</span>
+                  <span class="tog__label">
+                  {c.labelHead}
+                  {c.labelTail && <><br />{c.labelTail}</>}
+                </span>
                   <span class="tog__track" aria-hidden="true"><span class="tog__thumb"></span></span>
                 </button>
               ))}
@@ -190,8 +204,8 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 
   .fb__switches {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 2px 16px;
+    grid-template-columns: repeat(auto-fill, var(--tog-cell-w, 14rem));
+    gap: 2px 4px;
   }
 
   .fb__note {
@@ -271,13 +285,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
       color 0.3s linear;
   }
 
-  .tog .tog__label { flex: 1; }
-  .tog .tog__track { margin-left: 8px; }
-
-  .tog:hover {
-    background: rgba(0, 37, 84, 0.04);
-    border-color: rgba(0, 37, 84, 0.08);
-  }
+  .tog .tog__label { width: var(--tog-label-w, auto); }
 
   .tog:focus-visible {
     outline: 2px solid var(--matisse);
@@ -287,7 +295,6 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
   .tog.is-on {
     background: rgba(0, 37, 84, 0.06);
     border-color: rgba(0, 37, 84, 0.12);
-    font-weight: 700;
   }
 
   .tog__swatch {
@@ -297,7 +304,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
   }
 
   .tog__label {
-    line-height: 1.2;
+    line-height: 1.1;
     min-width: 0;
   }
 

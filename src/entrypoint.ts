@@ -172,6 +172,42 @@ export default (Alpine: Alpine) => {
       const fromUrl = readFiltersFromUrl();
       if (fromUrl !== null) this.filters = fromUrl;
 
+      // Size all toggle labels in a group to the widest one so their tracks
+      // align at a consistent X (rather than being pushed to the cell's edge).
+      // Also drive the grid cell min-width from the same measurement so the
+      // flex container isn't forced to shrink the label.
+      const TOG_FIXED = 14 + 8 + 8 + 26 + 18; // swatch + 2×gap + track + tog padding
+      const TOG_PAD = 0; // extra breathing room after label text (on top of 8px flex gap)
+      const measureGroup = (group: HTMLElement) => {
+        const labels = group.querySelectorAll<HTMLElement>('.tog__label');
+        if (!labels.length) return;
+        group.style.removeProperty('--tog-label-w');
+        group.style.removeProperty('--tog-cell-w');
+        let max = 0;
+        labels.forEach((l) => {
+          const w = l.getBoundingClientRect().width;
+          if (w > max) max = w;
+        });
+        if (max > 0) {
+          const labelW = Math.ceil(max) + TOG_PAD;
+          group.style.setProperty('--tog-label-w', `${labelW}px`);
+          group.style.setProperty('--tog-cell-w', `${labelW + TOG_FIXED}px`);
+        }
+      };
+      const measureAll = () => {
+        document.querySelectorAll<HTMLElement>('.fb__group.is-open').forEach(measureGroup);
+      };
+      let measureRaf = 0;
+      const scheduleMeasure = () => {
+        if (measureRaf) cancelAnimationFrame(measureRaf);
+        measureRaf = requestAnimationFrame(() => { measureRaf = 0; measureAll(); });
+      };
+      scheduleMeasure();
+      window.addEventListener('resize', scheduleMeasure, { passive: true });
+      if (document.fonts?.ready) document.fonts.ready.then(scheduleMeasure);
+      this.$watch('classesOpen', (v: boolean) => { if (v) scheduleMeasure(); });
+      this.$watch('examsOpen', (v: boolean) => { if (v) scheduleMeasure(); });
+
       // Hide filter bar on scroll-down (past its natural position), show on scroll-up.
       const fbEl = document.querySelector<HTMLElement>('.fb');
       if (fbEl) {
