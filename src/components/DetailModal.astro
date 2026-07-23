@@ -1,7 +1,13 @@
 ---
 ---
 <template x-if="detail">
-  <div class="detail-scrim" @click="detail = null">
+  <div class="detail-scrim" @click="closeDetail()">
+    <div
+      x-show="spotlight.active"
+      class="detail-spotlight"
+      :style="`--sp-x:${spotlight.x}px;--sp-y:${spotlight.y}px;--sp-w:${spotlight.w}px;--sp-h:${spotlight.h}px`"
+      aria-hidden="true"
+    ></div>
     <article
       class="detail-card"
       @click.stop
@@ -15,7 +21,7 @@
           <p class="detail-card__weekday" x-text="detail.weekday"></p>
           <h2 id="detail-heading" class="detail-card__date" x-text="detail.dateLabel"></h2>
         </hgroup>
-        <button type="button" class="detail-card__close" @click="detail = null" aria-label="Close">✕</button>
+        <button type="button" class="detail-card__close" @click="closeDetail()" aria-label="Close">✕</button>
       </header>
 
       <ul class="detail-card__body">
@@ -59,7 +65,7 @@
     position: fixed;
     inset: 0;
     z-index: 70;
-    background: rgba(0, 37, 84, 0.42);
+    background: rgba(0, 37, 84, 0.28);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -67,7 +73,22 @@
     animation: gpFade 0.16s ease;
   }
 
+  /* Extra dimming everywhere EXCEPT the source month card — box-shadow spills
+     outward from a zero-fill rect so the source month reads as a spotlight
+     while the rest of the calendar sits under a heavier dim. */
+  .detail-spotlight {
+    position: fixed;
+    left: var(--sp-x, 0);
+    top: var(--sp-y, 0);
+    width: var(--sp-w, 0);
+    height: var(--sp-h, 0);
+    pointer-events: none;
+    box-shadow: 0 0 0 100vmax rgba(0, 37, 84, 0.20);
+  }
+
   .detail-card {
+    position: relative;
+    z-index: 1;
     background: #fff;
     width: 100%;
     max-width: 400px;

@@ -181,9 +181,18 @@ export default (Alpine: Alpine) => {
       slot0: null as CalendarDetail | null,
       slot1: null as CalendarDetail | null,
     } as TooltipModel,
+    spotlight: {
+      active: false,
+      x: 0,
+      y: 0,
+      w: 0,
+      h: 0,
+    },
     _ttHideTimer: 0 as ReturnType<typeof setTimeout> | 0,
     _ttClearTimer: 0 as ReturnType<typeof setTimeout> | 0,
     _ttEnterRaf: 0 as number,
+    _spSrcEl: null as HTMLElement | null,
+    _spTrack: null as (() => void) | null,
 
     init() {
       // Fixed-position tooltip references cell viewport coords; drop it on
@@ -319,7 +328,7 @@ export default (Alpine: Alpine) => {
       syncFiltersToUrl(this.filters);
     },
 
-    openDetail(detail: CalendarDetail) {
+    openDetail(detail: CalendarDetail, sourceEl?: HTMLElement) {
       vibrate(9);
       this.detail = detail;
       this.tooltip.visible = false;
@@ -330,6 +339,50 @@ export default (Alpine: Alpine) => {
       if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
       if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
       if (this._ttEnterRaf) { cancelAnimationFrame(this._ttEnterRaf); this._ttEnterRaf = 0; }
+      this._setSpotlight(sourceEl?.closest('.month-card') as HTMLElement | null);
+    },
+
+    closeDetail() {
+      this.detail = null;
+      this._teardownSpotlight();
+    },
+
+    _setSpotlight(monthEl: HTMLElement | null | undefined) {
+      this._teardownSpotlight();
+      if (!monthEl) return;
+      this._spSrcEl = monthEl;
+      this._readSpotlightRect();
+      this.spotlight.active = true;
+      const track = () => this._readSpotlightRect();
+      this._spTrack = track;
+      window.addEventListener('scroll', track, { passive: true, capture: true });
+      window.addEventListener('resize', track, { passive: true });
+    },
+
+    _readSpotlightRect() {
+      if (!this._spSrcEl) return;
+      const r = this._spSrcEl.getBoundingClientRect();
+      // Clamp to below the sticky filter bar so the spotlight cutout doesn't
+      // extend up into the filter bar area (it would otherwise show a lighter
+      // patch on the bar in the source month's column).
+      const fb = document.querySelector<HTMLElement>('.fb');
+      const topFloor = fb ? Math.max(0, fb.getBoundingClientRect().bottom) : 0;
+      const top = Math.max(r.top, topFloor);
+      const height = Math.max(0, r.bottom - top);
+      this.spotlight.x = r.left;
+      this.spotlight.y = top;
+      this.spotlight.w = r.width;
+      this.spotlight.h = height;
+    },
+
+    _teardownSpotlight() {
+      this.spotlight.active = false;
+      this._spSrcEl = null;
+      if (this._spTrack) {
+        window.removeEventListener('scroll', this._spTrack, { capture: true } as EventListenerOptions);
+        window.removeEventListener('resize', this._spTrack);
+        this._spTrack = null;
+      }
     },
 
     /** Head background color for the currently-active slot — reactive so CSS `--tt-head` transitions. */
@@ -421,7 +474,10 @@ export default (Alpine: Alpine) => {
     openTooltipDetail() {
       const d = this.tooltip.active === 0 ? this.tooltip.slot0 : this.tooltip.slot1;
       if (!d) return;
-      this.openDetail(d);
+      const cell = this.tooltip.activeIso
+        ? document.querySelector<HTMLElement>(`[data-iso="${this.tooltip.activeIso}"]`)
+        : null;
+      this.openDetail(d, cell ?? undefined);
     },
 
     /**

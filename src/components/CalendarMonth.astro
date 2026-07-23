@@ -148,7 +148,7 @@ const headingId = `month-${monthIdx}-name`;
         :class="{ 'is-dim': isDim($el.dataset.cats) }"
         :style="cellStyle($el.dataset.cats)"
         :aria-describedby={`tooltip && tooltip.iso === '${cell.iso}' ? 'cal-tooltip' : null`}
-        @click={`openDetail(${JSON.stringify(cell.detail)})`}
+        @click={`openDetail(${JSON.stringify(cell.detail)}, $el)`}
         @mouseenter={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
         @mouseleave="hideTooltip()"
         @focus={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
