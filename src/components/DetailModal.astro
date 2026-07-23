@@ -5,6 +5,7 @@
     <article
       class="detail-card"
       @click.stop
+      @pointerdown="startCardDrag($event)"
       role="dialog"
       aria-modal="true"
       aria-labelledby="detail-heading"
@@ -73,6 +74,23 @@
     border: 2px solid var(--prussian-blue);
     box-shadow: 8px 8px 0 var(--prussian-blue);
     animation: gpPop 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    cursor: grab;
+    touch-action: none;
+  }
+
+  .detail-card.is-dragging {
+    cursor: grabbing;
+    user-select: none;
+    animation: none;
+  }
+
+  .detail-card.is-dragging * {
+    user-select: none;
+  }
+
+  .detail-card a,
+  .detail-card button {
+    cursor: pointer;
   }
 
   .detail-card__head {

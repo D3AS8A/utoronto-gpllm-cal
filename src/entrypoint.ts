@@ -424,6 +424,46 @@ export default (Alpine: Alpine) => {
       this.openDetail(d);
     },
 
+    /**
+     * Window-manager style drag on the detail modal — grab any non-interactive
+     * spot (header, date, item text, swatch) and drag to reposition. Uses the
+     * standalone `translate` CSS property so it composes with the pop
+     * animation's `transform: scale(...)` without fighting it.
+     */
+    startCardDrag(e: PointerEvent) {
+      if (e.button !== 0) return;
+      const el = e.currentTarget as HTMLElement;
+      const t = e.target as HTMLElement;
+      if (t.closest('a, button, input, select, textarea')) return;
+      e.preventDefault();
+
+      const parse = (s: string): [number, number] => {
+        const p = s.trim().split(/\s+/);
+        const n = (v?: string) => (v ? parseFloat(v) : 0) || 0;
+        return [n(p[0]), n(p[1])];
+      };
+      const [baseDx, baseDy] = parse(el.style.translate);
+      const startX = e.clientX;
+      const startY = e.clientY;
+
+      const onMove = (ev: PointerEvent) => {
+        el.style.translate = `${baseDx + (ev.clientX - startX)}px ${baseDy + (ev.clientY - startY)}px`;
+      };
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove);
+        window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
+        document.body.style.removeProperty('cursor');
+        el.classList.remove('is-dragging');
+      };
+
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
+      document.body.style.cursor = 'grabbing';
+      el.classList.add('is-dragging');
+    },
+
     /** Google Calendar "add event" URL for one detail item. */
     googleCalUrl(item: DetailItem): string | null {
       if (!item.isoStart || !item.isoEnd) return null;
