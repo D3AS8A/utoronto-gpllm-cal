@@ -48,15 +48,24 @@ interface CalendarDetail {
   items: DetailItem[];
 }
 
-interface TooltipState {
-  iso: string;
-  detail: CalendarDetail;
+interface TooltipModel {
+  /** Container fade / pointer-events gate. */
+  visible: boolean;
+  /** True during a lavalamp-style travel — enables position + head-color transitions. */
+  travel: boolean;
+  /** Anchor below the cell instead of above (used when cell is near top of viewport). */
+  below: boolean;
   /** Center-x of the source cell, viewport coords. */
   x: number;
   /** Top-y of the source cell, viewport coords. Tooltip renders above this. */
   yTop: number;
   /** Bottom-y of the source cell, for below-cell fallback when near top of viewport. */
   yBottom: number;
+  /** Double-buffered content — the active slot is shown, the inactive one crossfades out during travel. */
+  active: 0 | 1;
+  activeIso: string;
+  slot0: CalendarDetail | null;
+  slot1: CalendarDetail | null;
 }
 
 /**
@@ -160,8 +169,21 @@ export default (Alpine: Alpine) => {
     examsOpen: false,
     fbHidden: false,
     detail: null as CalendarDetail | null,
-    tooltip: null as TooltipState | null,
+    tooltip: {
+      visible: false,
+      travel: false,
+      below: false,
+      x: 0,
+      yTop: 0,
+      yBottom: 0,
+      active: 0 as 0 | 1,
+      activeIso: '',
+      slot0: null as CalendarDetail | null,
+      slot1: null as CalendarDetail | null,
+    } as TooltipModel,
     _ttHideTimer: 0 as ReturnType<typeof setTimeout> | 0,
+    _ttClearTimer: 0 as ReturnType<typeof setTimeout> | 0,
+    _ttEnterRaf: 0 as number,
 
     init() {
       // Fixed-position tooltip references cell viewport coords; drop it on
@@ -300,38 +322,106 @@ export default (Alpine: Alpine) => {
     openDetail(detail: CalendarDetail) {
       vibrate(9);
       this.detail = detail;
-      this.tooltip = null;
+      this.tooltip.visible = false;
+      this.tooltip.travel = false;
+      this.tooltip.slot0 = null;
+      this.tooltip.slot1 = null;
+      this.tooltip.activeIso = '';
       if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
+      if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
+      if (this._ttEnterRaf) { cancelAnimationFrame(this._ttEnterRaf); this._ttEnterRaf = 0; }
+    },
+
+    /** Head background color for the currently-active slot — reactive so CSS `--tt-head` transitions. */
+    get tooltipHeadBg(): string {
+      const d = this.tooltip.active === 0 ? this.tooltip.slot0 : this.tooltip.slot1;
+      return d?.headBg ?? 'var(--prussian-blue)';
     },
 
     /**
      * Fine-pointer hover / keyboard-focus preview. Skips touch and coarse
      * pointers so mobile taps go straight to the modal instead of showing
      * a tooltip that a finger can't hover.
+     *
+     * Two modes:
+     *  - Fresh entry (nothing visible): teleport to position, fade in.
+     *  - Travel (tooltip already visible from a prior hover): write incoming
+     *    detail into the inactive slot, flip active — CSS transitions the
+     *    container position and crossfades the two slots. Head-color also
+     *    transitions via `--tt-head`.
+     *
+     * When the anchor axis flips (above ↔ below), we force fresh entry so
+     * the arrow doesn't rotate mid-glide.
      */
     showTooltip(iso: string, detail: CalendarDetail, rect: DOMRect) {
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
       if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
-      this.tooltip = {
-        iso, detail,
-        x: rect.left + rect.width / 2,
-        yTop: rect.top,
-        yBottom: rect.bottom,
-      };
+      if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
+
+      const belowNext = rect.top < 180;
+      const x = rect.left + rect.width / 2;
+      const wasVisible = this.tooltip.visible;
+      const arrowFlip = wasVisible && belowNext !== this.tooltip.below;
+      const canTravel = wasVisible && !arrowFlip;
+
+      if (canTravel) {
+        if (this.tooltip.activeIso === iso) return;
+        const nextActive: 0 | 1 = this.tooltip.active === 0 ? 1 : 0;
+        if (nextActive === 0) this.tooltip.slot0 = detail;
+        else this.tooltip.slot1 = detail;
+        this.tooltip.travel = true;
+        this.tooltip.active = nextActive;
+        this.tooltip.activeIso = iso;
+        this.tooltip.below = belowNext;
+        this.tooltip.x = x;
+        this.tooltip.yTop = rect.top;
+        this.tooltip.yBottom = rect.bottom;
+        return;
+      }
+
+      this.tooltip.travel = false;
+      this.tooltip.visible = false;
+      this.tooltip.active = 0;
+      this.tooltip.activeIso = iso;
+      this.tooltip.slot0 = detail;
+      this.tooltip.slot1 = null;
+      this.tooltip.below = belowNext;
+      this.tooltip.x = x;
+      this.tooltip.yTop = rect.top;
+      this.tooltip.yBottom = rect.bottom;
+
+      if (this._ttEnterRaf) cancelAnimationFrame(this._ttEnterRaf);
+      this._ttEnterRaf = requestAnimationFrame(() => {
+        this._ttEnterRaf = 0;
+        this.tooltip.visible = true;
+      });
     },
 
-    hideTooltip(delay = 140) {
+    hideTooltip(delay = 320) {
       if (this._ttHideTimer) clearTimeout(this._ttHideTimer);
-      this._ttHideTimer = setTimeout(() => { this.tooltip = null; this._ttHideTimer = 0; }, delay);
+      this._ttHideTimer = setTimeout(() => {
+        this.tooltip.visible = false;
+        this.tooltip.travel = false;
+        this.tooltip.activeIso = '';
+        this._ttHideTimer = 0;
+        if (this._ttClearTimer) clearTimeout(this._ttClearTimer);
+        this._ttClearTimer = setTimeout(() => {
+          this.tooltip.slot0 = null;
+          this.tooltip.slot1 = null;
+          this._ttClearTimer = 0;
+        }, 180);
+      }, delay);
     },
 
     cancelHideTooltip() {
       if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
+      if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
     },
 
     openTooltipDetail() {
-      if (!this.tooltip) return;
-      this.openDetail(this.tooltip.detail);
+      const d = this.tooltip.active === 0 ? this.tooltip.slot0 : this.tooltip.slot1;
+      if (!d) return;
+      this.openDetail(d);
     },
 
     /** Google Calendar "add event" URL for one detail item. */
