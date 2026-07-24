@@ -98,8 +98,8 @@ p + p {
 --------------------------------------------------------------------------- */
 
 :focus-visible {
-  outline: 1px solid var(--tobacco);
-  outline-offset: 3px;
+  outline: 0.0625rem solid var(--tobacco);
+  outline-offset: 0.1875rem;
   border-radius: 0.2rem;
 }
 
@@ -122,10 +122,10 @@ p + p {
 
 .sr-only {
   position: absolute;
-  width: 1px;
-  height: 1px;
+  width: 0.0625rem;
+  height: 0.0625rem;
   padding: 0;
-  margin: -1px;
+  margin: -0.0625rem;
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
@@ -137,7 +137,7 @@ p + p {
   top: -100%;
   left: 1rem;
   background: var(--woodsmoke);
-  border: 1px solid var(--tuna);
+  border: 0.0625rem solid var(--tuna);
   color: var(--bone);
   padding: 0.5rem 1.25rem;
   border-radius: 0.3rem;
@@ -169,7 +169,7 @@ p + p {
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
-  border: 1px solid transparent;
+  border: 0.0625rem solid transparent;
   transition:
     background-color 200ms ease,
     border-color     200ms ease,
@@ -270,7 +270,7 @@ body.no-cursor  { cursor: none; }
 
 [data-tooltip]::before {
   content: '';
-  top: calc(100% + 2px);
+  top: calc(100% + 0.125rem);
   border-left: 0.5rem solid transparent;
   border-right: 0.5rem solid transparent;
   border-bottom: 0.375rem solid var(--woodsmoke);
@@ -280,13 +280,13 @@ body.no-cursor  { cursor: none; }
   content: attr(data-tooltip);
   top: calc(100% + 0.5rem);
   background-color: var(--woodsmoke);
-  border: 1px solid var(--tuna);
+  border: 0.0625rem solid var(--tuna);
   color: var(--bone);
   font-size: var(--text-xs);
   font-weight: 500;
   white-space: nowrap;
   padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
+  border-radius: 624.938rem;
 }
 
 /* ---------------------------------------------------------------------------
@@ -336,7 +336,7 @@ body.no-cursor  { cursor: none; }
   top: 50%;
   left: auto;
   right: 100%;
-  transform: translateY(-50%) translateX(4px) scale(0.95);
+  transform: translateY(-50%) translateX(0.25rem) scale(0.95);
   margin-right: 0.5rem;
 }
 
@@ -354,7 +354,7 @@ body.no-cursor  { cursor: none; }
   top: 50%;
   left: 100%;
   right: auto;
-  transform: translateY(-50%) translateX(-4px) scale(0.95);
+  transform: translateY(-50%) translateX(-0.25rem) scale(0.95);
   margin-left: 0.5rem;
 }
 

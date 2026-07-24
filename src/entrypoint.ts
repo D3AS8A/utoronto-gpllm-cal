@@ -209,9 +209,9 @@ export default (Alpine: Alpine) => {
       // Also drive the grid cell min-width from the same measurement so the
       // flex container isn't forced to shrink the label.
       const TOG_FIXED = 14 + 8 + 8 + 26 + 18; // swatch + 2×gap + track + tog padding
-      const TOG_PAD = 0; // extra breathing room after label text (on top of 8px flex gap)
+      const TOG_PAD = 0; // extra breathing room after label text (on top of 0.5rem flex gap)
       const measureGroup = (group: HTMLElement) => {
-        const labels = group.querySelectorAll<HTMLElement>('.tog__label');
+        const labels = group.querySelectorAll<HTMLElement>('.toggle-label');
         if (!labels.length) return;
         group.style.removeProperty('--tog-label-w');
         group.style.removeProperty('--tog-cell-w');
@@ -222,12 +222,12 @@ export default (Alpine: Alpine) => {
         });
         if (max > 0) {
           const labelW = Math.ceil(max) + TOG_PAD;
-          group.style.setProperty('--tog-label-w', `${labelW}px`);
-          group.style.setProperty('--tog-cell-w', `${labelW + TOG_FIXED}px`);
+          group.style.setProperty('--tog-label-w', `${labelW / 16}rem`);
+          group.style.setProperty('--tog-cell-w', `${(labelW + TOG_FIXED) / 16}rem`);
         }
       };
       const measureAll = () => {
-        document.querySelectorAll<HTMLElement>('.fb__group.is-open').forEach(measureGroup);
+        document.querySelectorAll<HTMLElement>('.filter-group.is-open').forEach(measureGroup);
       };
       let measureRaf = 0;
       const scheduleMeasure = () => {
@@ -310,7 +310,7 @@ export default (Alpine: Alpine) => {
       const v = cellVisual(relevant.length ? relevant : all);
       return (
         `background:${v.bg};color:${v.fg};border:${v.border};` +
-        (v.outline ? `outline:${v.outline};outline-offset:-2px;` : '') +
+        (v.outline ? `outline:${v.outline};outline-offset:-0.125rem;` : '') +
         `font-weight:${v.isBold ? '800' : '600'};` +
         `--corner-color:${v.cornerColor ?? 'transparent'};`
       );
@@ -365,7 +365,7 @@ export default (Alpine: Alpine) => {
       // Clamp to below the sticky filter bar so the spotlight cutout doesn't
       // extend up into the filter bar area (it would otherwise show a lighter
       // patch on the bar in the source month's column).
-      const fb = document.querySelector<HTMLElement>('.fb');
+      const fb = document.querySelector<HTMLElement>('.filter-bar');
       const topFloor = fb ? Math.max(0, fb.getBoundingClientRect().bottom) : 0;
       const top = Math.max(r.top, topFloor);
       const height = Math.max(0, r.bottom - top);

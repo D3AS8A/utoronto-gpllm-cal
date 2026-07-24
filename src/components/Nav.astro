@@ -146,10 +146,10 @@ function isActive(href: string): boolean {
   /* Floating indicator — single element that slides between links */
   .nav-indicator {
     position: absolute;
-    bottom: -2px;
-    height: 2px;
+    bottom: -0.125rem;
+    height: 0.125rem;
     background: var(--tan);
-    border-radius: 9999px;
+    border-radius: 624.938rem;
     pointer-events: none;
     /* No transition on load — snaps to active link instantly */
   }
@@ -163,15 +163,15 @@ function isActive(href: string): boolean {
   .hamburger {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    width: 22px;
+    gap: 0.375rem;
+    width: 1.375rem;
   }
 
   .hamburger span {
     display: block;
-    height: 2px;
+    height: 0.125rem;
     background: currentColor;
-    border-radius: 9999px;
+    border-radius: 624.938rem;
     transform-origin: center;
     transition:
       transform 350ms ease,
@@ -179,14 +179,14 @@ function isActive(href: string): boolean {
   }
 
   .nav-toggle.is-open .hamburger span:nth-child(1) {
-    transform: translateY(8px) rotate(45deg);
+    transform: translateY(0.5rem) rotate(45deg);
   }
   .nav-toggle.is-open .hamburger span:nth-child(2) {
     opacity: 0;
     transform: scaleX(0);
   }
   .nav-toggle.is-open .hamburger span:nth-child(3) {
-    transform: translateY(-8px) rotate(-45deg);
+    transform: translateY(-0.5rem) rotate(-45deg);
   }
 
   /* ---- Mobile ---------------------------------------------------------- */
@@ -217,9 +217,9 @@ function isActive(href: string): boolean {
       flex-direction: column;
       align-items: flex-start;
       gap: 0;
-      min-width: 180px;
+      min-width: 11.25rem;
       background: var(--woodsmoke);
-      border: 1px solid var(--tuna);
+      border: 0.0625rem solid var(--tuna);
       border-radius: 0.45rem;
       box-shadow: var(--shadow-lg);
       padding-block: 0.5rem;

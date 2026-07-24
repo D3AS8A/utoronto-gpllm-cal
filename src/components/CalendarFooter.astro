@@ -1,59 +1,59 @@
 ---
 ---
 <footer class="cal-footer">
-  <section class="cal-footer__col" aria-labelledby="footer-note-label">
-    <h2 id="footer-note-label" class="cal-footer__label">PLEASE NOTE</h2>
+  <section class="footer-col" aria-labelledby="footer-note-label">
+    <h2 id="footer-note-label" class="footer-label">PLEASE NOTE</h2>
     <p>
       Dates and times herein are subject to change. For course-specific dates and times,
       please consult syllabi on <a href="https://idpz.utorauth.utoronto.ca/idp/profile/SAML2/Redirect/SSO?execution=e1s1" target="_blank" rel="noopener"><strong>Quercus</strong></a>.
     </p>
   </section>
-  <section class="cal-footer__col cal-footer__col--mobile" aria-labelledby="footer-viewport-label">
-    <h2 id="footer-viewport-label" class="cal-footer__label">VIEWPORT</h2>
+  <section class="footer-col mobile" aria-labelledby="footer-viewport-label">
+    <h2 id="footer-viewport-label" class="footer-label">VIEWPORT</h2>
     <p>
       This calendar is fully functional on mobile devices, however a larger screen is recommended for a better view of the calendar.
     </p>
   </section>
-  <div class="cal-footer__mark">
+  <div class="footer-mark">
     <img
       src="/images/uoft-law-logo.png"
       alt="Henry N.R. Jackman Faculty of Law, University of Toronto"
-      class="cal-footer__uoft"
+      class="footer-uoft-mark"
     />
   </div>
 </footer>
 
 <style>
   .cal-footer {
-    margin-top: clamp(32px, 4.5vw, 56px);
-    border-top: 2px solid var(--prussian-blue);
-    padding-top: 18px;
+    margin-top: clamp(2rem, 4.5vw, 3.5rem);
+    border-top: 0.125rem solid var(--prussian-blue);
+    padding-top: 1.125rem;
     display: flex;
-    gap: 28px;
+    gap: 1.75rem;
     flex-wrap: wrap;
     justify-content: space-between;
   }
 
-  .cal-footer__col:first-child { max-width: 440px; }
-  .cal-footer__col:last-child  { max-width: 360px; }
+  .footer-col:first-child { max-width: 27.5rem; }
+  .footer-col:last-child  { max-width: 22.5rem; }
 
-  .cal-footer__col--mobile { display: none; }
+  .footer-col.mobile { display: none; }
 
-  @media (max-width: 720px) {
-    .cal-footer__col--mobile { display: block; }
+  @media (max-width: 45rem) {
+    .footer-col.mobile { display: block; }
   }
 
-  .cal-footer__label {
+  .footer-label {
     font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     color: var(--driftwood);
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
   }
 
   .cal-footer p {
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.5;
     font-weight: 500;
     color: var(--oxford-blue);
@@ -63,22 +63,22 @@
     color: var(--prussian-blue);
   }
 
-  .cal-footer__mark {
+  .footer-mark {
     flex: 1 0 100%;
     display: flex;
     justify-content: flex-end;
-    margin-top: 4px;
+    margin-top: 0.25rem;
   }
 
-  .cal-footer__uoft {
-    height: clamp(34px, 4vw, 46px);
+  .footer-uoft-mark {
+    height: clamp(2.125rem, 4vw, 2.875rem);
     width: auto;
     display: block;
     opacity: 0.9;
   }
 
-  @media (min-width: 900px) {
-    .cal-footer__mark {
+  @media (min-width: 56.25rem) {
+    .footer-mark {
       flex: 0 0 auto;
       align-items: flex-start;
       align-self: flex-start;

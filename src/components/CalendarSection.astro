@@ -20,15 +20,15 @@ const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
   class="season"
   aria-labelledby={`season-${season}-name`}
 >
-  <header class="season__head">
-    <p class="season__no" aria-hidden="true">{meta.no}</p>
-    <h2 id={`season-${season}-name`} class="season__name">
-      <a href={`#season-${season}`} class="season__anchor">{meta.name}</a>
+  <header class="season-head">
+    <p class="season-number" aria-hidden="true">{meta.no}</p>
+    <h2 id={`season-${season}-name`} class="season-name">
+      <a href={`#season-${season}`} class="season-anchor">{meta.name}</a>
     </h2>
-    <p class="season__sub">{meta.sub}</p>
+    <p class="season-range">{meta.sub}</p>
   </header>
 
-  <div class="season__grid">
+  <div class="season-months">
     {items.map(({ month, monthIdx }) => (
       <CalendarMonth month={month} monthIdx={monthIdx} />
     ))}
@@ -36,47 +36,47 @@ const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
 </section>
 
 <style>
-  .season__head {
+  .season-head {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: clamp(12px, 1.8vw, 18px);
-    border-bottom: 1px solid var(--tana);
-    padding-bottom: 10px;
+    gap: 0.75rem;
+    margin-bottom: clamp(0.75rem, 1.8vw, 1.125rem);
+    border-bottom: 0.0625rem solid var(--tana);
+    padding-bottom: 0.625rem;
   }
 
-  .season__no {
+  .season-number {
     flex: none;
-    width: 34px;
-    height: 34px;
+    width: 2.125rem;
+    height: 2.125rem;
     background: var(--matisse);
     color: #fff;
     font-family: 'Space Mono', ui-monospace, monospace;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 0.875rem;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 0;
   }
 
-  .season__name {
+  .season-name {
     font-weight: 800;
-    font-size: clamp(18px, 2.2vw, 24px);
-    line-height: 34px;
+    font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+    line-height: 2.125rem;
     letter-spacing: 0.01em;
     text-transform: uppercase;
     color: var(--prussian-blue);
     margin: 0;
   }
 
-  .season__anchor {
+  .season-anchor {
     color: inherit;
     text-decoration: none;
     position: relative;
   }
 
-  .season__anchor::after {
+  .season-anchor::after {
     content: '#';
     margin-left: 0.35em;
     color: var(--driftwood);
@@ -85,30 +85,30 @@ const items: Array<{ month: MonthDef; monthIdx: number }> = MONTHS
     transition: opacity 0.15s ease;
   }
 
-  .season__anchor:hover::after,
-  .season__anchor:focus-visible::after {
+  .season-anchor:hover::after,
+  .season-anchor:focus-visible::after {
     opacity: 0.55;
   }
 
-  .season__anchor:focus-visible {
-    outline: 2px solid var(--matisse);
-    outline-offset: 3px;
-    border-radius: 2px;
+  .season-anchor:focus-visible {
+    outline: 0.125rem solid var(--matisse);
+    outline-offset: 0.1875rem;
+    border-radius: 0.125rem;
   }
 
-  .season__sub {
+  .season-range {
     font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: clamp(10px, 1.1vw, 12px);
-    line-height: 34px;
+    font-size: clamp(0.625rem, 1.1vw, 0.75rem);
+    line-height: 2.125rem;
     letter-spacing: 0.12em;
     color: #8a7f68;
     font-weight: 700;
     margin: 0 0 0 auto;
   }
 
-  .season__grid {
+  .season-months {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
-    gap: clamp(12px, 1.4vw, 18px);
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 15.625rem), 1fr));
+    gap: clamp(0.75rem, 1.4vw, 1.125rem);
   }
 </style>
