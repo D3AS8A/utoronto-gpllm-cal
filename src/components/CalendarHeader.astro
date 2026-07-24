@@ -1,23 +1,23 @@
 ---
 ---
 <header class="cal-header">
-  <div class="cal-header__logos">
-    <img src="/images/gpllm-logo.png" alt="GPLLM" class="cal-header__gpllm" />
+  <div class="header-logos">
+    <img src="/images/gpllm-logo.png" alt="GPLLM" class="header-gpllm-mark" />
     <img
       src="/images/uoft-law-logo.png"
       alt="Henry N.R. Jackman Faculty of Law, University of Toronto"
-      class="cal-header__uoft"
+      class="header-uoft-mark"
     />
   </div>
 
-  <div class="cal-header__title-row">
+  <div class="header-title-row">
     <hgroup>
-      <p class="cal-header__year">
+      <p class="header-year">
         <time datetime="2026-09/2027-08">2026 — 2027 ACADEMIC YEAR</time>
       </p>
-      <h1 class="cal-header__title">Program Calendar</h1>
+      <h1 class="header-title">Program Calendar</h1>
     </hgroup>
-    <p class="cal-header__desc">
+    <p class="header-desc">
       Regular classes take place on <strong>Friday evenings</strong> (4–9pm) and
       <strong>Saturdays</strong> (8:30am–6:30pm). Select any coloured date for details,
       or open the key to filter by session type.
@@ -30,7 +30,7 @@
     padding: clamp(1.125rem, 3vw, 2rem) 0 clamp(0.875rem, 2vw, 1.375rem);
   }
 
-  .cal-header__logos {
+  .header-logos {
     display: flex;
     align-items: flex-end;
     justify-content: space-between;
@@ -38,19 +38,19 @@
     flex-wrap: wrap;
   }
 
-  .cal-header__gpllm {
+  .header-gpllm-mark {
     height: clamp(4.75rem, 9vw, 6.75rem);
     width: auto;
     display: block;
   }
 
-  .cal-header__uoft {
+  .header-uoft-mark {
     height: clamp(3.375rem, 6.6vw, 4.875rem);
     width: auto;
     display: block;
   }
 
-  .cal-header__title-row {
+  .header-title-row {
     margin-top: clamp(1rem, 2.5vw, 1.75rem);
     border-top: 0.125rem solid var(--prussian-blue);
     padding-top: clamp(0.75rem, 1.6vw, 1.125rem);
@@ -61,11 +61,11 @@
     flex-wrap: wrap;
   }
 
-  .cal-header__title-row hgroup {
+  .header-title-row hgroup {
     margin: 0;
   }
 
-  .cal-header__year {
+  .header-year {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: clamp(0.625rem, 1.1vw, 0.75rem);
     letter-spacing: 0.24em;
@@ -74,7 +74,7 @@
     margin: 0;
   }
 
-  .cal-header__title {
+  .header-title {
     font-weight: 800;
     line-height: 0.95;
     letter-spacing: -0.015em;
@@ -84,7 +84,7 @@
     color: var(--prussian-blue);
   }
 
-  .cal-header__desc {
+  .header-desc {
     max-width: 32.5rem;
     font-size: clamp(0.8125rem, 1.4vw, 0.90625rem);
     line-height: 1.35;
@@ -94,7 +94,7 @@
     align-self: flex-end;
   }
 
-  .cal-header__desc strong {
+  .header-desc strong {
     color: var(--prussian-blue);
   }
 </style>

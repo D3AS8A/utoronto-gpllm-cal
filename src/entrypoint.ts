@@ -211,7 +211,7 @@ export default (Alpine: Alpine) => {
       const TOG_FIXED = 14 + 8 + 8 + 26 + 18; // swatch + 2×gap + track + tog padding
       const TOG_PAD = 0; // extra breathing room after label text (on top of 0.5rem flex gap)
       const measureGroup = (group: HTMLElement) => {
-        const labels = group.querySelectorAll<HTMLElement>('.tog__label');
+        const labels = group.querySelectorAll<HTMLElement>('.toggle-label');
         if (!labels.length) return;
         group.style.removeProperty('--tog-label-w');
         group.style.removeProperty('--tog-cell-w');
@@ -227,7 +227,7 @@ export default (Alpine: Alpine) => {
         }
       };
       const measureAll = () => {
-        document.querySelectorAll<HTMLElement>('.fb__group.is-open').forEach(measureGroup);
+        document.querySelectorAll<HTMLElement>('.filter-group.is-open').forEach(measureGroup);
       };
       let measureRaf = 0;
       const scheduleMeasure = () => {
@@ -365,7 +365,7 @@ export default (Alpine: Alpine) => {
       // Clamp to below the sticky filter bar so the spotlight cutout doesn't
       // extend up into the filter bar area (it would otherwise show a lighter
       // patch on the bar in the source month's column).
-      const fb = document.querySelector<HTMLElement>('.fb');
+      const fb = document.querySelector<HTMLElement>('.filter-bar');
       const topFloor = fb ? Math.max(0, fb.getBoundingClientRect().bottom) : 0;
       const top = Math.max(r.top, topFloor);
       const height = Math.max(0, r.bottom - top);

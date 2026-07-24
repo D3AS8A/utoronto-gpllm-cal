@@ -16,23 +16,23 @@
       aria-modal="true"
       aria-labelledby="detail-heading"
     >
-      <header class="detail-card__head" :style="`background:${detail.headBg}`">
+      <header class="detail-head" :style="`background:${detail.headBg}`">
         <hgroup>
-          <p class="detail-card__weekday" x-text="detail.weekday"></p>
-          <h2 id="detail-heading" class="detail-card__date" x-text="detail.dateLabel"></h2>
+          <p class="detail-weekday" x-text="detail.weekday"></p>
+          <h2 id="detail-heading" class="detail-date-title" x-text="detail.dateLabel"></h2>
         </hgroup>
-        <button type="button" class="detail-card__close" @click="closeDetail()" aria-label="Close">✕</button>
+        <button type="button" class="detail-close" @click="closeDetail()" aria-label="Close">✕</button>
       </header>
 
-      <ul class="detail-card__body">
+      <ul class="detail-body">
         <template x-for="item in detail.items" :key="item.name">
           <li class="detail-item">
-            <span class="detail-item__swatch" :style="item.swatchStyle" aria-hidden="true"></span>
-            <div class="detail-item__body">
-              <p class="detail-item__name" x-text="item.name"></p>
-              <p class="detail-item__time" x-text="item.time"></p>
-              <div class="detail-item__cta" x-show="item.isoStart">
-                <span class="detail-item__cta-label">Add to</span>
+            <span class="detail-item-swatch" :style="item.swatchStyle" aria-hidden="true"></span>
+            <div class="detail-item-info">
+              <p class="detail-item-name" x-text="item.name"></p>
+              <p class="detail-item-time" x-text="item.time"></p>
+              <div class="detail-item-cta" x-show="item.isoStart">
+                <span class="detail-item-cta-label">Add to</span>
                 <a
                   class="cta"
                   target="_blank"
@@ -114,7 +114,7 @@
     cursor: pointer;
   }
 
-  .detail-card__head {
+  .detail-head {
     color: #fff;
     padding: 1rem 1.125rem;
     display: flex;
@@ -123,7 +123,7 @@
     gap: 0.75rem;
   }
 
-  .detail-card__weekday {
+  .detail-weekday {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.6875rem;
     letter-spacing: 0.14em;
@@ -131,14 +131,14 @@
     font-weight: 700;
   }
 
-  .detail-card__date {
+  .detail-date-title {
     font-weight: 900;
     font-size: 1.625rem;
     line-height: 1;
     margin-top: 0.1875rem;
   }
 
-  .detail-card__close {
+  .detail-close {
     background: none;
     border: 0.125rem solid currentColor;
     color: inherit;
@@ -149,9 +149,9 @@
     font-weight: 700;
   }
 
-  .detail-card__close:active { transform: scale(0.9); }
+  .detail-close:active { transform: scale(0.9); }
 
-  .detail-card__body {
+  .detail-body {
     padding: 1rem 1.125rem;
     display: flex;
     flex-direction: column;
@@ -166,29 +166,29 @@
     align-items: flex-start;
   }
 
-  .detail-item__swatch { display: block; }
+  .detail-item-swatch { display: block; }
 
-  .detail-item__name {
+  .detail-item-name {
     font-weight: 800;
     font-size: 0.9375rem;
     color: var(--prussian-blue);
   }
 
-  .detail-item__time {
+  .detail-item-time {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.75rem;
     color: var(--pablo);
     margin-top: 0.125rem;
   }
 
-  .detail-item__body {
+  .detail-item-info {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
     min-width: 0;
   }
 
-  .detail-item__cta {
+  .detail-item-cta {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -196,7 +196,7 @@
     flex-wrap: wrap;
   }
 
-  .detail-item__cta-label {
+  .detail-item-cta-label {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.65625rem;
     letter-spacing: 0.14em;
@@ -231,8 +231,8 @@
   .cta:active { transform: scale(0.97); }
 
   @media (max-width: 30rem) {
-    .detail-item__cta { gap: 0.375rem; }
-    .detail-item__cta-label { font-size: 0.59375rem; letter-spacing: 0.1em; }
+    .detail-item-cta { gap: 0.375rem; }
+    .detail-item-cta-label { font-size: 0.59375rem; letter-spacing: 0.1em; }
     .cta {
       padding: 0.25rem 0.4375rem;
       font-size: 0.625rem;

@@ -2,30 +2,30 @@
 ---
 <div
   id="cal-tooltip"
-  class="cal-tt"
+  class="cal-tooltip"
   role="tooltip"
-  :class="{ 'is-visible': tooltip.visible, 'is-traveling': tooltip.travel, 'cal-tt--below': tooltip.below }"
+  :class="{ 'is-visible': tooltip.visible, 'is-traveling': tooltip.travel, 'below': tooltip.below }"
   :style="`--tt-x:${tooltip.x}px;--tt-top:${tooltip.yTop}px;--tt-bottom:${tooltip.yBottom}px;--tt-head:${tooltipHeadBg}`"
   @mouseenter="cancelHideTooltip()"
   @mouseleave="hideTooltip(0)"
   @click="openTooltipDetail()"
 >
-  <div class="cal-tt__stack">
-    <div class="cal-tt__slot" :class="{ 'is-active': tooltip.active === 0 }" aria-hidden="tooltip.active !== 0">
+  <div class="tooltip-slot-stack">
+    <div class="tooltip-slot" :class="{ 'is-active': tooltip.active === 0 }" aria-hidden="tooltip.active !== 0">
       <template x-if="tooltip.slot0">
-        <div class="cal-tt__inner">
-          <p class="cal-tt__date">
+        <div class="tooltip-slot-inner">
+          <p class="tooltip-date">
             <span x-text="tooltip.slot0.weekday"></span>
-            <span class="cal-tt__sep" aria-hidden="true">·</span>
+            <span class="tooltip-sep" aria-hidden="true">·</span>
             <span x-text="tooltip.slot0.dateLabel"></span>
           </p>
-          <ul class="cal-tt__list">
+          <ul class="tooltip-item-list">
             <template x-for="item in tooltip.slot0.items" :key="item.name">
-              <li class="cal-tt__item">
-                <span class="cal-tt__swatch" :style="item.swatchStyle" aria-hidden="true"></span>
-                <span class="cal-tt__body">
-                  <span class="cal-tt__name" x-text="item.name"></span>
-                  <span class="cal-tt__time" x-text="item.time"></span>
+              <li class="tooltip-item">
+                <span class="tooltip-swatch" :style="item.swatchStyle" aria-hidden="true"></span>
+                <span class="tooltip-item-info">
+                  <span class="tooltip-item-name" x-text="item.name"></span>
+                  <span class="tooltip-item-time" x-text="item.time"></span>
                 </span>
               </li>
             </template>
@@ -33,21 +33,21 @@
         </div>
       </template>
     </div>
-    <div class="cal-tt__slot" :class="{ 'is-active': tooltip.active === 1 }" aria-hidden="tooltip.active !== 1">
+    <div class="tooltip-slot" :class="{ 'is-active': tooltip.active === 1 }" aria-hidden="tooltip.active !== 1">
       <template x-if="tooltip.slot1">
-        <div class="cal-tt__inner">
-          <p class="cal-tt__date">
+        <div class="tooltip-slot-inner">
+          <p class="tooltip-date">
             <span x-text="tooltip.slot1.weekday"></span>
-            <span class="cal-tt__sep" aria-hidden="true">·</span>
+            <span class="tooltip-sep" aria-hidden="true">·</span>
             <span x-text="tooltip.slot1.dateLabel"></span>
           </p>
-          <ul class="cal-tt__list">
+          <ul class="tooltip-item-list">
             <template x-for="item in tooltip.slot1.items" :key="item.name">
-              <li class="cal-tt__item">
-                <span class="cal-tt__swatch" :style="item.swatchStyle" aria-hidden="true"></span>
-                <span class="cal-tt__body">
-                  <span class="cal-tt__name" x-text="item.name"></span>
-                  <span class="cal-tt__time" x-text="item.time"></span>
+              <li class="tooltip-item">
+                <span class="tooltip-swatch" :style="item.swatchStyle" aria-hidden="true"></span>
+                <span class="tooltip-item-info">
+                  <span class="tooltip-item-name" x-text="item.name"></span>
+                  <span class="tooltip-item-time" x-text="item.time"></span>
                 </span>
               </li>
             </template>
@@ -56,11 +56,11 @@
       </template>
     </div>
   </div>
-  <p class="cal-tt__hint" aria-hidden="true">details</p>
+  <p class="tooltip-hint" aria-hidden="true">details</p>
 </div>
 
 <style>
-  .cal-tt {
+  .cal-tooltip {
     position: fixed;
     left: var(--tt-x);
     top: var(--tt-top);
@@ -79,13 +79,13 @@
     transition: opacity 120ms ease-out;
   }
 
-  .cal-tt.is-visible {
+  .cal-tooltip.is-visible {
     opacity: 1;
     pointer-events: auto;
   }
 
   /* Travel mode: position + head-color glide between anchors. */
-  .cal-tt.is-traveling {
+  .cal-tooltip.is-traveling {
     transition:
       left 200ms cubic-bezier(0.4, 0, 0.2, 1),
       top 200ms cubic-bezier(0.4, 0, 0.2, 1),
@@ -93,18 +93,18 @@
       opacity 120ms ease-out;
   }
 
-  .cal-tt.is-traveling::after {
+  .cal-tooltip.is-traveling::after {
     transition: border-color 200ms cubic-bezier(0.4, 0, 0.2, 1);
   }
 
   /* Flip below the cell when the cell is near the top of the viewport. */
-  .cal-tt--below {
+  .cal-tooltip.below {
     top: var(--tt-bottom);
     transform: translate(-50%, 0.625rem);
   }
 
   /* Small arrow pointing at the cell */
-  .cal-tt::after {
+  .cal-tooltip::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -117,7 +117,7 @@
     border-bottom: 0.09375rem solid var(--prussian-blue);
   }
 
-  .cal-tt--below::after {
+  .cal-tooltip.below::after {
     bottom: auto;
     top: -0.4375rem;
     border-right: none;
@@ -128,36 +128,36 @@
 
   /* Double-buffered content stack — slots share the same grid cell so the
      container height is driven by whichever slot has taller content. */
-  .cal-tt__stack {
+  .tooltip-slot-stack {
     display: grid;
     grid-template-areas: 'stack';
   }
 
-  .cal-tt__slot {
+  .tooltip-slot {
     grid-area: stack;
     opacity: 0;
     min-width: 0;
   }
 
-  .cal-tt__slot.is-active {
+  .tooltip-slot.is-active {
     opacity: 1;
   }
 
   /* Slot crossfade only kicks in during travel — fresh entry snaps content
      to its committed state under the container's opacity fade. */
-  .cal-tt.is-traveling .cal-tt__slot {
+  .cal-tooltip.is-traveling .tooltip-slot {
     transition: opacity 140ms ease-out;
   }
 
-  .cal-tt.is-traveling .cal-tt__slot.is-active {
+  .cal-tooltip.is-traveling .tooltip-slot.is-active {
     transition-delay: 40ms;
   }
 
-  .cal-tt__inner {
+  .tooltip-slot-inner {
     display: contents;
   }
 
-  .cal-tt__date {
+  .tooltip-date {
     display: flex;
     align-items: baseline;
     gap: 0.375rem;
@@ -170,14 +170,14 @@
     margin: 0 0 0.375rem;
   }
 
-  .cal-tt__date > span:last-child {
+  .tooltip-date > span:last-child {
     color: var(--prussian-blue);
     letter-spacing: 0.02em;
   }
 
-  .cal-tt__sep { opacity: 0.5; }
+  .tooltip-sep { opacity: 0.5; }
 
-  .cal-tt__list {
+  .tooltip-item-list {
     list-style: none;
     margin: 0;
     padding: 0;
@@ -186,39 +186,39 @@
     gap: 0.5rem;
   }
 
-  .cal-tt__item {
+  .tooltip-item {
     display: flex;
     gap: 0.5rem;
     align-items: flex-start;
   }
 
-  .cal-tt__swatch {
+  .tooltip-swatch {
     display: block;
     flex: none;
     margin-top: 0.125rem;
   }
 
-  .cal-tt__body {
+  .tooltip-item-info {
     display: flex;
     flex-direction: column;
     min-width: 0;
   }
 
-  .cal-tt__name {
+  .tooltip-item-name {
     font-weight: 700;
     font-size: 0.8125rem;
     line-height: 1.25;
     color: var(--prussian-blue);
   }
 
-  .cal-tt__time {
+  .tooltip-item-time {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.6875rem;
     color: var(--pablo);
     margin-top: 0.0625rem;
   }
 
-  .cal-tt__hint {
+  .tooltip-hint {
     margin: 0.5rem 0 0;
     padding-top: 0.375rem;
     border-top: 0.0625rem dashed var(--tana);
@@ -233,10 +233,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .cal-tt,
-    .cal-tt.is-traveling,
-    .cal-tt.is-traveling::after,
-    .cal-tt.is-traveling .cal-tt__slot {
+    .cal-tooltip,
+    .cal-tooltip.is-traveling,
+    .cal-tooltip.is-traveling::after,
+    .cal-tooltip.is-traveling .tooltip-slot {
       transition: opacity 80ms linear;
     }
   }
@@ -245,6 +245,6 @@
      The showTooltip() method also gates on matchMedia — this is the visual
      safety net. */
   @media (hover: none), (pointer: coarse), (max-width: 44.9375rem) {
-    .cal-tt { display: none; }
+    .cal-tooltip { display: none; }
   }
 </style>
