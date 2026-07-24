@@ -64,15 +64,15 @@
     position: fixed;
     left: var(--tt-x);
     top: var(--tt-top);
-    transform: translate(-50%, calc(-100% - 10px));
+    transform: translate(-50%, calc(-100% - 0.625rem));
     z-index: 60;
-    min-width: 200px;
-    max-width: 280px;
+    min-width: 12.5rem;
+    max-width: 17.5rem;
     background: #fff;
-    border: 1.5px solid var(--prussian-blue);
-    border-top: 4px solid var(--tt-head, var(--prussian-blue));
-    box-shadow: 0 6px 18px rgba(0, 37, 84, 0.16);
-    padding: 10px 12px 8px;
+    border: 0.09375rem solid var(--prussian-blue);
+    border-top: 0.25rem solid var(--tt-head, var(--prussian-blue));
+    box-shadow: 0 0.375rem 1.125rem rgba(0, 37, 84, 0.16);
+    padding: 0.625rem 0.75rem 0.5rem;
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
@@ -100,7 +100,7 @@
   /* Flip below the cell when the cell is near the top of the viewport. */
   .cal-tt--below {
     top: var(--tt-bottom);
-    transform: translate(-50%, 10px);
+    transform: translate(-50%, 0.625rem);
   }
 
   /* Small arrow pointing at the cell */
@@ -108,22 +108,22 @@
     content: '';
     position: absolute;
     left: 50%;
-    bottom: -7px;
+    bottom: -0.4375rem;
     transform: translateX(-50%) rotate(45deg);
-    width: 10px;
-    height: 10px;
+    width: 0.625rem;
+    height: 0.625rem;
     background: #fff;
-    border-right: 1.5px solid var(--prussian-blue);
-    border-bottom: 1.5px solid var(--prussian-blue);
+    border-right: 0.09375rem solid var(--prussian-blue);
+    border-bottom: 0.09375rem solid var(--prussian-blue);
   }
 
   .cal-tt--below::after {
     bottom: auto;
-    top: -7px;
+    top: -0.4375rem;
     border-right: none;
     border-bottom: none;
-    border-left: 1.5px solid var(--prussian-blue);
-    border-top: 4px solid var(--tt-head, var(--prussian-blue));
+    border-left: 0.09375rem solid var(--prussian-blue);
+    border-top: 0.25rem solid var(--tt-head, var(--prussian-blue));
   }
 
   /* Double-buffered content stack — slots share the same grid cell so the
@@ -160,14 +160,14 @@
   .cal-tt__date {
     display: flex;
     align-items: baseline;
-    gap: 6px;
+    gap: 0.375rem;
     font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.06em;
     color: var(--driftwood);
     font-weight: 700;
     text-transform: uppercase;
-    margin: 0 0 6px;
+    margin: 0 0 0.375rem;
   }
 
   .cal-tt__date > span:last-child {
@@ -183,19 +183,19 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0.5rem;
   }
 
   .cal-tt__item {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     align-items: flex-start;
   }
 
   .cal-tt__swatch {
     display: block;
     flex: none;
-    margin-top: 2px;
+    margin-top: 0.125rem;
   }
 
   .cal-tt__body {
@@ -206,30 +206,30 @@
 
   .cal-tt__name {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.25;
     color: var(--prussian-blue);
   }
 
   .cal-tt__time {
     font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--pablo);
-    margin-top: 1px;
+    margin-top: 0.0625rem;
   }
 
   .cal-tt__hint {
-    margin: 8px 0 0;
-    padding-top: 6px;
-    border-top: 1px dashed var(--tana);
+    margin: 0.5rem 0 0;
+    padding-top: 0.375rem;
+    border-top: 0.0625rem dashed var(--tana);
     font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 0.6875rem;
     color: var(--matisse);
     font-weight: 500;
     text-align: center;
     text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 3px;
+    text-decoration-thickness: 0.0625rem;
+    text-underline-offset: 0.1875rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -244,7 +244,7 @@
   /* Desktop-only: hide on touch / coarse pointers and narrow viewports.
      The showTooltip() method also gates on matchMedia — this is the visual
      safety net. */
-  @media (hover: none), (pointer: coarse), (max-width: 719px) {
+  @media (hover: none), (pointer: coarse), (max-width: 44.9375rem) {
     .cal-tt { display: none; }
   }
 </style>

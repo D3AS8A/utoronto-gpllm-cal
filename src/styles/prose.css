@@ -50,7 +50,7 @@
 
   hr {
     border: none;
-    border-top: 1px solid var(--tuna);
+    border-top: 0.0625rem solid var(--tuna);
     margin-block: 2rem;
   }
 
@@ -79,17 +79,17 @@
     position: absolute;
     left: 0.5rem;
     top: 0.75em;
-    width: 5px;
-    height: 5px;
+    width: 0.3125rem;
+    height: 0.3125rem;
     transform: translateY(-50%);
-    border-radius: 9999px;
+    border-radius: 624.938rem;
     background-color: var(--tan);
   }
 
   /* Second-level bullets — hollow ring */
   ul li > ul > li::before {
     background-color: transparent;
-    border: 1px solid var(--tan);
+    border: 0.0625rem solid var(--tan);
   }
 
   ol li {
@@ -105,7 +105,7 @@
   blockquote {
     margin: 0;
     padding-left: 2.25rem;
-    border-left: 4px solid var(--tuna);
+    border-left: 0.25rem solid var(--tuna);
     color: var(--sandstone);
   }
 
@@ -116,8 +116,8 @@
 
   table {
     width: 100%;
-    border-top: 2px solid var(--tuna);
-    border-bottom: 2px solid var(--tuna);
+    border-top: 0.125rem solid var(--tuna);
+    border-bottom: 0.125rem solid var(--tuna);
     margin-bottom: 1.25rem;
     border-collapse: collapse;
   }
@@ -162,7 +162,7 @@
 
   pre {
     background-color: var(--woodsmoke);
-    border: 1px solid var(--tuna);
+    border: 0.0625rem solid var(--tuna);
     padding: 1.25rem 1.5rem;
     margin-bottom: 1.25rem;
     border-radius: 0.45rem;

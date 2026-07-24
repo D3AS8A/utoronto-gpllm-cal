@@ -218,12 +218,12 @@ export const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 // Visual helpers used at build time to compute per-cell styles
 
 export function swatchStyle(t: SwatchType, c: string, size = 22): string {
-  const base = `width:${size}px;height:${size}px;flex:none;box-sizing:border-box;`;
-  if (t === 'outline') return base + `background:#fff;border:3px solid ${c};`;
-  if (t === 'dashed')  return base + `background:#fff;border:3px dashed ${c};`;
+  const base = `width:${size / 16}rem;height:${size / 16}rem;flex:none;box-sizing:border-box;`;
+  if (t === 'outline') return base + `background:#fff;border:0.1875rem solid ${c};`;
+  if (t === 'dashed')  return base + `background:#fff;border:0.1875rem dashed ${c};`;
   if (t === 'circle')  return base + `background:${c};border-radius:50%;`;
-  if (t === 'alrw')    return base + `background:#fff;border:2px dotted #002554;border-radius:50%;`;
-  if (t === 'orient')  return base + `background:#f7f0e2;border:2px solid #af9b88;`;
+  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dotted #002554;border-radius:50%;`;
+  if (t === 'orient')  return base + `background:#f7f0e2;border:0.125rem solid #af9b88;`;
   return base + `background:${c};`;
 }
 
@@ -253,23 +253,23 @@ export function cellVisual(cats: CatKey[]): CellVisual {
   const has = (k: CatKey) => cats.indexOf(k) !== -1;
   const classKey = (['reg', 'makeup', 'lmc', 'lmb', 'intc', 'intb', 'orient'] as CatKey[]).find(has);
   const hasDeferred = has('dmid') || has('dfin');
-  let bg = 'transparent', fg = '#002554', border = '2px solid transparent';
+  let bg = 'transparent', fg = '#002554', border = '0.125rem solid transparent';
   let outline: string | undefined;
-  if (classKey === 'orient') { bg = '#f7f0e2'; fg = '#6b4e22'; border = '2px solid #af9b88'; }
+  if (classKey === 'orient') { bg = '#f7f0e2'; fg = '#6b4e22'; border = '0.125rem solid #af9b88'; }
   else if (classKey)          { [bg, fg] = CLASS_COLORS[classKey]; }
   else if (has('dmid'))       { bg = DEFERRED_COLOR; fg = '#002554'; }
-  if      (has('mid'))                     border = '2px solid #1f6092';
-  else if (has('fin'))                     border = '2px solid #002554';
-  else if (has('finc'))                    border = '2px dashed #002554';
-  else if (has('dfin') && !classKey)       border = '2px solid #70c7e9';
+  if      (has('mid'))                     border = '0.125rem solid #1f6092';
+  else if (has('fin'))                     border = '0.125rem solid #002554';
+  else if (has('finc'))                    border = '0.125rem dashed #002554';
+  else if (has('dfin') && !classKey)       border = '0.125rem solid #70c7e9';
   // ALRW → white solid inner border + blue dotted outline on top of it.
   if (has('alrw')) {
-    border = '2px solid #fff';
-    outline = '2px dotted #002554';
+    border = '0.125rem solid #fff';
+    outline = '0.125rem dotted #002554';
   }
   // Class + deferred exam → BR corner triangle in deferred color; kill the
   // border so the triangle sits flush with the cell edge (a transparent
-  // border leaves 2px of class-color showing around the triangle).
+  // border leaves 0.125rem of class-color showing around the triangle).
   const cornerColor = classKey && hasDeferred ? DEFERRED_COLOR : undefined;
   if (cornerColor) border = '0';
   return { bg, fg, border, outline, cornerColor, isBold: !!(classKey || has('dmid')) };
@@ -288,7 +288,7 @@ export function countFor(cats: CatKey[]): number {
 export function calloutStyle(tone: 'cream' | 'ink' | 'tan'): string {
   const bg  = tone === 'cream' ? '#f6eccf' : tone === 'ink' ? '#eef1f5' : '#f3ece0';
   const bar = tone === 'cream' ? '#c9a94e' : tone === 'ink' ? '#002554' : '#af9b88';
-  return `margin:0 8px 10px;padding:9px 11px;background:${bg};border-left:3px solid ${bar}`;
+  return `margin:0 0.5rem 0.625rem;padding:0.5625rem 0.6875rem;background:${bg};border-left:0.1875rem solid ${bar}`;
 }
 
 /** Weekday name for a given month-day; uses fdow (day-of-week for the 1st). */

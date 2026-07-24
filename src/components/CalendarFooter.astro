@@ -25,35 +25,35 @@
 
 <style>
   .cal-footer {
-    margin-top: clamp(32px, 4.5vw, 56px);
-    border-top: 2px solid var(--prussian-blue);
-    padding-top: 18px;
+    margin-top: clamp(2rem, 4.5vw, 3.5rem);
+    border-top: 0.125rem solid var(--prussian-blue);
+    padding-top: 1.125rem;
     display: flex;
-    gap: 28px;
+    gap: 1.75rem;
     flex-wrap: wrap;
     justify-content: space-between;
   }
 
-  .cal-footer__col:first-child { max-width: 440px; }
-  .cal-footer__col:last-child  { max-width: 360px; }
+  .cal-footer__col:first-child { max-width: 27.5rem; }
+  .cal-footer__col:last-child  { max-width: 22.5rem; }
 
   .cal-footer__col--mobile { display: none; }
 
-  @media (max-width: 720px) {
+  @media (max-width: 45rem) {
     .cal-footer__col--mobile { display: block; }
   }
 
   .cal-footer__label {
     font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 11px;
+    font-size: 0.6875rem;
     letter-spacing: 0.16em;
     color: var(--driftwood);
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
   }
 
   .cal-footer p {
-    font-size: 13px;
+    font-size: 0.8125rem;
     line-height: 1.5;
     font-weight: 500;
     color: var(--oxford-blue);
@@ -67,17 +67,17 @@
     flex: 1 0 100%;
     display: flex;
     justify-content: flex-end;
-    margin-top: 4px;
+    margin-top: 0.25rem;
   }
 
   .cal-footer__uoft {
-    height: clamp(34px, 4vw, 46px);
+    height: clamp(2.125rem, 4vw, 2.875rem);
     width: auto;
     display: block;
     opacity: 0.9;
   }
 
-  @media (min-width: 900px) {
+  @media (min-width: 56.25rem) {
     .cal-footer__mark {
       flex: 0 0 auto;
       align-items: flex-start;
