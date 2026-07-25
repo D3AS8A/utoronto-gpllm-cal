@@ -164,7 +164,7 @@ function triggerDownload(text: string, filename: string) {
 
 export default (Alpine: Alpine) => {
   Alpine.data('calendar', () => ({
-    filters: { reg: true } as Record<string, boolean>,
+    filters: {} as Record<string, boolean>,
     classesOpen: true,
     examsOpen: false,
     fbHidden: false,
