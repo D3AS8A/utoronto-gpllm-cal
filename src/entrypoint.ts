@@ -322,6 +322,16 @@ export default (Alpine: Alpine) => {
       syncFiltersToUrl(this.filters);
     },
 
+    toggleGroup(name: 'classes' | 'exams') {
+      const key = name === 'classes' ? 'classesOpen' : 'examsOpen';
+      const other = name === 'classes' ? 'examsOpen' : 'classesOpen';
+      const next = !this[key];
+      this[key] = next;
+      if (next && window.matchMedia('(max-width: 45rem)').matches) {
+        this[other] = false;
+      }
+    },
+
     reset() {
       vibrate(6);
       this.filters = {};

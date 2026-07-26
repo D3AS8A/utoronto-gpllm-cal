@@ -64,7 +64,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
         <button
           type="button"
           class="filter-section-label"
-          @click="classesOpen = !classesOpen"
+          @click="toggleGroup('classes')"
           :aria-expanded="classesOpen ? 'true' : 'false'"
           aria-controls="fb-classes-content"
         >
@@ -102,7 +102,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
         <button
           type="button"
           class="filter-section-label"
-          @click="examsOpen = !examsOpen"
+          @click="toggleGroup('exams')"
           :aria-expanded="examsOpen ? 'true' : 'false'"
           aria-controls="fb-exams-content"
         >
