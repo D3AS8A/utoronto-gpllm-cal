@@ -174,9 +174,20 @@ const headingId = `month-${monthIdx}-name`;
 
 <style>
   .month-card {
+    display: flex;
+    flex-direction: column;
     background: #fff;
     border: 0.0625rem solid var(--prussian-blue);
     box-shadow: 0.1875rem 0.1875rem 0 rgba(0, 37, 84, 0.18);
+  }
+
+  .month-callout {
+    margin: 0 0.5rem 0.625rem;
+    padding: 0.5625rem 0.6875rem;
+  }
+
+  .month-callout:first-of-type {
+    margin-top: auto;
   }
 
   .month-head {

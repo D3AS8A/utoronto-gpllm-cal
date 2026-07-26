@@ -288,7 +288,7 @@ export function countFor(cats: CatKey[]): number {
 export function calloutStyle(tone: 'cream' | 'ink' | 'tan'): string {
   const bg  = tone === 'cream' ? '#f6eccf' : tone === 'ink' ? '#eef1f5' : '#f3ece0';
   const bar = tone === 'cream' ? '#c9a94e' : tone === 'ink' ? '#002554' : '#af9b88';
-  return `margin:0 0.5rem 0.625rem;padding:0.5625rem 0.6875rem;background:${bg};border-left:0.1875rem solid ${bar}`;
+  return `background:${bg};border-left:0.1875rem solid ${bar}`;
 }
 
 /** Weekday name for a given month-day; uses fdow (day-of-week for the 1st). */
