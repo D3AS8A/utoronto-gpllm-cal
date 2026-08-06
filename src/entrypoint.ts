@@ -45,6 +45,7 @@ interface CalendarDetail {
   weekday: string;
   dateLabel: string;
   headBg: string;
+  headFg: string;
   items: DetailItem[];
 }
 

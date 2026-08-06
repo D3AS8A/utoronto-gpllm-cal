@@ -57,8 +57,22 @@ type Cell = {
       isoEnd: string | null;
     }>;
     headBg: string;
+    headFg: string;
   };
 };
+
+function readableFg(hex: string): string {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.slice(0, 2), 16);
+  const g = parseInt(h.slice(2, 4), 16);
+  const b = parseInt(h.slice(4, 6), 16);
+  const srgb = [r, g, b].map((v) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  });
+  const lum = 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
+  return lum > 0.55 ? '#002554' : '#fff';
+}
 
 const cells: Cell[] = [];
 for (let i = 0; i < rows * 7; i++) {
@@ -101,15 +115,14 @@ for (let i = 0; i < rows * 7; i++) {
       });
       ariaParts.push(specific ? `${m.name}, ${time}` : m.name);
     }
-    const tone = cats.includes('reg') ? 'blue'
-      : cats.some((c) => ['fin', 'mid', 'finc', 'dmid', 'dfin'].includes(c)) ? 'ink'
-      : 'brown';
-    const headBg = tone === 'ink' ? '#002554' : tone === 'blue' ? '#1f6092' : '#936e42';
+    const headBg = META[cats[0] as keyof typeof META].c;
+    const headFg = readableFg(headBg);
     detail = {
       weekday,
       dateLabel: `${month.name} ${day}`,
       items,
       headBg,
+      headFg,
     };
     ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaParts.join('; ')}`;
   }
