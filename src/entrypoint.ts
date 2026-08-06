@@ -527,6 +527,7 @@ export default (Alpine: Alpine) => {
       window.addEventListener('pointerup', onUp);
       window.addEventListener('pointercancel', onUp);
       document.body.style.cursor = 'grabbing';
+      el.style.animation = 'none';
       el.classList.add('is-dragging');
     },
 
