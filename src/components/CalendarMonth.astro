@@ -55,6 +55,8 @@ type Cell = {
       /** Naive local ISO strings (America/Toronto assumed). Null when no hours. */
       isoStart: string | null;
       isoEnd: string | null;
+      /** Day-level free-form note; embedded in ICS/Google Cal description. */
+      note: string | null;
     }>;
     headBg: string;
     headFg: string;
@@ -117,6 +119,7 @@ for (let i = 0; i < rows * 7; i++) {
         swatchStyle: swatchStyle(m.t, m.c, 20),
         isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
         isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
+        note: note?.text ?? null,
       });
       ariaParts.push(specific ? `${displayName}, ${time}` : displayName);
     }
