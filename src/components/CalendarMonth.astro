@@ -2,7 +2,7 @@
 import type { MonthDef } from '../lib/calendar-data';
 import {
   cellVisual, swatchStyle, weekdayName, calloutStyle,
-  META, pickHours, fmtHours, toLocalIso, cssColor, cssVar,
+  META, pickHours, fmtHours, toLocalIso, cssColor, cssVar, itemNote,
 } from '../lib/calendar-data';
 
 interface Props {
@@ -119,7 +119,7 @@ for (let i = 0; i < rows * 7; i++) {
         swatchStyle: swatchStyle(m.t, m.c, 20),
         isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
         isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
-        note: note?.text ?? null,
+        note: itemNote(c as keyof typeof META, dow),
       });
       ariaParts.push(specific ? `${displayName}, ${time}` : displayName);
     }

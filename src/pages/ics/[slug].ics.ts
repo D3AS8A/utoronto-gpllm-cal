@@ -1,6 +1,6 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { createEvent, type DateArray } from 'ics';
-import { MONTHS, META, pickHours, toLocalIso, type CatKey } from '../../lib/calendar-data';
+import { MONTHS, META, pickHours, toLocalIso, itemNote, type CatKey } from '../../lib/calendar-data';
 
 const MONTH_NUM: Record<string, number> = {
   January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
@@ -64,13 +64,17 @@ function allEvents(): Array<{ slug: string; event: EventItem }> {
         const slug = `${iso}-${safeFilename(name)}`;
         if (seen.has(slug)) continue;
         seen.add(slug);
+        // Merge day-level note (all items) with per-item note (this cat+dow).
+        const combinedNote = [noteEntry?.text, itemNote(cat, dow)]
+          .filter(Boolean)
+          .join('\n');
         out.push({
           slug,
           event: {
             isoStart: toLocalIso(iso, specific.start),
             isoEnd: toLocalIso(iso, specific.end),
             name,
-            ...(noteEntry?.text ? { note: noteEntry.text } : {}),
+            ...(combinedNote ? { note: combinedNote } : {}),
           },
         });
       }

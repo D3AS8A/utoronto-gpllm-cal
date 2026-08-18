@@ -152,6 +152,18 @@ export function toLocalIso(dateIso: string, [h, m]: HourMin): string {
   return `${dateIso}T${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}:00`;
 }
 
+/**
+ * Per-item, per-dow supplementary note surfaced under a specific event in
+ * the tooltip / modal, and merged into that event's ICS + Google Cal
+ * description. Distinct from `MonthDef.notes` (day-level, all items).
+ */
+export function itemNote(cat: CatKey, dow: number): string | null {
+  if ((cat === 'intc' || cat === 'intb') && dow === 0) {
+    return 'Classes may end as late as 2:30pm';
+  }
+  return null;
+}
+
 export interface FilterDef {
   key: string;
   cats: CatKey[];

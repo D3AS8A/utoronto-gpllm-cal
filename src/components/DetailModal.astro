@@ -31,6 +31,7 @@
             <div class="detail-item-info">
               <p class="detail-item-name" x-text="item.name"></p>
               <p class="detail-item-time" x-text="item.time"></p>
+              <p class="detail-item-note" x-show="item.note" x-text="item.note"></p>
               <div class="detail-item-cta" x-show="item.isoStart">
                 <span class="detail-item-cta-label">Add to</span>
                 <a
@@ -190,6 +191,14 @@
     font-size: 0.75rem;
     color: var(--pablo);
     margin-top: 0.125rem;
+  }
+
+  .detail-item-note {
+    font-size: 0.8125rem;
+    font-style: italic;
+    color: var(--pablo);
+    margin-top: 0.25rem;
+    line-height: 1.35;
   }
 
   .detail-item-info {

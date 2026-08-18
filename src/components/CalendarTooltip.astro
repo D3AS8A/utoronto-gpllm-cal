@@ -26,6 +26,7 @@
                 <span class="tooltip-item-info">
                   <span class="tooltip-item-name" x-text="item.name"></span>
                   <span class="tooltip-item-time" x-text="item.time"></span>
+                  <span class="tooltip-item-note" x-show="item.note" x-text="item.note"></span>
                 </span>
               </li>
             </template>
@@ -49,6 +50,7 @@
                 <span class="tooltip-item-info">
                   <span class="tooltip-item-name" x-text="item.name"></span>
                   <span class="tooltip-item-time" x-text="item.time"></span>
+                  <span class="tooltip-item-note" x-show="item.note" x-text="item.note"></span>
                 </span>
               </li>
             </template>
@@ -218,6 +220,14 @@
     font-size: 0.6875rem;
     color: var(--pablo);
     margin-top: 0.0625rem;
+  }
+
+  .tooltip-item-note {
+    font-size: 0.6875rem;
+    font-style: italic;
+    color: var(--pablo);
+    margin-top: 0.125rem;
+    line-height: 1.3;
   }
 
   .tooltip-note {
