@@ -34,6 +34,7 @@ interface EventItem {
   isoStart: string;
   isoEnd: string;
   name: string;
+  note?: string;
 }
 
 function allEvents(): Array<{ slug: string; event: EventItem }> {
@@ -58,12 +59,14 @@ function allEvents(): Array<{ slug: string; event: EventItem }> {
         const slug = `${iso}-${safeFilename(meta.name)}`;
         if (seen.has(slug)) continue;
         seen.add(slug);
+        const note = month.notes?.[day]?.text;
         out.push({
           slug,
           event: {
             isoStart: toLocalIso(iso, specific.start),
             isoEnd: toLocalIso(iso, specific.end),
             name: meta.name,
+            ...(note ? { note } : {}),
           },
         });
       }
@@ -85,7 +88,9 @@ function makeIcs(e: EventItem): Promise<string> {
       endInputType:    'utc',
       endOutputType:   'utc',
       title: e.name,
-      description: 'UofT GPLLM program calendar',
+      description: e.note
+        ? `${e.note}\n\nUofT GPLLM program calendar`
+        : 'UofT GPLLM program calendar',
       productId: 'utoronto-gpllm-cal/ics',
       calName: 'UofT GPLLM Calendar',
     }, (error, value) => {

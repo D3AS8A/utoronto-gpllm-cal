@@ -158,6 +158,10 @@ export interface MonthDef {
   fdow: number; // day-of-week (0=Sun) that the 1st falls on
   days: number;
   marks: Record<number, CatKey[]>;
+  /** Optional per-day annotation. `text` shows under the tooltip / modal items
+   * list and is appended to the ICS event description. `borderColor` (hex),
+   * when set, overrides the cell's outer border for a subtle visual flag. */
+  notes?: Record<number, { text: string; borderColor?: string }>;
   callouts?: Array<{ label: string; detail: string; tone: 'cream' | 'ink' | 'tan' }>;
 }
 
@@ -165,6 +169,7 @@ export const MONTHS: MonthDef[] = [
   { name: 'September', year: '2026', season: 'fall', fdow: 2, days: 30, marks: {
       8: ['orient'], 9: ['orient'], 10: ['lmc'], 11: ['lmc'], 12: ['lmb', 'alrw'], 13: ['lmb', 'alrw'],
       17: ['lmc'], 18: ['lmc'], 19: ['lmb', 'alrw'], 20: ['lmb', 'alrw'], 25: ['reg'], 26: ['reg'] },
+    notes: { 18: { text: 'Foundations of Cdn Law (full day)', borderColor: '#936e42' } },
     callouts: [{ label: 'Orientation Evenings',
       detail: 'Cdn Law — Sept 8, 6:00–8:00pm · Bus Law & ILT — Sept 9, 6:00–8:00pm', tone: 'tan' }] },
   { name: 'October', year: '2026', season: 'fall', fdow: 4, days: 31, marks: {

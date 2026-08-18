@@ -58,6 +58,7 @@ type Cell = {
     }>;
     headBg: string;
     headFg: string;
+    note: string | null;
   };
 };
 
@@ -84,9 +85,11 @@ for (let i = 0; i < rows * 7; i++) {
   }
   const cats = month.marks[day] || [];
   const hasMark = cats.length > 0;
+  const note = month.notes?.[day];
   const v = cellVisual(cats);
+  const border = note?.borderColor ? `0.125rem solid ${note.borderColor}` : v.border;
   const style =
-    `background:${v.bg};color:${v.fg};border:${v.border};` +
+    `background:${v.bg};color:${v.fg};border:${border};` +
     (v.outline ? `outline:${v.outline};outline-offset:-0.125rem;` : '') +
     `font-weight:${v.isBold ? '800' : '600'};` +
     `--corner-color:${v.cornerColor ?? 'transparent'};`;
@@ -117,14 +120,17 @@ for (let i = 0; i < rows * 7; i++) {
     }
     const headBg = META[cats[0] as keyof typeof META].c;
     const headFg = readableFg(headBg);
+    const noteText = note?.text ?? null;
     detail = {
       weekday,
       dateLabel: `${month.name} ${day}`,
       items,
       headBg,
       headFg,
+      note: noteText,
     };
-    ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaParts.join('; ')}`;
+    const ariaTail = noteText ? `${ariaParts.join('; ')}. ${noteText}` : ariaParts.join('; ');
+    ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaTail}`;
   }
   cells.push({ blank: false, num: day, iso: dateIso, dow, cats, hasMark, style, cornerColor: v.cornerColor, ariaLabel, detail });
 }

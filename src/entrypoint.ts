@@ -45,6 +45,7 @@ interface CalendarDetail {
   dateLabel: string;
   headBg: string;
   headFg: string;
+  note: string | null;
   items: DetailItem[];
 }
 
