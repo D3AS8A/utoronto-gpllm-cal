@@ -24,7 +24,6 @@ const FILTER_KEY_TO_CATS: Record<string, string[]> = {
   mid:       ['mid'],
   dmid:      ['dmid'],
   fin:       ['fin'],
-  finc:      ['finc'],
   dfin:      ['dfin'],
 };
 
@@ -115,7 +114,6 @@ const FILTER_URL_KEYS: Record<string, string> = {
   mid:       'midterms',
   dmid:      'def-midterms',
   fin:       'finals',
-  finc:      'finals-cdn',
   dfin:      'def-finals',
 };
 

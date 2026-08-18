@@ -3,7 +3,7 @@
 export type CatKey =
   | 'reg' | 'makeup' | 'lmc' | 'lmb' | 'alrw' | 'orient'
   | 'intc' | 'intb'
-  | 'mid' | 'dmid' | 'fin' | 'finc' | 'dfin';
+  | 'mid' | 'dmid' | 'fin' | 'dfin';
 
 export type SwatchType = 'fill' | 'outline' | 'dashed' | 'circle' | 'alrw' | 'orient';
 
@@ -92,7 +92,6 @@ export const META: Record<CatKey, CatMeta> = {
   mid:  { name: 'Mid-Term Exam',           time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#1f6092', hours: EXAM_HOURS },
   dmid: { name: 'Deferred Mid-Term Exam',  time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'circle',  c: '#70c7e9', hours: EXAM_HOURS },
   fin:  { name: 'Final Exam',              time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#002554', hours: EXAM_HOURS },
-  finc: { name: 'Final Exam — Canadian Law',    time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'dashed',  c: '#002554', hours: EXAM_HOURS },
   dfin: { name: 'Deferred Final Exam',     time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#70c7e9', hours: EXAM_HOURS },
 };
 
@@ -147,7 +146,6 @@ export const FILTERS_EXAMS: FilterDef[] = [
   { key: 'mid',  cats: ['mid'] },
   { key: 'dmid', cats: ['dmid'] },
   { key: 'fin',  cats: ['fin'] },
-  { key: 'finc', cats: ['finc'] },
   { key: 'dfin', cats: ['dfin'] },
 ];
 
@@ -176,7 +174,7 @@ export const MONTHS: MonthDef[] = [
       1: ['mid'], 5: ['mid'], 6: ['reg', 'dmid'], 7: ['reg'], 8: ['makeup'],
       13: ['dmid'], 20: ['reg'], 21: ['reg'], 28: ['mid'], 29: ['mid'] } },
   { name: 'December', year: '2026', season: 'fall', fdow: 2, days: 31, marks: {
-      3: ['fin'], 4: ['intc'], 5: ['intc', 'finc'], 6: ['intc', 'finc'], 10: ['dfin'],
+      3: ['fin'], 4: ['intc'], 5: ['intc', 'fin'], 6: ['intc', 'fin'], 10: ['dfin'],
       11: ['intb'], 12: ['intb'], 13: ['intb'], 17: ['dfin'], 18: ['intb'], 19: ['intb'] },
     callouts: [{ label: 'December Intensive 1 & 2',
       detail: 'Intensives 1 & 2 overlap. Some dates to be released — please hold for now.', tone: 'cream' }] },
@@ -195,7 +193,7 @@ export const MONTHS: MonthDef[] = [
       detail: 'Some dates to be released — please hold for now.', tone: 'cream' }] },
   { name: 'May', year: '2027', season: 'summer', fdow: 6, days: 31, marks: {
       1: ['reg'], 7: ['reg'], 8: ['reg'], 9: ['makeup'], 14: ['reg'], 15: ['reg'],
-      16: ['fin'], 29: ['finc'], 30: ['finc'] },
+      16: ['fin'], 29: ['fin'], 30: ['fin'] },
     callouts: [{ label: 'Intensive Final Exam', detail: 'May 16.', tone: 'ink' }] },
   { name: 'June', year: '2027', season: 'summer', fdow: 2, days: 30, marks: {
       4: ['reg'], 5: ['reg'], 6: ['fin'], 11: ['reg', 'dfin'], 12: ['reg'],
@@ -260,7 +258,6 @@ export function cellVisual(cats: CatKey[]): CellVisual {
   else if (has('dmid'))       { bg = DEFERRED_COLOR; fg = '#002554'; }
   if      (has('mid'))                     border = '0.125rem solid #1f6092';
   else if (has('fin'))                     border = '0.125rem solid #002554';
-  else if (has('finc'))                    border = '0.125rem dashed #002554';
   else if (has('dfin') && !classKey)       border = '0.125rem solid #70c7e9';
   // ALRW → white solid inner border + blue dotted outline on top of it.
   if (has('alrw')) {
