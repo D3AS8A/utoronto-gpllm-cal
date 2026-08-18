@@ -258,7 +258,7 @@ export function swatchStyle(t: SwatchType, c: string, size = 22): string {
   if (t === 'outline') return base + `background:#fff;border:0.1875rem solid ${col};`;
   if (t === 'dashed')  return base + `background:#fff;border:0.1875rem dashed ${col};`;
   if (t === 'circle')  return base + `background:${col};border-radius:50%;`;
-  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dashed ${cssVar('prussian-blue')};`;
+  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dotted ${cssVar('prussian-blue')};border-radius:50%;`;
   if (t === 'orient')  return base + `background:${cssVar('spanish-white')};border:0.125rem solid ${cssVar('hillary')};`;
   return base + `background:${col};`;
 }
@@ -297,10 +297,10 @@ export function cellVisual(cats: CatKey[]): CellVisual {
   if      (has('mid'))                     border = `0.125rem solid ${cssVar('matisse')}`;
   else if (has('fin'))                     border = `0.125rem solid ${cssVar('prussian-blue')}`;
   else if (has('dfin') && !classKey)       border = `0.125rem solid ${cssVar('sky')}`;
-  // ALRW → white solid inner border + blue dashed outline on top of it.
+  // ALRW → white solid inner border + blue dotted outline on top of it.
   if (has('alrw')) {
     border = '0.125rem solid #fff';
-    outline = `0.125rem dashed ${cssVar('prussian-blue')}`;
+    outline = `0.125rem dotted ${cssVar('prussian-blue')}`;
   }
   // Class + deferred exam → BR corner triangle in deferred color; kill the
   // border so the triangle sits flush with the cell edge (a transparent
