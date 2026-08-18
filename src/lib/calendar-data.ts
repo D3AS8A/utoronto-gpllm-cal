@@ -189,11 +189,14 @@ export interface MonthDef {
   fdow: number; // day-of-week (0=Sun) that the 1st falls on
   days: number;
   marks: Record<number, CatKey[]>;
-  /** Optional per-day annotation. `text` shows under the tooltip / modal items
-   * list and is appended to the ICS event description. `borderColor`, when
-   * set (as a palette name), overrides the cell's outer border for a subtle
-   * visual flag. */
-  notes?: Record<number, { text: string; borderColor?: ColorName }>;
+  /** Optional per-day annotation.
+   * - `title` overrides the primary item's display name (tooltip, modal,
+   *   ICS event title, aria-label) — use for date-specific event names.
+   * - `text` shows as italic note under the tooltip / modal items list and
+   *   is appended to the ICS event description — use for supplementary info.
+   * - `borderColor` (palette name) overrides the cell's outer border for a
+   *   subtle visual flag. */
+  notes?: Record<number, { title?: string; text?: string; borderColor?: ColorName }>;
   callouts?: Array<{ label: string; detail: string; tone: 'cream' | 'ink' | 'tan' }>;
 }
 
@@ -201,9 +204,11 @@ export const MONTHS: MonthDef[] = [
   { name: 'September', year: '2026', season: 'fall', fdow: 2, days: 30, marks: {
       8: ['orient'], 9: ['orient'], 10: ['lmc'], 11: ['lmc'], 12: ['lmb', 'alrw'], 13: ['lmb', 'alrw'],
       17: ['lmc'], 18: ['lmc'], 19: ['lmb', 'alrw'], 20: ['lmb', 'alrw'], 25: ['reg'], 26: ['reg'] },
-    notes: { 18: { text: 'Foundations of Cdn Law (full day)', borderColor: 'driftwood' } },
-    callouts: [{ label: 'Orientation Evenings',
-      detail: 'Cdn Law — Sept 8, 6:00–8:00pm · Bus Law & ILT — Sept 9, 6:00–8:00pm', tone: 'tan' }] },
+    notes: {
+      8:  { title: 'Canadian Law Orientation' },
+      9:  { title: 'Business Law & ILT Orientation' },
+      18: { text: 'Foundations of Canadian Law (full day)', borderColor: 'driftwood' },
+    } },
   { name: 'October', year: '2026', season: 'fall', fdow: 4, days: 31, marks: {
       2: ['reg'], 3: ['reg'], 4: ['makeup'], 16: ['reg'], 17: ['reg'],
       23: ['reg'], 24: ['reg'], 25: ['makeup'], 31: ['mid'] } },
@@ -212,12 +217,10 @@ export const MONTHS: MonthDef[] = [
       13: ['dmid'], 20: ['reg'], 21: ['reg'], 28: ['fin'], 29: ['fin'] } },
   { name: 'December', year: '2026', season: 'fall', fdow: 2, days: 31, marks: {
       3: ['fin'], 4: ['intc'], 5: ['intc', 'fin'], 6: ['intc', 'fin'], 10: ['dfin'],
-      11: ['intb'], 12: ['intb'], 13: ['intb'], 17: ['dfin'], 18: ['intb'], 19: ['intb'] },
-    callouts: [{ label: 'December Intensive 1 & 2',
-      detail: 'Intensives 1 & 2 overlap. Some dates to be released — please hold for now.', tone: 'cream' }] },
+      11: ['intb'], 12: ['intb'], 13: ['intb'], 17: ['dfin'], 18: ['intb'], 19: ['intb'] } },
   { name: 'January', year: '2027', season: 'winter', fdow: 5, days: 31, marks: {
       8: ['reg'], 9: ['reg'], 10: ['fin'], 22: ['reg'], 23: ['reg'], 24: ['makeup'] },
-    callouts: [{ label: 'December Intensive Final Exam(s)', detail: 'January 10.', tone: 'ink' }] },
+    notes: { 10: { title: 'December Intensive Final Exam(s)' } } },
   { name: 'February', year: '2027', season: 'winter', fdow: 1, days: 28, marks: {
       5: ['reg'], 6: ['reg'], 19: ['mid'], 20: ['mid'], 21: ['mid'],
       26: ['dmid'], 27: ['reg'], 28: ['makeup'] } },
@@ -231,7 +234,7 @@ export const MONTHS: MonthDef[] = [
   { name: 'May', year: '2027', season: 'summer', fdow: 6, days: 31, marks: {
       1: ['reg'], 7: ['reg'], 8: ['reg'], 9: ['makeup'], 14: ['reg'], 15: ['reg'],
       16: ['fin'], 29: ['fin'], 30: ['fin'] },
-    callouts: [{ label: 'April Intensive Final Exam(s)', detail: 'May 16.', tone: 'ink' }] },
+    notes: { 16: { title: 'April Intensive Final Exam(s)' } } },
   { name: 'June', year: '2027', season: 'summer', fdow: 2, days: 30, marks: {
       4: ['reg'], 5: ['reg'], 6: ['fin'], 11: ['reg', 'dfin'], 12: ['reg'],
       13: ['dmid'], 18: ['reg'], 19: ['reg'], 25: ['fin'], 26: ['fin'], 27: ['fin'] } },

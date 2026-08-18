@@ -109,14 +109,16 @@ for (let i = 0; i < rows * 7; i++) {
       const m = META[c as keyof typeof META];
       const specific = pickHours(m.hours, dow);
       const time = specific ? fmtHours(specific) : m.time;
+      // note.title overrides the primary (first) item's display name
+      const displayName = items.length === 0 && note?.title ? note.title : m.name;
       items.push({
-        name: m.name,
+        name: displayName,
         time,
         swatchStyle: swatchStyle(m.t, m.c, 20),
         isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
         isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
       });
-      ariaParts.push(specific ? `${m.name}, ${time}` : m.name);
+      ariaParts.push(specific ? `${displayName}, ${time}` : displayName);
     }
     const rawHeadBg = META[cats[0] as keyof typeof META].c;
     const headBg = cssColor(rawHeadBg);

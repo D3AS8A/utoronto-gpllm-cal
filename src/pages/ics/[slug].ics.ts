@@ -47,7 +47,9 @@ function allEvents(): Array<{ slug: string; event: EventItem }> {
       const day = Number(dayStr);
       const iso = `${month.year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const dow = (month.fdow + day - 1) % 7;
+      const noteEntry = month.notes?.[day];
       const dedup = new Set<string>();
+      let firstItem = true;
       for (const cat of cats as CatKey[]) {
         // intc + intb dedup to the same displayed session
         const key = cat === 'intb' ? 'intc' : cat;
@@ -56,17 +58,19 @@ function allEvents(): Array<{ slug: string; event: EventItem }> {
         const meta = META[cat];
         const specific = pickHours(meta.hours, dow);
         if (!specific) continue;
-        const slug = `${iso}-${safeFilename(meta.name)}`;
+        // note.title overrides the primary (first) event's title
+        const name = firstItem && noteEntry?.title ? noteEntry.title : meta.name;
+        firstItem = false;
+        const slug = `${iso}-${safeFilename(name)}`;
         if (seen.has(slug)) continue;
         seen.add(slug);
-        const note = month.notes?.[day]?.text;
         out.push({
           slug,
           event: {
             isoStart: toLocalIso(iso, specific.start),
             isoEnd: toLocalIso(iso, specific.end),
-            name: meta.name,
-            ...(note ? { note } : {}),
+            name,
+            ...(noteEntry?.text ? { note: noteEntry.text } : {}),
           },
         });
       }
