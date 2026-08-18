@@ -1,5 +1,36 @@
 // Session category metadata: display name, time string, swatch type + color
 
+// Color palette — mirrors src/styles/variables.css. Hex is retained here
+// because readableFg() needs raw values for a luminance calc; everything
+// emitted to inline styles goes through cssVar() and lands as var(--name).
+export const PALETTE = {
+  'prussian-blue': '#002554',
+  matisse:         '#1f6092',
+  sky:             '#70c7e9',
+  heather:         '#bdc9d7',
+  espresso:        '#2a1d0a',
+  acorn:           '#6b4e22',
+  bronzetone:      '#4a3410',
+  driftwood:       '#936e42',
+  hillary:         '#af9b88',
+  chamois:         '#e5d3a1',
+  albescent:       '#f6eccf',
+  roti:            '#c9a94e',
+  mystic:          '#eef1f5',
+  'spanish-white': '#f7f0e2',
+  merino:          '#f3ece0',
+} as const;
+export type ColorName = keyof typeof PALETTE;
+export const cssVar = (n: ColorName): string => `var(--${n})`;
+
+const HEX_TO_VAR: Record<string, string> = Object.fromEntries(
+  Object.entries(PALETTE).map(([name, hex]) => [hex.toLowerCase(), `var(--${name})`])
+);
+/** Emit a var(--name) for any hex in the palette; passthrough otherwise. */
+export const cssColor = (hex: string): string =>
+  HEX_TO_VAR[hex.toLowerCase()] ?? hex;
+
+
 export type CatKey =
   | 'reg' | 'makeup' | 'lmc' | 'lmb' | 'alrw' | 'orient'
   | 'intc' | 'intb'
@@ -159,9 +190,10 @@ export interface MonthDef {
   days: number;
   marks: Record<number, CatKey[]>;
   /** Optional per-day annotation. `text` shows under the tooltip / modal items
-   * list and is appended to the ICS event description. `borderColor` (hex),
-   * when set, overrides the cell's outer border for a subtle visual flag. */
-  notes?: Record<number, { text: string; borderColor?: string }>;
+   * list and is appended to the ICS event description. `borderColor`, when
+   * set (as a palette name), overrides the cell's outer border for a subtle
+   * visual flag. */
+  notes?: Record<number, { text: string; borderColor?: ColorName }>;
   callouts?: Array<{ label: string; detail: string; tone: 'cream' | 'ink' | 'tan' }>;
 }
 
@@ -169,7 +201,7 @@ export const MONTHS: MonthDef[] = [
   { name: 'September', year: '2026', season: 'fall', fdow: 2, days: 30, marks: {
       8: ['orient'], 9: ['orient'], 10: ['lmc'], 11: ['lmc'], 12: ['lmb', 'alrw'], 13: ['lmb', 'alrw'],
       17: ['lmc'], 18: ['lmc'], 19: ['lmb', 'alrw'], 20: ['lmb', 'alrw'], 25: ['reg'], 26: ['reg'] },
-    notes: { 18: { text: 'Foundations of Cdn Law (full day)', borderColor: '#936e42' } },
+    notes: { 18: { text: 'Foundations of Cdn Law (full day)', borderColor: 'driftwood' } },
     callouts: [{ label: 'Orientation Evenings',
       detail: 'Cdn Law — Sept 8, 6:00–8:00pm · Bus Law & ILT — Sept 9, 6:00–8:00pm', tone: 'tan' }] },
   { name: 'October', year: '2026', season: 'fall', fdow: 4, days: 31, marks: {
@@ -222,12 +254,13 @@ export const DOW = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fri
 
 export function swatchStyle(t: SwatchType, c: string, size = 22): string {
   const base = `width:${size / 16}rem;height:${size / 16}rem;flex:none;box-sizing:border-box;`;
-  if (t === 'outline') return base + `background:#fff;border:0.1875rem solid ${c};`;
-  if (t === 'dashed')  return base + `background:#fff;border:0.1875rem dashed ${c};`;
-  if (t === 'circle')  return base + `background:${c};border-radius:50%;`;
-  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dashed #002554;`;
-  if (t === 'orient')  return base + `background:#f7f0e2;border:0.125rem solid #af9b88;`;
-  return base + `background:${c};`;
+  const col = cssColor(c);
+  if (t === 'outline') return base + `background:#fff;border:0.1875rem solid ${col};`;
+  if (t === 'dashed')  return base + `background:#fff;border:0.1875rem dashed ${col};`;
+  if (t === 'circle')  return base + `background:${col};border-radius:50%;`;
+  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dashed ${cssVar('prussian-blue')};`;
+  if (t === 'orient')  return base + `background:${cssVar('spanish-white')};border:0.125rem solid ${cssVar('hillary')};`;
+  return base + `background:${col};`;
 }
 
 export interface CellVisual {
@@ -242,32 +275,32 @@ export interface CellVisual {
 }
 
 const CLASS_COLORS: Record<string, [string, string]> = {
-  reg:    ['#1f6092', '#fff'],
-  makeup: ['#bdc9d7', '#002554'],
-  lmc:    ['#af9b88', '#2a1d0a'],
-  lmb:    ['#936e42', '#fff'],
-  intc:   ['#e5d3a1', '#4a3410'],
-  intb:   ['#936e42', '#fff'],
+  reg:    [cssVar('matisse'),   '#fff'],
+  makeup: [cssVar('heather'),   cssVar('prussian-blue')],
+  lmc:    [cssVar('hillary'),   cssVar('espresso')],
+  lmb:    [cssVar('driftwood'), '#fff'],
+  intc:   [cssVar('chamois'),   cssVar('bronzetone')],
+  intb:   [cssVar('driftwood'), '#fff'],
 };
 
-const DEFERRED_COLOR = '#70c7e9';
+const DEFERRED_COLOR = cssVar('sky');
 
 export function cellVisual(cats: CatKey[]): CellVisual {
   const has = (k: CatKey) => cats.indexOf(k) !== -1;
   const classKey = (['reg', 'makeup', 'lmc', 'lmb', 'intc', 'intb', 'orient'] as CatKey[]).find(has);
   const hasDeferred = has('dmid') || has('dfin');
-  let bg = 'transparent', fg = '#002554', border = '0.125rem solid transparent';
+  let bg = 'transparent', fg = cssVar('prussian-blue'), border = '0.125rem solid transparent';
   let outline: string | undefined;
-  if (classKey === 'orient') { bg = '#f7f0e2'; fg = '#6b4e22'; border = '0.125rem solid #af9b88'; }
+  if (classKey === 'orient') { bg = cssVar('spanish-white'); fg = cssVar('acorn'); border = `0.125rem solid ${cssVar('hillary')}`; }
   else if (classKey)          { [bg, fg] = CLASS_COLORS[classKey]; }
-  else if (has('dmid'))       { bg = DEFERRED_COLOR; fg = '#002554'; }
-  if      (has('mid'))                     border = '0.125rem solid #1f6092';
-  else if (has('fin'))                     border = '0.125rem solid #002554';
-  else if (has('dfin') && !classKey)       border = '0.125rem solid #70c7e9';
+  else if (has('dmid'))       { bg = DEFERRED_COLOR; fg = cssVar('prussian-blue'); }
+  if      (has('mid'))                     border = `0.125rem solid ${cssVar('matisse')}`;
+  else if (has('fin'))                     border = `0.125rem solid ${cssVar('prussian-blue')}`;
+  else if (has('dfin') && !classKey)       border = `0.125rem solid ${cssVar('sky')}`;
   // ALRW → white solid inner border + blue dashed outline on top of it.
   if (has('alrw')) {
     border = '0.125rem solid #fff';
-    outline = '0.125rem dashed #002554';
+    outline = `0.125rem dashed ${cssVar('prussian-blue')}`;
   }
   // Class + deferred exam → BR corner triangle in deferred color; kill the
   // border so the triangle sits flush with the cell edge (a transparent
@@ -288,8 +321,8 @@ export function countFor(cats: CatKey[]): number {
 }
 
 export function calloutStyle(tone: 'cream' | 'ink' | 'tan'): string {
-  const bg  = tone === 'cream' ? '#f6eccf' : tone === 'ink' ? '#eef1f5' : '#f3ece0';
-  const bar = tone === 'cream' ? '#c9a94e' : tone === 'ink' ? '#002554' : '#af9b88';
+  const bg  = tone === 'cream' ? cssVar('albescent') : tone === 'ink' ? cssVar('mystic')        : cssVar('merino');
+  const bar = tone === 'cream' ? cssVar('roti')      : tone === 'ink' ? cssVar('prussian-blue') : cssVar('hillary');
   return `background:${bg};border-left:0.1875rem solid ${bar}`;
 }
 
