@@ -24,7 +24,6 @@ const FILTER_KEY_TO_CATS: Record<string, string[]> = {
   mid:       ['mid'],
   dmid:      ['dmid'],
   fin:       ['fin'],
-  finc:      ['finc'],
   dfin:      ['dfin'],
 };
 
@@ -39,6 +38,8 @@ interface DetailItem {
   /** Naive America/Toronto local ISO — null when the session has no set hours. */
   isoStart: string | null;
   isoEnd:   string | null;
+  /** Day-level free-form note; embedded in ICS + Google Cal description. */
+  note: string | null;
 }
 
 interface CalendarDetail {
@@ -46,6 +47,7 @@ interface CalendarDetail {
   dateLabel: string;
   headBg: string;
   headFg: string;
+  note: string | null;
   items: DetailItem[];
 }
 
@@ -115,7 +117,6 @@ const FILTER_URL_KEYS: Record<string, string> = {
   mid:       'midterms',
   dmid:      'def-midterms',
   fin:       'finals',
-  finc:      'finals-cdn',
   dfin:      'def-finals',
 };
 
@@ -535,12 +536,15 @@ export default (Alpine: Alpine) => {
     /** Google Calendar "add event" URL for one detail item. */
     googleCalUrl(item: DetailItem): string | null {
       if (!item.isoStart || !item.isoEnd) return null;
+      const details = item.note
+        ? `${item.note}\n\nUofT GPLLM program calendar`
+        : 'UofT GPLLM program calendar';
       const params = new URLSearchParams({
         action: 'TEMPLATE',
         text: item.name,
         dates: `${toGcalStamp(item.isoStart)}/${toGcalStamp(item.isoEnd)}`,
         ctz: 'America/Toronto',
-        details: 'UofT GPLLM program calendar',
+        details,
       });
       return `https://calendar.google.com/calendar/render?${params.toString()}`;
     },
@@ -574,7 +578,9 @@ export default (Alpine: Alpine) => {
         endInputType:    'utc',
         endOutputType:   'utc',
         title: item.name,
-        description: 'UofT GPLLM program calendar',
+        description: item.note
+          ? `${item.note}\n\nUofT GPLLM program calendar`
+          : 'UofT GPLLM program calendar',
         productId: 'utoronto-gpllm-cal/ics',
         calName: 'UofT GPLLM Calendar',
       }, (error, value) => {

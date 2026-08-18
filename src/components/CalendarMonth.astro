@@ -2,7 +2,7 @@
 import type { MonthDef } from '../lib/calendar-data';
 import {
   cellVisual, swatchStyle, weekdayName, calloutStyle,
-  META, pickHours, fmtHours, toLocalIso,
+  META, pickHours, fmtHours, toLocalIso, cssColor, cssVar,
 } from '../lib/calendar-data';
 
 interface Props {
@@ -55,9 +55,12 @@ type Cell = {
       /** Naive local ISO strings (America/Toronto assumed). Null when no hours. */
       isoStart: string | null;
       isoEnd: string | null;
+      /** Day-level free-form note; embedded in ICS/Google Cal description. */
+      note: string | null;
     }>;
     headBg: string;
     headFg: string;
+    note: string | null;
   };
 };
 
@@ -71,7 +74,7 @@ function readableFg(hex: string): string {
     return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
   });
   const lum = 0.2126 * srgb[0] + 0.7152 * srgb[1] + 0.0722 * srgb[2];
-  return lum > 0.55 ? '#002554' : '#fff';
+  return lum > 0.55 ? cssVar('prussian-blue') : '#fff';
 }
 
 const cells: Cell[] = [];
@@ -84,9 +87,11 @@ for (let i = 0; i < rows * 7; i++) {
   }
   const cats = month.marks[day] || [];
   const hasMark = cats.length > 0;
+  const note = month.notes?.[day];
   const v = cellVisual(cats);
+  const border = note?.borderColor ? `0.125rem solid ${cssVar(note.borderColor)}` : v.border;
   const style =
-    `background:${v.bg};color:${v.fg};border:${v.border};` +
+    `background:${v.bg};color:${v.fg};border:${border};` +
     (v.outline ? `outline:${v.outline};outline-offset:-0.125rem;` : '') +
     `font-weight:${v.isBold ? '800' : '600'};` +
     `--corner-color:${v.cornerColor ?? 'transparent'};`;
@@ -106,25 +111,32 @@ for (let i = 0; i < rows * 7; i++) {
       const m = META[c as keyof typeof META];
       const specific = pickHours(m.hours, dow);
       const time = specific ? fmtHours(specific) : m.time;
+      // note.title overrides the primary (first) item's display name
+      const displayName = items.length === 0 && note?.title ? note.title : m.name;
       items.push({
-        name: m.name,
+        name: displayName,
         time,
         swatchStyle: swatchStyle(m.t, m.c, 20),
         isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
         isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
+        note: note?.text ?? null,
       });
-      ariaParts.push(specific ? `${m.name}, ${time}` : m.name);
+      ariaParts.push(specific ? `${displayName}, ${time}` : displayName);
     }
-    const headBg = META[cats[0] as keyof typeof META].c;
-    const headFg = readableFg(headBg);
+    const rawHeadBg = META[cats[0] as keyof typeof META].c;
+    const headBg = cssColor(rawHeadBg);
+    const headFg = readableFg(rawHeadBg);
+    const noteText = note?.text ?? null;
     detail = {
       weekday,
       dateLabel: `${month.name} ${day}`,
       items,
       headBg,
       headFg,
+      note: noteText,
     };
-    ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaParts.join('; ')}`;
+    const ariaTail = noteText ? `${ariaParts.join('; ')}. ${noteText}` : ariaParts.join('; ');
+    ariaLabel = `${weekday}, ${month.name} ${day} — ${ariaTail}`;
   }
   cells.push({ blank: false, num: day, iso: dateIso, dow, cats, hasMark, style, cornerColor: v.cornerColor, ariaLabel, detail });
 }
@@ -239,7 +251,7 @@ const headingId = `month-${monthIdx}-name`;
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.59375rem;
     font-weight: 700;
-    color: #7d8794;
+    color: var(--pewter);
     padding-bottom: 0.3125rem;
     /* Reset <abbr> browser defaults */
     text-decoration: none;
@@ -322,6 +334,6 @@ const headingId = `month-${monthIdx}-name`;
     font-size: 0.6875rem;
     line-height: 1.35;
     margin-top: 0.125rem;
-    color: #4a4230;
+    color: var(--umber);
   }
 </style>
