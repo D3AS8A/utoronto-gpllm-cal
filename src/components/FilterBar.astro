@@ -82,7 +82,14 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
                   @click={`toggle('${c.key}')`}
                   :aria-checked={`filters['${c.key}'] ? 'true' : 'false'`}
                 >
-                  <span class="toggle-swatch" style={c.swatchStyle} aria-hidden="true"></span>
+                  {c.key === 'intensive' ? (
+                    <span class="toggle-swatch toggle-swatch--twotone" aria-hidden="true">
+                      <span class="toggle-swatch__half--fri"></span>
+                      <span class="toggle-swatch__half--wknd"></span>
+                    </span>
+                  ) : (
+                    <span class="toggle-swatch" style={c.swatchStyle} aria-hidden="true"></span>
+                  )}
                   <span class="toggle-label">
                   {c.labelHead}
                   {c.labelTail && <><br />{c.labelTail}</>}
@@ -91,6 +98,9 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
                 </button>
               ))}
             </div>
+            <p class="filter-note">
+              *Sunday intensive classes may end as late as 2:30pm
+            </p>
           </div>
         </div>
       </div>
@@ -296,6 +306,21 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
     flex: none;
     box-sizing: border-box;
   }
+
+  .toggle-swatch--twotone {
+    display: inline-flex;
+    width: 0.875rem;
+    height: 0.875rem;
+    overflow: hidden;
+  }
+
+  .toggle-swatch--twotone > span {
+    flex: 1 1 50%;
+    height: 100%;
+  }
+
+  .toggle-swatch__half--fri  { background: var(--driftwood); }
+  .toggle-swatch__half--wknd { background: var(--chamois); }
 
   .toggle-label {
     line-height: 1.1;

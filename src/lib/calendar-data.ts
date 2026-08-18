@@ -172,7 +172,7 @@ export const MONTHS: MonthDef[] = [
       23: ['reg'], 24: ['reg'], 25: ['makeup'], 31: ['mid'] } },
   { name: 'November', year: '2026', season: 'fall', fdow: 0, days: 30, marks: {
       1: ['mid'], 5: ['mid'], 6: ['reg', 'dmid'], 7: ['reg'], 8: ['makeup'],
-      13: ['dmid'], 20: ['reg'], 21: ['reg'], 28: ['mid'], 29: ['mid'] } },
+      13: ['dmid'], 20: ['reg'], 21: ['reg'], 28: ['fin'], 29: ['fin'] } },
   { name: 'December', year: '2026', season: 'fall', fdow: 2, days: 31, marks: {
       3: ['fin'], 4: ['intc'], 5: ['intc', 'fin'], 6: ['intc', 'fin'], 10: ['dfin'],
       11: ['intb'], 12: ['intb'], 13: ['intb'], 17: ['dfin'], 18: ['intb'], 19: ['intb'] },
@@ -180,7 +180,7 @@ export const MONTHS: MonthDef[] = [
       detail: 'Intensives 1 & 2 overlap. Some dates to be released — please hold for now.', tone: 'cream' }] },
   { name: 'January', year: '2027', season: 'winter', fdow: 5, days: 31, marks: {
       8: ['reg'], 9: ['reg'], 10: ['fin'], 22: ['reg'], 23: ['reg'], 24: ['makeup'] },
-    callouts: [{ label: 'Intensive Final Exam', detail: 'January 10.', tone: 'ink' }] },
+    callouts: [{ label: 'December Intensive Final Exam(s)', detail: 'January 10.', tone: 'ink' }] },
   { name: 'February', year: '2027', season: 'winter', fdow: 1, days: 28, marks: {
       5: ['reg'], 6: ['reg'], 19: ['mid'], 20: ['mid'], 21: ['mid'],
       26: ['dmid'], 27: ['reg'], 28: ['makeup'] } },
@@ -194,7 +194,7 @@ export const MONTHS: MonthDef[] = [
   { name: 'May', year: '2027', season: 'summer', fdow: 6, days: 31, marks: {
       1: ['reg'], 7: ['reg'], 8: ['reg'], 9: ['makeup'], 14: ['reg'], 15: ['reg'],
       16: ['fin'], 29: ['fin'], 30: ['fin'] },
-    callouts: [{ label: 'Intensive Final Exam', detail: 'May 16.', tone: 'ink' }] },
+    callouts: [{ label: 'April Intensive Final Exam(s)', detail: 'May 16.', tone: 'ink' }] },
   { name: 'June', year: '2027', season: 'summer', fdow: 2, days: 30, marks: {
       4: ['reg'], 5: ['reg'], 6: ['fin'], 11: ['reg', 'dfin'], 12: ['reg'],
       13: ['dmid'], 18: ['reg'], 19: ['reg'], 25: ['fin'], 26: ['fin'], 27: ['fin'] } },
@@ -220,7 +220,7 @@ export function swatchStyle(t: SwatchType, c: string, size = 22): string {
   if (t === 'outline') return base + `background:#fff;border:0.1875rem solid ${c};`;
   if (t === 'dashed')  return base + `background:#fff;border:0.1875rem dashed ${c};`;
   if (t === 'circle')  return base + `background:${c};border-radius:50%;`;
-  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dotted #002554;border-radius:50%;`;
+  if (t === 'alrw')    return base + `background:#fff;border:0.125rem dashed #002554;`;
   if (t === 'orient')  return base + `background:#f7f0e2;border:0.125rem solid #af9b88;`;
   return base + `background:${c};`;
 }
@@ -259,10 +259,10 @@ export function cellVisual(cats: CatKey[]): CellVisual {
   if      (has('mid'))                     border = '0.125rem solid #1f6092';
   else if (has('fin'))                     border = '0.125rem solid #002554';
   else if (has('dfin') && !classKey)       border = '0.125rem solid #70c7e9';
-  // ALRW → white solid inner border + blue dotted outline on top of it.
+  // ALRW → white solid inner border + blue dashed outline on top of it.
   if (has('alrw')) {
     border = '0.125rem solid #fff';
-    outline = '0.125rem dotted #002554';
+    outline = '0.125rem dashed #002554';
   }
   // Class + deferred exam → BR corner triangle in deferred color; kill the
   // border so the triangle sits flush with the cell edge (a transparent
