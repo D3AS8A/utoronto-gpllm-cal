@@ -135,7 +135,10 @@ function allFiltersOn(): Record<string, boolean> {
 function readFiltersFromUrl(): Record<string, boolean> | null {
   const p = new URLSearchParams(window.location.search);
   if (!p.has('f')) return null;
-  const active = new Set(p.get('f')!.split(',').filter(Boolean));
+  const val = p.get('f')!;
+  if (val === 'all') return allFiltersOn();
+  if (val === 'none') return {};
+  const active = new Set(val.split(',').filter(Boolean));
   const next: Record<string, boolean> = {};
   for (const [urlKey, internal] of Object.entries(FILTER_URL_KEYS_REV)) {
     if (active.has(urlKey)) next[internal] = true;
@@ -149,9 +152,8 @@ function syncFiltersToUrl(filters: Record<string, boolean>) {
     if (filters[key]) active.push(FILTER_URL_KEYS[key]);
   }
   const params = new URLSearchParams(window.location.search);
-  const isDefault = active.length === ALL_FILTER_KEYS.length;
-  if (isDefault) {
-    params.delete('f');
+  if (active.length === ALL_FILTER_KEYS.length) {
+    params.set('f', 'all');
   } else if (active.length === 0) {
     params.set('f', 'none');
   } else {
@@ -349,6 +351,24 @@ export default (Alpine: Alpine) => {
       vibrate(6);
       this.filters = {};
       syncFiltersToUrl(this.filters);
+    },
+
+    showAll() {
+      vibrate(6);
+      this.filters = allFiltersOn();
+      syncFiltersToUrl(this.filters);
+    },
+
+    clearOrShowAll() {
+      if (this.anyFilter) this.reset();
+      else this.showAll();
+    },
+
+    get clearLabel(): string {
+      if (!this.anyFilter) return 'show all';
+      if (this.isDefault) return 'clear all';
+      const n = this.activeCount;
+      return `clear ${n} filter${n === 1 ? '' : 's'}`;
     },
 
     openDetail(detail: CalendarDetail, sourceEl?: HTMLElement) {

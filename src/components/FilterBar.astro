@@ -49,10 +49,9 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
   <button
     type="button"
     class="filter-clear"
-    @click="reset()"
-    x-show="anyFilter && !isDefault"
+    @click="clearOrShowAll()"
   >
-    <span class="filter-clear-text">clear <span x-text="activeCount"></span> filter<span x-text="activeCount === 1 ? '' : 's'"></span></span> <span class="filter-clear-x">✕</span>
+    <span class="filter-clear-text" x-text="clearLabel"></span> <span class="filter-clear-x" x-text="anyFilter ? '✕' : '+'"></span>
   </button>
 </div>
 
