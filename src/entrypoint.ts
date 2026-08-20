@@ -124,6 +124,14 @@ const FILTER_URL_KEYS_REV: Record<string, string> = Object.fromEntries(
   Object.entries(FILTER_URL_KEYS).map(([k, v]) => [v, k])
 );
 
+const ALL_FILTER_KEYS = Object.keys(FILTER_URL_KEYS);
+
+function allFiltersOn(): Record<string, boolean> {
+  const next: Record<string, boolean> = {};
+  for (const k of ALL_FILTER_KEYS) next[k] = true;
+  return next;
+}
+
 function readFiltersFromUrl(): Record<string, boolean> | null {
   const p = new URLSearchParams(window.location.search);
   if (!p.has('f')) return null;
@@ -137,13 +145,15 @@ function readFiltersFromUrl(): Record<string, boolean> | null {
 
 function syncFiltersToUrl(filters: Record<string, boolean>) {
   const active: string[] = [];
-  for (const key of Object.keys(FILTER_URL_KEYS)) {
+  for (const key of ALL_FILTER_KEYS) {
     if (filters[key]) active.push(FILTER_URL_KEYS[key]);
   }
   const params = new URLSearchParams(window.location.search);
-  const isDefault = active.length === 1 && active[0] === FILTER_URL_KEYS.reg;
+  const isDefault = active.length === ALL_FILTER_KEYS.length;
   if (isDefault) {
     params.delete('f');
+  } else if (active.length === 0) {
+    params.set('f', 'none');
   } else {
     params.set('f', active.join(','));
   }
@@ -204,7 +214,7 @@ export default (Alpine: Alpine) => {
       window.addEventListener('resize', drop, { passive: true });
 
       const fromUrl = readFiltersFromUrl();
-      if (fromUrl !== null) this.filters = fromUrl;
+      this.filters = fromUrl !== null ? fromUrl : allFiltersOn();
 
       // Size all toggle labels in a group to the widest one so their tracks
       // align at a consistent X (rather than being pushed to the cell's edge).
@@ -287,16 +297,16 @@ export default (Alpine: Alpine) => {
     },
 
     get isDefault(): boolean {
-      const on = Object.keys(this.filters).filter((k) => this.filters[k]);
-      return on.length === 1 && on[0] === 'reg';
+      return ALL_FILTER_KEYS.every((k) => this.filters[k]);
     },
 
     /** Dim a cell whose `data-cats` doesn't intersect the active filter set. */
     isDim(catsAttr: string): boolean {
-      const active = this.activeCats;
-      if (active.size === 0) return false;
       const cats = (catsAttr || '').split(/\s+/).filter(Boolean);
-      return cats.length > 0 && !cats.some((c) => active.has(c));
+      if (cats.length === 0) return false;
+      const active = this.activeCats;
+      if (active.size === 0) return true;
+      return !cats.some((c) => active.has(c));
     },
 
     /**
@@ -308,7 +318,8 @@ export default (Alpine: Alpine) => {
       const all = ((catsAttr || '').split(/\s+/).filter(Boolean)) as CatKey[];
       if (all.length === 0) return '';
       const active = this.activeCats;
-      const relevant = active.size === 0 ? all : all.filter((c) => active.has(c));
+      if (active.size === 0) return '';
+      const relevant = all.filter((c) => active.has(c));
       const v = cellVisual(relevant.length ? relevant : all);
       return (
         `background:${v.bg};color:${v.fg};border:${v.border};` +
