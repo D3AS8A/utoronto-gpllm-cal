@@ -5,7 +5,7 @@
   class="cal-tooltip"
   role="tooltip"
   :class="{ 'is-visible': tooltip.visible, 'is-traveling': tooltip.travel, 'below': tooltip.below }"
-  :style="`--tt-x:${tooltip.x}px;--tt-top:${tooltip.yTop}px;--tt-bottom:${tooltip.yBottom}px;--tt-head:${tooltipHeadBg}`"
+  :style="`--tt-x:${tooltip.x}px;--tt-arrow:${tooltip.arrow}px;--tt-top:${tooltip.yTop}px;--tt-bottom:${tooltip.yBottom}px;--tt-head:${tooltipHeadBg}`"
   @mouseenter="cancelHideTooltip()"
   @mouseleave="hideTooltip(0)"
   @click="openTooltipDetail()"
@@ -107,11 +107,12 @@
     transform: translate(-50%, 0.625rem);
   }
 
-  /* Small arrow pointing at the cell */
+  /* Small arrow pointing at the cell. Anchor x is offset from center when
+     the tooltip container was clamped away from the viewport edge. */
   .cal-tooltip::after {
     content: '';
     position: absolute;
-    left: 50%;
+    left: calc(50% + var(--tt-arrow, 0px));
     bottom: -0.4375rem;
     transform: translateX(-50%) rotate(45deg);
     width: 0.625rem;

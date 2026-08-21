@@ -58,8 +58,10 @@ interface TooltipModel {
   travel: boolean;
   /** Anchor below the cell instead of above (used when cell is near top of viewport). */
   below: boolean;
-  /** Center-x of the source cell, viewport coords. */
+  /** Clamped center-x for the tooltip container, viewport coords. */
   x: number;
+  /** Signed px offset of arrow from tooltip center — non-zero when x was clamped away from the anchor. */
+  arrow: number;
   /** Top-y of the source cell, viewport coords. Tooltip renders above this. */
   yTop: number;
   /** Bottom-y of the source cell, for below-cell fallback when near top of viewport. */
@@ -188,6 +190,7 @@ export default (Alpine: Alpine) => {
       travel: false,
       below: false,
       x: 0,
+      arrow: 0,
       yTop: 0,
       yBottom: 0,
       active: 0 as 0 | 1,
@@ -205,6 +208,7 @@ export default (Alpine: Alpine) => {
     _ttHideTimer: 0 as ReturnType<typeof setTimeout> | 0,
     _ttClearTimer: 0 as ReturnType<typeof setTimeout> | 0,
     _ttEnterRaf: 0 as number,
+    _ttRefineRaf: 0 as number,
     _spSrcEl: null as HTMLElement | null,
     _spTrack: null as (() => void) | null,
 
@@ -214,6 +218,20 @@ export default (Alpine: Alpine) => {
       const drop = () => this.hideTooltip(0);
       window.addEventListener('scroll', drop, { passive: true, capture: true });
       window.addEventListener('resize', drop, { passive: true });
+
+      // Re-clamp the tooltip against the viewport whenever its rendered
+      // width changes — the grid-stack slot layout settles across a
+      // crossfade so the container's final width isn't known when we
+      // first position it.
+      const tt = document.getElementById('cal-tooltip');
+      if (tt && typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => {
+          if (!this.tooltip.visible || !this.tooltip.activeIso) return;
+          const anchorX = this.tooltip.x + this.tooltip.arrow;
+          this._refineTooltipPosition(this.tooltip.activeIso, anchorX);
+        });
+        ro.observe(tt);
+      }
 
       const fromUrl = readFiltersFromUrl();
       this.filters = fromUrl !== null ? fromUrl : allFiltersOn();
@@ -382,6 +400,7 @@ export default (Alpine: Alpine) => {
       if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
       if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
       if (this._ttEnterRaf) { cancelAnimationFrame(this._ttEnterRaf); this._ttEnterRaf = 0; }
+      if (this._ttRefineRaf) { cancelAnimationFrame(this._ttRefineRaf); this._ttRefineRaf = 0; }
       this._setSpotlight(sourceEl?.closest('.month-card') as HTMLElement | null);
     },
 
@@ -455,7 +474,16 @@ export default (Alpine: Alpine) => {
       if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
 
       const belowNext = rect.top < 180;
-      const x = rect.left + rect.width / 2;
+      const anchorX = rect.left + rect.width / 2;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      // Initial clamp uses the max-width budget (17.5rem); a follow-up rAF
+      // re-clamps against the ACTUAL rendered width so narrower tooltips
+      // (few items) aren't over-inset from the viewport edge.
+      const halfWMax = (17.5 * rem) / 2;
+      const pad = 0.5 * rem;
+      const vw = window.innerWidth;
+      const x = Math.max(halfWMax + pad, Math.min(anchorX, vw - halfWMax - pad));
+      const arrow = anchorX - x;
       const wasVisible = this.tooltip.visible;
       const arrowFlip = wasVisible && belowNext !== this.tooltip.below;
       const canTravel = wasVisible && !arrowFlip;
@@ -470,8 +498,10 @@ export default (Alpine: Alpine) => {
         this.tooltip.activeIso = iso;
         this.tooltip.below = belowNext;
         this.tooltip.x = x;
+        this.tooltip.arrow = arrow;
         this.tooltip.yTop = rect.top;
         this.tooltip.yBottom = rect.bottom;
+        this._scheduleTooltipRefine(iso, anchorX);
         return;
       }
 
@@ -483,14 +513,44 @@ export default (Alpine: Alpine) => {
       this.tooltip.slot1 = null;
       this.tooltip.below = belowNext;
       this.tooltip.x = x;
+      this.tooltip.arrow = arrow;
       this.tooltip.yTop = rect.top;
       this.tooltip.yBottom = rect.bottom;
 
       if (this._ttEnterRaf) cancelAnimationFrame(this._ttEnterRaf);
       this._ttEnterRaf = requestAnimationFrame(() => {
-        this._ttEnterRaf = 0;
-        this.tooltip.visible = true;
+        this._ttEnterRaf = requestAnimationFrame(() => {
+          this._ttEnterRaf = 0;
+          this._refineTooltipPosition(iso, anchorX);
+          this.tooltip.visible = true;
+        });
       });
+    },
+
+    _scheduleTooltipRefine(iso: string, anchorX: number) {
+      if (this._ttRefineRaf) cancelAnimationFrame(this._ttRefineRaf);
+      // Double-rAF: first frame lets Alpine flush the slot content into the
+      // DOM; second frame gives the grid-stack layout a chance to grow to
+      // the new max-child width before we measure.
+      this._ttRefineRaf = requestAnimationFrame(() => {
+        this._ttRefineRaf = requestAnimationFrame(() => {
+          this._ttRefineRaf = 0;
+          this._refineTooltipPosition(iso, anchorX);
+        });
+      });
+    },
+
+    _refineTooltipPosition(iso: string, anchorX: number) {
+      if (this.tooltip.activeIso !== iso) return;
+      const el = document.getElementById('cal-tooltip');
+      if (!el) return;
+      const rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      const halfW = el.offsetWidth / 2;
+      const pad = 0.5 * rem;
+      const vw = window.innerWidth;
+      const x = Math.max(halfW + pad, Math.min(anchorX, vw - halfW - pad));
+      this.tooltip.x = x;
+      this.tooltip.arrow = anchorX - x;
     },
 
     hideTooltip(delay = 320) {
