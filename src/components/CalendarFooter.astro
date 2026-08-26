@@ -1,13 +1,37 @@
 ---
+interface Props {
+  /** ISO YYYY-MM-DD of the last manual content update. */
+  lastUpdated?: string;
+}
+const { lastUpdated } = Astro.props;
+
+let updatedLabel: string | null = null;
+if (lastUpdated) {
+  const [y, m, d] = lastUpdated.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dt.getDay()];
+  const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getMonth()];
+  updatedLabel = `${wd} ${mo} ${dt.getDate()}, ${dt.getFullYear()}`;
+}
 ---
 <footer class="cal-footer">
-  <section class="footer-col" aria-labelledby="footer-note-label">
-    <h2 id="footer-note-label" class="footer-label">PLEASE NOTE</h2>
-    <p>
-      Dates and times herein are subject to change. For course-specific dates and times,
-      please consult syllabi on <a href="https://idpz.utorauth.utoronto.ca/idp/profile/SAML2/Redirect/SSO?execution=e1s1" target="_blank" rel="noopener"><strong>Quercus</strong></a>.
-    </p>
-  </section>
+  <div class="footer-col-stack">
+    <section class="footer-col" aria-labelledby="footer-note-label">
+      <h2 id="footer-note-label" class="footer-label">PLEASE NOTE</h2>
+      <p>
+        Dates and times herein are subject to change. For course-specific dates and times,
+        please consult syllabi on <a href="https://idpz.utorauth.utoronto.ca/idp/profile/SAML2/Redirect/SSO?execution=e1s1" target="_blank" rel="noopener"><strong>Quercus</strong></a>.
+      </p>
+    </section>
+    {updatedLabel && (
+      <section class="footer-col" aria-labelledby="footer-updated-label">
+        <h2 id="footer-updated-label" class="footer-label">LAST UPDATED</h2>
+        <p>
+          <em><time datetime={lastUpdated}>{updatedLabel}</time></em>
+        </p>
+      </section>
+    )}
+  </div>
   <section class="footer-col mobile" aria-labelledby="footer-viewport-label">
     <h2 id="footer-viewport-label" class="footer-label">VIEWPORT</h2>
     <p>
@@ -34,7 +58,13 @@
     justify-content: space-between;
   }
 
-  .footer-col:first-child { max-width: 27.5rem; }
+  .footer-col-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    max-width: 27.5rem;
+  }
+
   .footer-col:last-child  { max-width: 22.5rem; }
 
   .footer-col.mobile { display: none; }
@@ -76,6 +106,7 @@
     display: block;
     opacity: 0.9;
   }
+
 
   @media (min-width: 56.25rem) {
     .footer-mark {

@@ -1,4 +1,18 @@
 ---
+interface Props {
+  /** ISO YYYY-MM-DD of the last manual content update. */
+  lastUpdated?: string;
+}
+const { lastUpdated } = Astro.props;
+
+let updatedLabel: string | null = null;
+if (lastUpdated) {
+  const [y, m, d] = lastUpdated.split('-').map(Number);
+  const dt = new Date(y, m - 1, d);
+  const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dt.getDay()];
+  const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getMonth()];
+  updatedLabel = `${wd} ${mo} ${dt.getDate()}, ${dt.getFullYear()}`;
+}
 ---
 <header class="cal-header">
   <div class="header-logos">
@@ -17,11 +31,16 @@
       </p>
       <h1 class="header-title">Program Calendar</h1>
     </hgroup>
-    <p class="header-desc">
-      Regular classes take place on <strong>Friday evenings</strong> (4–9pm) and
-      <strong>Saturdays</strong> (8:30am–6:30pm). Select any coloured date for details,
-      or open the key to filter by session type.
-    </p>
+    <div class="header-desc">
+      <p>
+        Regular classes take place on <strong>Friday evenings</strong> (4–9pm) and
+        <strong>Saturdays</strong> (8:30am–6:30pm). Select any coloured date for details,
+        or open the key to filter by session type.
+      </p>
+      {updatedLabel && (
+        <p>This site's content was last updated on <time datetime={lastUpdated}>{updatedLabel}</time>.</p>
+      )}
+    </div>
   </div>
 </header>
 
@@ -92,6 +111,14 @@
     color: var(--oxford-blue);
     margin: 3rem 0 -0.25rem;
     align-self: flex-end;
+  }
+
+  .header-desc p {
+    margin: 0 0 0.5rem;
+  }
+
+  .header-desc p:last-child {
+    margin-bottom: 0;
   }
 
   .header-desc strong {

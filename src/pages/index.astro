@@ -9,7 +9,8 @@ import DetailModal from '../components/DetailModal.astro';
 import CalendarTooltip from '../components/CalendarTooltip.astro';
 
 const global = loadGlobal();
-const { meta } = loadPage('home');
+const { meta, content } = loadPage<{ last_updated?: string }>('home');
+const lastUpdated = content.last_updated;
 
 const jsonLD = {
   '@context': 'https://schema.org',
@@ -26,6 +27,7 @@ const jsonLD = {
   ogImage={meta.og_image}
   jsonLD={jsonLD}
   showChrome={false}
+  lastUpdated={lastUpdated}
 >
   <div
     class="cal-app rails-on"
@@ -34,7 +36,7 @@ const jsonLD = {
     x-cloak
     @keydown.escape.window="detail = null; tooltip = null"
   >
-    <CalendarHeader />
+    <CalendarHeader lastUpdated={lastUpdated} />
 
     <FilterBar />
 
@@ -44,7 +46,7 @@ const jsonLD = {
       <CalendarSection season="summer" />
     </main>
 
-    <CalendarFooter />
+    <CalendarFooter lastUpdated={lastUpdated} />
 
     <DetailModal />
     <CalendarTooltip />
