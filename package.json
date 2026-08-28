@@ -19,6 +19,8 @@
     "ics": "^3.12.0"
   },
   "devDependencies": {
-    "sass": "^1.100.0"
+    "@vite-pwa/astro": "^1.2.0",
+    "sass": "^1.100.0",
+    "workbox-window": "^7.4.1"
   }
 }
