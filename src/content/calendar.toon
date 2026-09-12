@@ -6,10 +6,7 @@ meta:
 options: null
 
 content:
-  heading: UofT GPLLM Calendar
-  tagline: Interactive academic calendar for the GPLLM program.
-  cta_primary: View calendar
-  cta_primary_href: "#"
-  cta_secondary: Learn more
-  cta_secondary_href: "#"
+  eyebrow: 2026 — 2027 ACADEMIC YEAR
+  eyebrow_datetime: 2026-09/2027-08
+  heading: Program Calendar
   last_updated: "2026-08-17"

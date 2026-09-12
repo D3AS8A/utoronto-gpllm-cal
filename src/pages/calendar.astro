@@ -1,16 +1,22 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import PageLayout from '../layouts/PageLayout.astro';
 import { loadGlobal, loadPage } from '../lib/content';
-import CalendarHeader from '../components/CalendarHeader.astro';
-import CalendarFooter from '../components/CalendarFooter.astro';
+import { formatUpdated } from '../lib/date';
+import PageTitle from '../components/PageTitle.astro';
 import FilterBar from '../components/FilterBar.astro';
 import CalendarSection from '../components/CalendarSection.astro';
 import DetailModal from '../components/DetailModal.astro';
 import CalendarTooltip from '../components/CalendarTooltip.astro';
 
 const global = loadGlobal();
-const { meta, content } = loadPage<{ last_updated?: string }>('home');
+const { meta, content } = loadPage<{
+  eyebrow: string;
+  eyebrow_datetime: string;
+  heading: string;
+  last_updated?: string;
+}>('calendar');
 const lastUpdated = content.last_updated;
+const updatedLabel = formatUpdated(lastUpdated);
 
 const jsonLD = {
   '@context': 'https://schema.org',
@@ -21,23 +27,34 @@ const jsonLD = {
 };
 ---
 
-<BaseLayout
+<PageLayout
   title={meta.title ?? undefined}
   description={meta.description}
   ogImage={meta.og_image}
   jsonLD={jsonLD}
-  showChrome={false}
   lastUpdated={lastUpdated}
 >
+  <PageTitle
+    eyebrow={content.eyebrow}
+    eyebrowDatetime={content.eyebrow_datetime}
+    title={content.heading}
+  >
+    <p>
+      Regular classes take place on <strong>Friday evenings</strong> (4–9pm) and
+      <strong>Saturdays</strong> (8:30am–6:30pm). Select any coloured date for details,
+      or open the key to filter by session type.
+    </p>
+    {updatedLabel && (
+      <p>This site's content was last updated on <time datetime={lastUpdated}>{updatedLabel}</time>.</p>
+    )}
+  </PageTitle>
+
   <div
-    class="cal-app rails-on"
     :class="{ 'no-scroll': detail }"
     x-data="calendar"
     x-cloak
     @keydown.escape.window="detail = null; tooltip = null"
   >
-    <CalendarHeader lastUpdated={lastUpdated} />
-
     <FilterBar />
 
     <main id="main-content" class="cal-main" tabindex="-1">
@@ -46,31 +63,12 @@ const jsonLD = {
       <CalendarSection season="summer" />
     </main>
 
-    <CalendarFooter lastUpdated={lastUpdated} />
-
     <DetailModal />
     <CalendarTooltip />
   </div>
-</BaseLayout>
+</PageLayout>
 
 <style is:global>
-  /* Overrides for the calendar page — global.scss paints a dark chrome; the
-     calendar's warm cream palette lives here. */
-  body:has(.cal-app) {
-    /* Undo global.scss's flex-column layout — .cal-app relies on plain block
-       flow so `max-width` + `margin: 0 auto` centers as expected. */
-    display: block;
-    background: var(--satin-linen);
-    color: var(--prussian-blue);
-    font-family: 'Archivo', system-ui, -apple-system, sans-serif;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body:has(.cal-app) ::selection {
-    background: var(--sky);
-    color: var(--prussian-blue);
-  }
-
   .gp-scroll::-webkit-scrollbar { height: 0.375rem; }
   .gp-scroll::-webkit-scrollbar-thumb { background: var(--chino); }
 
@@ -80,12 +78,6 @@ const jsonLD = {
 </style>
 
 <style>
-  .cal-app {
-    max-width: 82.5rem;
-    margin: 0 auto;
-    padding: 0 clamp(0.875rem, 3.5vw, 2.5rem) 5rem;
-  }
-
   .cal-main {
     margin-top: clamp(1.25rem, 2.5vw, 2rem);
     display: flex;

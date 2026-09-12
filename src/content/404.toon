@@ -11,4 +11,4 @@ content:
   heading: Page not found
   message: "Sorry, we couldn't find what you were looking for."
   cta: Go home
-  cta_href: /
+  cta_href: /calendar

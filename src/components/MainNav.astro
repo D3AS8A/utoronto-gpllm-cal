@@ -1,0 +1,72 @@
+---
+const links = [
+  { label: 'Calendar', href: '/calendar' },
+  { label: 'Courses', href: '/courses' },
+];
+
+// Normalised so `/`, `/index.html`, and `/courses/` all match their link.
+const pathname = normalise(Astro.url.pathname);
+
+function normalise(path: string): string {
+  return path.replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
+}
+
+function isActive(href: string): boolean {
+  const target = normalise(href);
+  return target === '/'
+    ? pathname === '/'
+    : pathname === target || pathname.startsWith(`${target}/`);
+}
+---
+<nav class="cal-nav" aria-label="Main navigation">
+  <ul class="cal-nav-list" role="list">
+    {links.map(({ label, href }) => (
+      <li>
+        <a
+          href={href}
+          class="cal-nav-link"
+          aria-current={isActive(href) ? 'page' : undefined}
+        >
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .cal-nav {
+    margin-top: clamp(1rem, 2.5vw, 1.75rem);
+    border-top: 0.125rem solid var(--prussian-blue);
+  }
+
+  .cal-nav-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cal-nav-link {
+    display: block;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: clamp(0.625rem, 1.1vw, 0.75rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--prussian-blue);
+    padding: 0.75rem clamp(1rem, 2.6vw, 1.75rem);
+    transition: background-color 150ms ease, color 150ms ease;
+  }
+
+  .cal-nav-link:hover,
+  .cal-nav-link:focus-visible {
+    background: var(--tana);
+  }
+
+  .cal-nav-link[aria-current='page'] {
+    background: var(--prussian-blue);
+    color: var(--satin-linen);
+  }
+</style>

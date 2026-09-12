@@ -9,6 +9,11 @@ export default defineConfig({
 
   output: 'static',
 
+  // The calendar is the site's landing page; `/` bounces to it.
+  redirects: {
+    '/': '/calendar',
+  },
+
   devToolbar: {
     enabled: false,
   },
@@ -21,13 +26,13 @@ export default defineConfig({
       strategies: 'generateSW',
       injectRegister: null,
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       manifest: {
         name: 'UofT GPLLM Calendar',
         short_name: 'GPLLM Cal',
         description: 'An interactive academic calendar for the GPLLM program at the UofT Jackman faculty of law.',
-        start_url: '/',
+        start_url: '/calendar',
         scope: '/',
         display: 'standalone',
         background_color: '#f4f1ea',
