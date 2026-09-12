@@ -1,0 +1,190 @@
+---
+interface Props {
+  concentrations: Array<{ key: string; label: string; short: string }>;
+}
+const { concentrations } = Astro.props;
+---
+
+<!--
+  Legend and filter in one: each switch is its concentration's colour, faded
+  when off and solid when on. Filtering itself is CSS, driven by the show-*
+  classes this component's Alpine root puts on .courses-app, so no per-card
+  bindings are needed.
+-->
+<aside class="cfilter" role="toolbar" aria-label="Filter courses by concentration">
+  <div class="cfilter-group">
+    <p class="cfilter-label" id="cfilter-label">CONCENTRATIONS</p>
+
+    <div class="cfilter-switches" role="group" aria-labelledby="cfilter-label">
+      {concentrations.map((c) => (
+        <button
+          type="button"
+          class={`cfilter-toggle tog-${c.key}`}
+          role="switch"
+          :class={`{ 'is-on': conc['${c.key}'] }`}
+          @click={`toggle('${c.key}')`}
+          :aria-checked={`conc['${c.key}'] ? 'true' : 'false'`}
+        >
+          <span class="cfilter-toggle-label">{c.label}</span>
+          <span class="cfilter-track" aria-hidden="true"><span class="cfilter-thumb"></span></span>
+        </button>
+      ))}
+    </div>
+
+    <button type="button" class="cfilter-clear" @click="clearOrShowAll()">
+      <span x-text="anyOn ? 'clear all' : 'show all'">clear all</span>
+      <span class="cfilter-clear-x" x-text="anyOn ? '✕' : '+'" aria-hidden="true">✕</span>
+    </button>
+  </div>
+</aside>
+
+<script is:inline>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('courseFilters', () => ({
+      conc: { cl: true, bl: true, ilt: true },
+
+      get anyOn() {
+        return Object.values(this.conc).some(Boolean);
+      },
+
+      toggle(key) {
+        this.conc[key] = !this.conc[key];
+      },
+
+      clearOrShowAll() {
+        const on = this.anyOn;
+        Object.keys(this.conc).forEach((key) => { this.conc[key] = !on; });
+      },
+    }));
+  });
+</script>
+
+<style>
+  /* Full-bleed out of the app's padding, so the rules span the page the way
+     the calendar's filter bar does */
+  .cfilter {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: rgba(244, 241, 234, 0.94);
+    backdrop-filter: blur(0.5rem);
+    -webkit-backdrop-filter: blur(0.5rem);
+    border-top: 0.0625rem solid var(--tana);
+    border-bottom: 0.0625rem solid var(--tana);
+    margin: clamp(0.875rem, 2vw, 1.375rem) calc(-1 * clamp(0.875rem, 3.5vw, 2.5rem)) 0;
+    padding: 0.75rem clamp(0.875rem, 3.5vw, 2.5rem);
+  }
+
+  .cfilter-group {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    padding: 0.5rem 0.9375rem;
+    border: 0.0625rem solid rgba(0, 37, 84, 0.1);
+    border-radius: 0.625rem;
+    background: rgba(255, 255, 255, 0.55);
+  }
+
+  .cfilter-label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.625rem;
+    line-height: 1;
+    letter-spacing: 0.2em;
+    color: var(--driftwood);
+    font-weight: 700;
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .cfilter-switches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 2.875rem;
+  }
+
+  /* Only three switches here, so they stand on their own: no pill container,
+     just the label and its coloured track */
+  .cfilter-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4375rem;
+    padding: 0.375rem 0;
+    border: 0;
+    background: none;
+    color: var(--prussian-blue);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    transition: color 0.3s linear;
+  }
+
+  .cfilter-toggle:focus-visible {
+    outline: 0.125rem solid var(--matisse);
+    outline-offset: 0.25rem;
+    border-radius: 0.25rem;
+  }
+
+  .cfilter-track {
+    position: relative;
+    display: inline-block;
+    width: 1.625rem;
+    height: 0.875rem;
+    border-radius: 62.4375rem;
+    flex: none;
+    transition: background 0.3s linear;
+  }
+
+  .cfilter-thumb {
+    position: absolute;
+    top: 0.125rem;
+    left: 0.125rem;
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0.0625rem 0.125rem rgba(0, 0, 0, 0.25);
+    transition: left 0.3s linear;
+  }
+
+  .cfilter-toggle.is-on .cfilter-thumb {
+    left: 0.875rem;
+  }
+
+  /* Each switch is its concentration's colour: faded off, solid on */
+  .tog-cl  .cfilter-track { background: color-mix(in srgb, var(--stiletto) 30%, transparent); }
+  .tog-bl  .cfilter-track { background: color-mix(in srgb, var(--matisse) 30%, transparent); }
+  .tog-ilt .cfilter-track { background: color-mix(in srgb, var(--sky) 40%, transparent); }
+
+  .tog-cl.is-on  .cfilter-track { background: var(--stiletto); }
+  .tog-bl.is-on  .cfilter-track { background: var(--matisse); }
+  .tog-ilt.is-on .cfilter-track { background: var(--sky); }
+
+  .cfilter-clear {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.06em;
+    color: var(--driftwood);
+    background: transparent;
+    border: 0;
+    padding: 0.25rem;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.1875rem;
+  }
+
+  .cfilter-clear:hover {
+    color: var(--prussian-blue);
+  }
+
+  @media (max-width: 45rem) {
+    .cfilter-clear {
+      margin-left: 0;
+    }
+  }
+</style>

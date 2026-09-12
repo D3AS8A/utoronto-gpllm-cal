@@ -29,7 +29,7 @@ const meta = [
   course.nca ? 'NCA required course' : null,
 ].filter(Boolean).join(' · ');
 ---
-<details class="course-card">
+<details class="course-card" data-conc={course.conc.join(' ')}>
   <summary class="course-summary">
     <div class="course-id">
       <p class={course.code ? 'course-code' : 'course-kind'}>{course.code ?? course.kind}</p>

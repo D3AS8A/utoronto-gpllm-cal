@@ -3,6 +3,7 @@ import PageLayout from '../layouts/PageLayout.astro';
 import { loadPage } from '../lib/content';
 import PageTitle from '../components/PageTitle.astro';
 import CourseSection from '../components/CourseSection.astro';
+import ConcentrationFilter from '../components/ConcentrationFilter.astro';
 import type { CourseDef } from '../components/CourseCard.astro';
 
 interface CatalogRow {
@@ -82,31 +83,59 @@ const catalog: Record<string, CourseDef> = Object.fromEntries([
     <p>{content.requirements}</p>
   </PageTitle>
 
-  <main id="main-content" class="courses-main" tabindex="-1">
-    <div class="conc-legend" role="list" aria-label="Concentrations">
-      {content.concentrations.map((c) => (
-        <span class={`conc-legend-item chip-${c.key}`} role="listitem">
-          <span class="conc-legend-swatch" aria-hidden="true"></span>
-          {c.label}
-        </span>
+  <div
+    class="courses-app"
+    x-data="courseFilters"
+    :class="{ 'show-cl': conc.cl, 'show-bl': conc.bl, 'show-ilt': conc.ilt }"
+  >
+    <ConcentrationFilter concentrations={content.concentrations} />
+
+    <main id="main-content" class="courses-main" tabindex="-1">
+      <p class="courses-empty" x-show="!anyOn" x-cloak>
+        No concentrations selected. Turn one on above to see its courses.
+      </p>
+
+      {Object.entries(content.terms).map(([id, term]) => (
+        <CourseSection
+          id={id}
+          no={term.no}
+          label={term.label}
+          range={term.range}
+          slots={term.slots}
+          catalog={catalog}
+          concLabels={concLabels}
+          placeholder={content.desc_placeholder}
+        />
       ))}
-    </div>
-
-    {Object.entries(content.terms).map(([id, term]) => (
-      <CourseSection
-        id={id}
-        no={term.no}
-        label={term.label}
-        range={term.range}
-        slots={term.slots}
-        catalog={catalog}
-        concLabels={concLabels}
-        placeholder={content.desc_placeholder}
-      />
-    ))}
-
-  </main>
+    </main>
+  </div>
 </PageLayout>
+
+<style is:global>
+  /* Filtering is declarative: the Alpine root carries show-cl / show-bl /
+     show-ilt, and a card, slot or term appears when it holds a course in a
+     shown concentration. A course in two concentrations survives either one. */
+  .courses-app .course-card,
+  .courses-app .cslot,
+  .courses-app .cterm {
+    display: none;
+  }
+
+  .courses-app.show-cl .course-card[data-conc~='cl'],
+  .courses-app.show-bl .course-card[data-conc~='bl'],
+  .courses-app.show-ilt .course-card[data-conc~='ilt'] {
+    display: block;
+  }
+
+  .courses-app.show-cl .cslot:has(.course-card[data-conc~='cl']),
+  .courses-app.show-bl .cslot:has(.course-card[data-conc~='bl']),
+  .courses-app.show-ilt .cslot:has(.course-card[data-conc~='ilt']),
+  .courses-app.show-cl .cterm:has(.course-card[data-conc~='cl']),
+  .courses-app.show-bl .cterm:has(.course-card[data-conc~='bl']),
+  .courses-app.show-ilt .cterm:has(.course-card[data-conc~='ilt']) {
+    display: block;
+  }
+</style>
 
 <style>
   /* Blog-style reading column: one column of cards with generous margins
@@ -121,31 +150,11 @@ const catalog: Record<string, CourseDef> = Object.fromEntries([
     margin-inline: auto;
   }
 
-  .conc-legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.5rem;
+  .courses-empty {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    color: var(--pablo);
+    margin: 0;
   }
-
-  .conc-legend-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4375rem;
-    font-size: 0.8125rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--oxford-blue);
-  }
-
-  .conc-legend-swatch {
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 0.1875rem;
-    display: inline-block;
-  }
-
-  .chip-cl .conc-legend-swatch  { background: var(--stiletto); }
-  .chip-bl .conc-legend-swatch  { background: var(--matisse); }
-  .chip-ilt .conc-legend-swatch { background: var(--sky); }
 
 </style>
