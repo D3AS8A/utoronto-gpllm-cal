@@ -25,7 +25,7 @@ function isActive(href: string): boolean {
   aria-label="Main navigation"
   transition:persist="main-nav"
   x-data="calNav"
-  :class="{ 'is-ready': ready }"
+  :class="{ 'is-ready': ready, 'is-tumbling': tumbling, 'is-arriving': arriving }"
 >
   <ul
     class="cal-nav-list"
@@ -42,6 +42,7 @@ function isActive(href: string): boolean {
 
     <span
       class="cal-nav-lava"
+      x-ref="lava"
       :style="`left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px`"
       aria-hidden="true"
     ></span>
@@ -78,6 +79,11 @@ function isActive(href: string): boolean {
       hoverWidth: 0,
       hoverHeight: 0,
       ready: false,
+      tumbling: false,
+      arriving: false,
+      flipTimer: null,
+      activeIndex: null,
+      anim: null,
 
       init() {
         this.onPageLoad = () => this.sync();
@@ -85,8 +91,7 @@ function isActive(href: string): boolean {
 
         this.$nextTick(() => {
           this.reset();
-          // Enable the transitions only after the first snap, so the blocks
-          // don't slide in from the corner on load
+          // Enable transitions after first snap, so blocks don't slide from corner
           requestAnimationFrame(() => { this.ready = true; });
           // Webfonts land after first paint and change the link widths
           document.fonts?.ready.then(() => this.reset());
@@ -97,18 +102,28 @@ function isActive(href: string): boolean {
         document.removeEventListener('astro:page-load', this.onPageLoad);
       },
 
+      items() {
+        return [...this.$refs.list.querySelectorAll('.cal-nav-link')];
+      },
+
       // Mirrors isActive() in the frontmatter, for the persisted node
       sync() {
         const path = this.normalise(location.pathname);
-        this.$refs.list.querySelectorAll('.cal-nav-link').forEach((el) => {
+        const items = this.items();
+        let next = -1;
+        items.forEach((el, i) => {
           const target = this.normalise(new URL(el.href).pathname);
           const active = target === '/'
             ? path === '/'
             : path === target || path.startsWith(`${target}/`);
-          if (active) el.setAttribute('aria-current', 'page');
+          if (active) { next = i; el.setAttribute('aria-current', 'page'); }
           else el.removeAttribute('aria-current');
         });
-        this.reset();
+
+        const prev = this.activeIndex;
+        this.activeIndex = next === -1 ? null : next;
+        if (prev == null || next === -1 || next === prev) { this.reset(); return; }
+        this.tumble(items, prev, next);
       },
 
       normalise(path) {
@@ -122,18 +137,115 @@ function isActive(href: string): boolean {
         this.hoverHeight = el.offsetHeight;
       },
 
+      park(el) {
+        this.left = el.offsetLeft;
+        this.top = el.offsetTop;
+        this.width = el.offsetWidth;
+        this.height = el.offsetHeight;
+        this.hover(el);
+      },
+
       reset() {
-        const active = this.$refs.list.querySelector('.cal-nav-link[aria-current="page"]');
-        if (!active) {
+        const items = this.items();
+        const i = items.findIndex((el) => el.getAttribute('aria-current') === 'page');
+        this.activeIndex = i === -1 ? null : i;
+        if (i === -1) {
           this.width = 0;
           this.hoverWidth = 0;
           return;
         }
-        this.left = active.offsetLeft;
-        this.top = active.offsetTop;
-        this.width = active.offsetWidth;
-        this.height = active.offsetHeight;
-        this.hover(active);
+        this.park(items[i]);
+      },
+
+      // block tumbles rotationally 
+      tumble(items, from, to) {
+        const dest = items[to];
+        const sameRow = items.every((el) => el.offsetTop === dest.offsetTop);
+        if (!sameRow || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          this.reset();
+          return;
+        }
+
+        this.anim?.cancel();
+        this.park(dest);
+
+        const h = dest.offsetHeight;
+        const dir = to > from ? 1 : -1;
+        const hops = [];
+        for (let i = from; i !== to; i += dir) hops.push([items[i], items[i + dir]]);
+
+        const EASE_TIP  = 'cubic-bezier(0.55, -0.28, 0.75, 0.25)';
+        const EASE_DROP = 'cubic-bezier(0.5, 0.04, 0.74, 0.28)';
+        const EASE_RISE = 'cubic-bezier(0.22, 0.52, 0.42, 0.9)';
+        const EASE_RUSH = 'cubic-bezier(0.3, 0, 0.7, 0.55)';
+        const EASE_ROCK_UP   = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        const EASE_ROCK_DOWN = 'cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+
+        const frames = [];
+        const n = hops.length;
+        hops.forEach(([a, b], k) => {
+          const t0 = k / n;
+          const t1 = (k + 1) / n;
+          const L = t1 - t0;
+          const last = k === n - 1;
+          const xa = a.offsetLeft, wa = a.offsetWidth;
+          const xb = b.offsetLeft, wb = b.offsetWidth;
+          const wm = h * 1.8; // pinch to a short rect at vertical, then grow to the destination
+          const pivot = dir === 1 ? xa + wa : xa;
+          const down = k === 0 ? EASE_TIP : EASE_DROP;
+          const up = last ? EASE_RUSH : EASE_RISE;
+          const A = dir === 1
+            ? { o: '100% 100%', rot: -90, leftMid: `${pivot - wm}px` }
+            : { o: '0% 100%',   rot: 90,  leftMid: `${pivot}px` };
+          const B = dir === 1
+            ? { o: '0% 100%',   rot: 90,  leftMid: `${pivot - h}px` }
+            : { o: '100% 100%', rot: -90, leftMid: `${pivot + h - wm}px` };
+          const seam = t0 + (last ? 0.3 : 0.5) * L;
+
+          frames.push(
+            { offset: t0,   easing: down, transformOrigin: A.o, transform: 'rotate(0deg)',        left: `${xa}px`, width: `${wa}px` },
+            { offset: seam,               transformOrigin: A.o, transform: `rotate(${A.rot}deg)`, left: A.leftMid, width: `${wm}px` },
+            { offset: seam, easing: up,   transformOrigin: B.o, transform: `rotate(${B.rot}deg)`, left: B.leftMid, width: `${wm}px` },
+          );
+
+          if (!last) {
+            frames.push(
+              { offset: t1, transformOrigin: B.o, transform: 'rotate(0deg)', left: `${xb}px`, width: `${wb}px` },
+            );
+            return;
+          }
+
+          const sgn = dir === 1 ? 1 : -1;
+          const at = (f, deg, easing) => ({
+            offset: t0 + f * L,
+            ...(easing ? { easing } : {}),
+            transformOrigin: B.o,
+            transform: `rotate(${deg}deg)`,
+            left: `${xb}px`,
+            width: `${wb}px`,
+          });
+          const BOUNCES = [15, 6];
+          const SLOTS   = [0.3, 0.24];
+          let tc = 0.46; // touchdown, after the rushed ascent
+          BOUNCES.forEach((amp, i) => {
+            frames.push(
+              at(tc, 0, EASE_ROCK_UP),
+              at(tc + SLOTS[i] * 0.5, sgn * amp, EASE_ROCK_DOWN),
+            );
+            tc += SLOTS[i];
+          });
+          frames.push(at(1, 0));
+        });
+
+        const dur = 1250 * n;
+        this.tumbling = true;
+        clearTimeout(this.flipTimer);
+        this.arriving = true;
+        this.flipTimer = setTimeout(() => { this.arriving = false; }, Math.round((n - 1 + 0.36) * 1250));
+        this.anim = this.$refs.lava.animate(frames, { duration: dur, fill: 'none' });
+        this.anim.finished
+          .then(() => { this.tumbling = false; this.anim = null; })
+          .catch(() => { this.tumbling = false; });
       },
     }));
   });
@@ -146,7 +258,7 @@ function isActive(href: string): boolean {
   }
 
   .cal-nav-list {
-    position: relative; /* offset parent for the lavalamp block */
+    position: relative;
     display: flex;
     flex-wrap: wrap;
     margin: 0;
@@ -167,7 +279,6 @@ function isActive(href: string): boolean {
     z-index: 1;
   }
 
-  /* Sits behind the current block, so on snap-back it hides underneath it */
   .cal-nav-lava-hover {
     background: rgb(0 37 84 / 0.08);
     z-index: 0;
@@ -192,6 +303,15 @@ function isActive(href: string): boolean {
       top 300ms ease-out,
       width 300ms ease-out,
       height 300ms ease-out;
+  }
+
+  .cal-nav.is-tumbling .cal-nav-lava {
+    transition: none;
+  }
+
+
+  .cal-nav.is-arriving .cal-nav-link[aria-current='page'] {
+    color: var(--prussian-blue);
   }
 
   .cal-nav-link {
