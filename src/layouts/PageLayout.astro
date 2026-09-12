@@ -31,10 +31,10 @@ const { title, description, ogImage, jsonLD, lastUpdated } = Astro.props;
 </BaseLayout>
 
 <style is:global>
-  /* Overrides for the calendar pages — global.scss paints a dark chrome; the
+  /* Overrides for the calendar pages. global.scss paints a dark chrome; the
      warm cream palette lives here. */
   body:has(.cal-app) {
-    /* Undo global.scss's flex-column layout — .cal-app relies on plain block
+    /* Undo global.scss's flex-column layout. .cal-app relies on plain block
        flow so `max-width` + `margin: 0 auto` centers as expected. */
     display: block;
     background: var(--satin-linen);

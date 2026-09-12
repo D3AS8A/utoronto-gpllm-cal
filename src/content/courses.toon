@@ -1,13 +1,85 @@
 meta:
   title: Courses
-  description: Course listings for the GPLLM program at the UofT Jackman faculty of law.
+  description: The 2026-2027 course offerings for the GPLLM program at the UofT Jackman faculty of law.
   og_image: /images/og-image.png
 
 options: null
 
 content:
-  eyebrow: 2026 — 2027 ACADEMIC YEAR
+  eyebrow: 2026-2027 ACADEMIC YEAR
   eyebrow_datetime: 2026-09/2027-08
   heading: Courses
-  intro: Course details for the program are on the way.
-  last_updated: "2026-08-17"
+  intro: All GPLLM courses are attended in person, with no remote option. Classes run on Friday evenings and Saturdays on alternating weekends, with intensive courses in December and April.
+  requirements: "The degree requires exactly ten courses: the required Friday evening course for your concentration in the fall term, four more from your concentration, and five from any concentration."
+  desc_placeholder: "A full description for {title} is on its way. Until then, the official course description is available on the GPLLM website."
+  last_updated: "2026-09-11"
+
+  concentrations[3]{key,label,short}:
+    cl,Canadian Law,CAN
+    bl,Business Law,BUS
+    ilt,Technology Law,TECH
+
+  program_courses[3]{key,kind,title,when,conc,capped,nca,desc}:
+    lm-cdn,Non-credit intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18 · 9:30 a.m. – 4:30 p.m.",cl,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
+    lm-bus,Non-credit intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20 · 9:30 a.m. – 4:30 p.m.",bl/ilt,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
+    alrw,NCA requirement,Applied Legal Research & Writing,"September 12, 13, 19 & 20 · 9:30 a.m. – 5:30 p.m.",cl,false,true,"Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement."
+
+  catalog[29]{code,title,conc,capped,nca,req}:
+    LAW4026H,Introduction to Law and Technology,ilt,false,false,true
+    LAW4008H,Constitutional Law,cl,true,true,false
+    LAW4009H,Criminal Law,cl,true,true,false
+    LAW4032H,Intellectual Property Law,bl/ilt,false,false,false
+    LAW4002H,Comparative Corporate Governance,bl,false,false,false
+    LAW4017H,Professional Responsibility,cl,true,true,false
+    LAW4046H,Privacy and Data Governance,ilt,false,false,false
+    LAW4055H,"Disruptive Innovations & Legal Infrastructure",ilt,false,false,false
+    LAW4072H,Aboriginal Law,cl,true,false,false
+    LAW4007H,Administrative Law,cl,true,true,false
+    LAW4036H,Applied Contract Law,bl/ilt,false,false,false
+    LAW4021H,Tort Law,cl,true,false,false
+    LAW4069H,"Electrification and the Energy Transition: Law and Policy",bl,false,false,false
+    LAW4030H,Financing Technological Innovation,ilt,false,false,false
+    LAW4053H,Law and Regulation of Banks and Financial Institutions,bl,false,false,false
+    LAW4063H,"Regulation of Artificial Intelligence: A Legal and Practical Study",ilt,false,false,false
+    LAW4074H,Immigration Law,cl,true,false,false
+    LAW4028H,"Blockchain, Digital Assets, and the Law",bl/ilt,false,false,false
+    LAW4022H,Contract Law,cl,true,false,false
+    LAW4031H,"Cybersecurity & Data Protection",ilt,false,false,false
+    LAW4075H,Financial Crime in a Global Context,bl,false,false,false
+    LAW4076H,"Artificial Intelligence: Policy, Ethics, and Legal Governance",cl,true,false,false
+    LAW4004H,"Mergers & Acquisitions",bl,false,false,false
+    LAW4020H,Property Law,cl,true,false,false
+    LAW4070H,Ethics of Emerging Technology,ilt,false,false,false
+    LAW4071H,Family Law,cl,true,false,false
+    LAW4023H,Business Organizations,cl,true,false,false
+    LAW4003H,Securities Regulation and Corporate Finance,bl,false,false,false
+    LAW4073H,"Data Law: a Health Perspective",ilt,false,false,false
+
+  terms:
+    fall:
+      no: "01"
+      label: Fall
+      range: September 25 – November 21, 2026
+      slots[5]{name,time,courses,note}:
+        Program Foundations,September 10 – 20,lm-cdn|lm-bus|alrw,"Intensives that run before the fall term begins. Attend the stream for your concentration"
+        Friday Evenings,4:00 – 9:00 p.m.,LAW4026H,"Every student takes the Friday evening course for their concentration in the fall term. It counts as one of the ten required courses"
+        Saturday Mornings,8:30 a.m. – 1:00 p.m.,LAW4008H|LAW4009H|LAW4032H,""
+        Saturday Afternoons,2:00 – 6:30 p.m.,LAW4002H|LAW4008H|LAW4017H|LAW4046H,""
+        December Intensive,"December 11 – 13 & 18 – 20",LAW4055H|LAW4072H,"Friday evenings 4:00 – 9:00 p.m., Saturdays 8:30 a.m. – 5:30 p.m., Sundays 9:00 a.m. – 1:30 p.m. Dates and times may change"
+    winter:
+      no: "02"
+      label: Winter
+      range: January 8 – March 20, 2027
+      slots[4]{name,time,courses,note}:
+        Friday Evenings,4:00 – 9:00 p.m.,LAW4007H|LAW4036H,""
+        Saturday Mornings,8:30 a.m. – 1:00 p.m.,LAW4009H|LAW4021H|LAW4069H|LAW4030H,""
+        Saturday Afternoons,2:00 – 6:30 p.m.,LAW4017H|LAW4053H|LAW4063H|LAW4074H,""
+        April Intensive,"April 9 – 11, 16 – 18 & 23 – 25",LAW4028H|LAW4072H,"Friday evenings 4:00 – 9:00 p.m., Saturdays 8:30 a.m. – 5:30 p.m., Sundays 9:00 a.m. – 2:30 p.m. Dates and times may change"
+    summer:
+      no: "03"
+      label: Summer
+      range: April 30 – June 19, 2027
+      slots[3]{name,time,courses,note}:
+        Friday Evenings,4:00 – 9:00 p.m.,LAW4022H|LAW4031H|LAW4075H|LAW4076H,""
+        Saturday Mornings,8:30 a.m. – 1:00 p.m.,LAW4004H|LAW4020H|LAW4070H|LAW4071H,""
+        Saturday Afternoons,2:00 – 6:30 p.m.,LAW4023H|LAW4003H|LAW4073H,""

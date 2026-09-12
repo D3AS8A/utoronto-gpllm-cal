@@ -2,14 +2,69 @@
 import PageLayout from '../layouts/PageLayout.astro';
 import { loadPage } from '../lib/content';
 import PageTitle from '../components/PageTitle.astro';
+import CourseSection from '../components/CourseSection.astro';
+import type { CourseDef } from '../components/CourseCard.astro';
+
+interface CatalogRow {
+  code: string;
+  title: string;
+  conc: string;
+  capped: boolean;
+  nca: boolean;
+  req: boolean;
+}
+
+/** Non-credit and NCA courses: no course code, own schedule and description. */
+interface ProgramRow {
+  key: string;
+  kind: string;
+  title: string;
+  when: string;
+  conc: string;
+  capped: boolean;
+  nca: boolean;
+  desc: string;
+}
+
+interface Slot {
+  name: string;
+  time: string;
+  courses: string;
+  note: string;
+}
+
+interface Term {
+  no: string;
+  label: string;
+  range: string;
+  slots: Slot[];
+}
 
 const { meta, content } = loadPage<{
   eyebrow: string;
   eyebrow_datetime: string;
   heading: string;
   intro: string;
+  requirements: string;
+  desc_placeholder: string;
   last_updated?: string;
+  concentrations: Array<{ key: string; label: string; short: string }>;
+  program_courses: ProgramRow[];
+  catalog: CatalogRow[];
+  terms: Record<string, Term>;
 }>('courses');
+
+const concLabels = Object.fromEntries(
+  content.concentrations.map((c) => [c.key, { label: c.label, short: c.short }]),
+);
+
+const catalog: Record<string, CourseDef> = Object.fromEntries([
+  ...content.catalog.map((row) => [row.code, { ...row, conc: row.conc.split('/') }]),
+  ...content.program_courses.map((row) => [
+    row.key,
+    { ...row, code: undefined, req: false, conc: row.conc.split('/') },
+  ]),
+]);
 ---
 
 <PageLayout
@@ -24,14 +79,73 @@ const { meta, content } = loadPage<{
     title={content.heading}
   >
     <p>{content.intro}</p>
+    <p>{content.requirements}</p>
   </PageTitle>
 
-  <main id="main-content" class="courses-main" tabindex="-1"></main>
+  <main id="main-content" class="courses-main" tabindex="-1">
+    <div class="conc-legend" role="list" aria-label="Concentrations">
+      {content.concentrations.map((c) => (
+        <span class={`conc-legend-item chip-${c.key}`} role="listitem">
+          <span class="conc-legend-swatch" aria-hidden="true"></span>
+          {c.label}
+        </span>
+      ))}
+    </div>
+
+    {Object.entries(content.terms).map(([id, term]) => (
+      <CourseSection
+        id={id}
+        no={term.no}
+        label={term.label}
+        range={term.range}
+        slots={term.slots}
+        catalog={catalog}
+        concLabels={concLabels}
+        placeholder={content.desc_placeholder}
+      />
+    ))}
+
+  </main>
 </PageLayout>
 
 <style>
+  /* Blog-style reading column: one column of cards with generous margins
+     either side on larger screens */
   .courses-main {
     margin-top: clamp(1.25rem, 2.5vw, 2rem);
-    min-height: 30vh;
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.875rem, 4vw, 3rem);
+    width: 100%;
+    max-width: 46rem;
+    margin-inline: auto;
   }
+
+  .conc-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+
+  .conc-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4375rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--oxford-blue);
+  }
+
+  .conc-legend-swatch {
+    width: 0.75rem;
+    height: 0.75rem;
+    border-radius: 0.1875rem;
+    display: inline-block;
+  }
+
+  .chip-cl .conc-legend-swatch  { background: var(--stiletto); }
+  .chip-bl .conc-legend-swatch  { background: var(--matisse); }
+  .chip-ilt .conc-legend-swatch { background: var(--sky); }
+
 </style>

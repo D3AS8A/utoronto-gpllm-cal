@@ -1,0 +1,290 @@
+---
+export interface CourseDef {
+  /** Course code, e.g. LAW4008H. Absent on non-credit program courses. */
+  code?: string;
+  /** Stands in for the code when there isn't one, e.g. "Non-credit intensive". */
+  kind?: string;
+  title: string;
+  /** Schedule line for courses that don't follow their slot's times. */
+  when?: string;
+  conc: string[];
+  capped: boolean;
+  nca: boolean;
+  req: boolean;
+  /** Official description. The placeholder renders until one is provided. */
+  desc?: string;
+}
+
+interface Props {
+  course: CourseDef;
+  concLabels: Record<string, { label: string; short: string }>;
+  placeholder: string;
+}
+const { course, concLabels, placeholder } = Astro.props;
+const desc = course.desc || placeholder.replace('{title}', course.title);
+
+// Full concentration names, since the summary only has room for abbreviations
+const meta = [
+  ...course.conc.map((key) => concLabels[key]?.label).filter(Boolean),
+  course.nca ? 'NCA required course' : null,
+].filter(Boolean).join(' · ');
+---
+<details class="course-card">
+  <summary class="course-summary">
+    <div class="course-id">
+      <p class={course.code ? 'course-code' : 'course-kind'}>{course.code ?? course.kind}</p>
+      <h4 class="course-title">{course.title}</h4>
+      {course.when && <p class="course-when">{course.when}</p>}
+    </div>
+    <div class="course-tags">
+      {course.conc.map((key) => (
+        <span class={`course-chip chip-${key}`} title={concLabels[key]?.label}>
+          <span class="course-chip-swatch" aria-hidden="true"></span>
+          {concLabels[key]?.short}
+        </span>
+      ))}
+      {course.req && <span class="course-badge badge-req">Required</span>}
+      {course.capped && <span class="course-badge badge-cap">Capped · 60</span>}
+    </div>
+    <span class="course-toggle" aria-hidden="true">+</span>
+  </summary>
+  <div class="course-desc">
+    <div class="course-desc-inner">
+      <p>{desc}</p>
+      <p class="course-meta">{meta}</p>
+    </div>
+  </div>
+</details>
+
+<!--
+  Native <details> snaps open. This animates the panel's height with the Web
+  Animations API instead, keeping the element's semantics (and its keyboard
+  and screen-reader behaviour) intact. Bundled once per page and delegated,
+  so all cards share a single listener.
+-->
+<script>
+  const DURATION = 320;
+  const EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+  interface AnimatedDetails extends HTMLDetailsElement {
+    __anim?: Animation | null;
+  }
+
+  function toggleCard(card: AnimatedDetails, opening: boolean) {
+    const panel = card.querySelector<HTMLElement>('.course-desc');
+    const inner = card.querySelector<HTMLElement>('.course-desc-inner');
+    if (!panel || !inner) return;
+
+    // Drives the +/× glyph immediately, ahead of [open] flipping on close
+    card.dataset.state = opening ? 'open' : 'closed';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      card.open = opening;
+      return;
+    }
+
+    card.__anim?.cancel();
+
+    // The wrapper has no padding of its own, so it can reach a true zero.
+    // border-box would otherwise floor its height at the panel's padding
+    const from = opening ? 0 : inner.offsetHeight;
+    if (opening) card.open = true;
+    const to = opening ? inner.offsetHeight : 0;
+
+    const anim = panel.animate(
+      [
+        { height: `${from}px`, opacity: opening ? 0 : 1 },
+        { height: `${to}px`, opacity: opening ? 1 : 0 },
+      ],
+      { duration: DURATION, easing: EASE },
+    );
+    card.__anim = anim;
+
+    anim.finished
+      .then(() => {
+        card.__anim = null;
+        // Held open through the collapse so the panel stays visible while it shrinks
+        if (!opening) card.open = false;
+      })
+      .catch(() => {});
+  }
+
+  if (!(window as any).__courseCardsBound) {
+    (window as any).__courseCardsBound = true;
+
+    document.addEventListener('click', (event) => {
+      const summary = (event.target as HTMLElement)?.closest?.('.course-summary');
+      if (!summary) return;
+      const card = summary.parentElement as AnimatedDetails | null;
+      if (!card?.classList.contains('course-card')) return;
+
+      event.preventDefault();
+      toggleCard(card, !card.open);
+    });
+  }
+</script>
+
+<style>
+  .course-card {
+    background: #fff;
+    border: 0.0625rem solid rgb(0 37 84 / 0.1);
+    border-radius: 0.625rem;
+    overflow: hidden;
+    box-shadow: 0 0.0625rem 0.125rem rgb(42 29 10 / 0.04), 0 0.25rem 0.875rem rgb(42 29 10 / 0.05);
+    transition: box-shadow 200ms ease;
+  }
+
+  .course-card:hover {
+    box-shadow: 0 0.125rem 0.25rem rgb(42 29 10 / 0.05), 0 0.5rem 1.25rem rgb(42 29 10 / 0.08);
+  }
+
+  .course-summary {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    transition: background-color 150ms ease;
+  }
+
+  .course-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .course-summary:hover {
+    background: rgb(243 236 224 / 0.55);
+  }
+
+  .course-code {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    font-weight: 700;
+    color: var(--driftwood);
+    margin: 0;
+  }
+
+  .course-kind {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--driftwood);
+    margin: 0;
+  }
+
+  .course-when {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--pablo);
+    margin: 0.25rem 0 0;
+  }
+
+  .course-title {
+    font-size: 1.0625rem;
+    line-height: 1.3;
+    font-weight: 700;
+    color: var(--prussian-blue);
+    margin: 0.125rem 0 0;
+  }
+
+  .course-tags {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.375rem 0.625rem;
+  }
+
+  .course-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--oxford-blue);
+  }
+
+  .course-chip-swatch {
+    width: 0.625rem;
+    height: 0.625rem;
+    border-radius: 0.1875rem;
+    display: inline-block;
+  }
+
+  .chip-cl .course-chip-swatch  { background: var(--stiletto); }
+  .chip-bl .course-chip-swatch  { background: var(--matisse); }
+  .chip-ilt .course-chip-swatch { background: var(--sky); }
+
+  .course-badge {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    padding: 0.1875rem 0.5625rem;
+    border-radius: 62.4375rem;
+  }
+
+  .badge-req { color: var(--matisse); background: rgb(31 96 146 / 0.1); }
+  .badge-cap { color: var(--umber);   background: rgb(125 116 96 / 0.12); }
+
+  .course-toggle {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--driftwood);
+    line-height: 1;
+    transition: transform 200ms ease;
+  }
+
+  .course-card[open] .course-toggle {
+    transform: rotate(45deg);
+  }
+
+  /* Set the instant a card is clicked. On close it beats [open], which
+     lingers until the collapse finishes */
+  .course-card[data-state='open'] .course-toggle {
+    transform: rotate(45deg);
+  }
+
+  .course-card[data-state='closed'] .course-toggle {
+    transform: none;
+  }
+
+  .course-desc {
+    overflow: hidden;
+  }
+
+  .course-desc-inner {
+    margin: 0 1rem;
+    border-top: 0.0625rem solid var(--tana);
+    padding: 0.75rem 0 1rem;
+  }
+
+  .course-desc-inner p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-weight: 400;
+    color: var(--oxford-blue);
+    margin: 0;
+  }
+
+  .course-desc-inner .course-meta {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--pablo);
+    margin-top: 0.625rem;
+  }
+
+  @media (max-width: 40rem) {
+    .course-summary {
+      grid-template-columns: 1fr auto;
+    }
+
+    .course-tags {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+  }
+</style>

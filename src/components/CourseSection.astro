@@ -1,0 +1,133 @@
+---
+import CourseCard, { type CourseDef } from './CourseCard.astro';
+
+interface Slot {
+  name: string;
+  time: string;
+  courses: string;
+  note: string;
+}
+
+interface Props {
+  id: string;
+  no: string;
+  label: string;
+  range: string;
+  slots: Slot[];
+  catalog: Record<string, CourseDef>;
+  concLabels: Record<string, { label: string; short: string }>;
+  placeholder: string;
+}
+const { id, no, label, range, slots, catalog, concLabels, placeholder } = Astro.props;
+---
+<section id={`term-${id}`} class="cterm" aria-labelledby={`term-${id}-name`}>
+  <header class="cterm-head">
+    <p class="cterm-number" aria-hidden="true">{no}</p>
+    <h2 id={`term-${id}-name`} class="cterm-name">{label}</h2>
+    <p class="cterm-range">{range}</p>
+  </header>
+
+  {slots.map((slot) => (
+    <div class="cslot">
+      <header class="cslot-head">
+        <h3 class="cslot-name">{slot.name}</h3>
+        <p class="cslot-time">{slot.time}</p>
+      </header>
+      {slot.note && <p class="cslot-note">{slot.note}</p>}
+      <div class="cslot-stack">
+        {slot.courses.split('|').map((code) => (
+          <CourseCard course={catalog[code]} concLabels={concLabels} placeholder={placeholder} />
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<style>
+  .cterm-head {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: clamp(0.875rem, 2vw, 1.25rem);
+    border-bottom: 0.0625rem solid var(--tana);
+    padding-bottom: 0.625rem;
+  }
+
+  .cterm-number {
+    flex: none;
+    width: 2.125rem;
+    height: 2.125rem;
+    background: var(--matisse);
+    color: #fff;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .cterm-name {
+    font-weight: 800;
+    font-size: clamp(1.125rem, 2.2vw, 1.5rem);
+    line-height: 2.125rem;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    color: var(--prussian-blue);
+    margin: 0;
+  }
+
+  .cterm-range {
+    margin: 0 0 0 auto;
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    font-weight: 600;
+    color: var(--driftwood);
+  }
+
+  .cslot {
+    margin-bottom: clamp(1.25rem, 2.5vw, 1.75rem);
+  }
+
+  .cslot-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.625rem;
+  }
+
+  .cslot-name {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--prussian-blue);
+    margin: 0;
+  }
+
+  .cslot-time {
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    font-weight: 500;
+    color: var(--pablo);
+    margin: 0;
+  }
+
+  .cslot-note {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    font-style: italic;
+    color: var(--oxford-blue);
+    max-width: 45rem;
+    margin: -0.25rem 0 0.75rem;
+  }
+
+  .cslot-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+</style>
