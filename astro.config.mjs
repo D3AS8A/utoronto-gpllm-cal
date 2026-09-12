@@ -26,7 +26,7 @@ export default defineConfig({
       strategies: 'generateSW',
       injectRegister: null,
       devOptions: {
-        enabled: false,
+        enabled: true,
       },
       manifest: {
         name: 'UofT GPLLM Calendar',

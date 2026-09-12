@@ -18,14 +18,42 @@ function isActive(href: string): boolean {
     : pathname === target || pathname.startsWith(`${target}/`);
 }
 ---
-<nav class="cal-nav" aria-label="Main navigation">
-  <ul class="cal-nav-list" role="list">
+
+<!-- Double lavalamp nav -->
+<nav
+  class="cal-nav"
+  aria-label="Main navigation"
+  transition:persist="main-nav"
+  x-data="calNav"
+  :class="{ 'is-ready': ready }"
+>
+  <ul
+    class="cal-nav-list"
+    role="list"
+    x-ref="list"
+    @mouseleave="reset()"
+    @focusout="if (!$el.contains($event.relatedTarget)) reset()"
+  >
+    <span
+      class="cal-nav-lava-hover"
+      :style="`left: ${hoverLeft}px; top: ${hoverTop}px; width: ${hoverWidth}px; height: ${hoverHeight}px`"
+      aria-hidden="true"
+    ></span>
+
+    <span
+      class="cal-nav-lava"
+      :style="`left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px`"
+      aria-hidden="true"
+    ></span>
+
     {links.map(({ label, href }) => (
       <li>
         <a
           href={href}
           class="cal-nav-link"
           aria-current={isActive(href) ? 'page' : undefined}
+          @mouseenter="hover($el)"
+          @focus="hover($el)"
         >
           {label}
         </a>
@@ -34,6 +62,83 @@ function isActive(href: string): boolean {
   </ul>
 </nav>
 
+<!--
+  is:inline so this runs before Alpine's bundled script, allowing
+  alpine:init to register the component before Alpine processes the DOM.
+-->
+<script is:inline>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('calNav', () => ({
+      left: 0,
+      top: 0,
+      width: 0,
+      height: 0,
+      hoverLeft: 0,
+      hoverTop: 0,
+      hoverWidth: 0,
+      hoverHeight: 0,
+      ready: false,
+
+      init() {
+        this.onPageLoad = () => this.sync();
+        document.addEventListener('astro:page-load', this.onPageLoad);
+
+        this.$nextTick(() => {
+          this.reset();
+          // Enable the transitions only after the first snap, so the blocks
+          // don't slide in from the corner on load
+          requestAnimationFrame(() => { this.ready = true; });
+          // Webfonts land after first paint and change the link widths
+          document.fonts?.ready.then(() => this.reset());
+        });
+      },
+
+      destroy() {
+        document.removeEventListener('astro:page-load', this.onPageLoad);
+      },
+
+      // Mirrors isActive() in the frontmatter, for the persisted node
+      sync() {
+        const path = this.normalise(location.pathname);
+        this.$refs.list.querySelectorAll('.cal-nav-link').forEach((el) => {
+          const target = this.normalise(new URL(el.href).pathname);
+          const active = target === '/'
+            ? path === '/'
+            : path === target || path.startsWith(`${target}/`);
+          if (active) el.setAttribute('aria-current', 'page');
+          else el.removeAttribute('aria-current');
+        });
+        this.reset();
+      },
+
+      normalise(path) {
+        return path.replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
+      },
+
+      hover(el) {
+        this.hoverLeft = el.offsetLeft;
+        this.hoverTop = el.offsetTop;
+        this.hoverWidth = el.offsetWidth;
+        this.hoverHeight = el.offsetHeight;
+      },
+
+      reset() {
+        const active = this.$refs.list.querySelector('.cal-nav-link[aria-current="page"]');
+        if (!active) {
+          this.width = 0;
+          this.hoverWidth = 0;
+          return;
+        }
+        this.left = active.offsetLeft;
+        this.top = active.offsetTop;
+        this.width = active.offsetWidth;
+        this.height = active.offsetHeight;
+        this.hover(active);
+      },
+    }));
+  });
+</script>
+
 <style>
   .cal-nav {
     margin-top: clamp(1rem, 2.5vw, 1.75rem);
@@ -41,13 +146,57 @@ function isActive(href: string): boolean {
   }
 
   .cal-nav-list {
+    position: relative; /* offset parent for the lavalamp block */
     display: flex;
     flex-wrap: wrap;
     margin: 0;
     padding: 0;
   }
 
+  .cal-nav-lava,
+  .cal-nav-lava-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cal-nav-lava {
+    background: var(--prussian-blue);
+    z-index: 1;
+  }
+
+  /* Sits behind the current block, so on snap-back it hides underneath it */
+  .cal-nav-lava-hover {
+    background: rgb(0 37 84 / 0.08);
+    z-index: 0;
+  }
+
+  .cal-nav.is-ready .cal-nav-lava,
+  .cal-nav.is-ready .cal-nav-lava-hover {
+    opacity: 1;
+  }
+
+  .cal-nav.is-ready .cal-nav-lava {
+    transition:
+      left 350ms ease-out,
+      top 350ms ease-out,
+      width 350ms ease-out,
+      height 350ms ease-out;
+  }
+
+  .cal-nav.is-ready .cal-nav-lava-hover {
+    transition:
+      left 300ms ease-out,
+      top 300ms ease-out,
+      width 300ms ease-out,
+      height 300ms ease-out;
+  }
+
   .cal-nav-link {
+    position: relative; /* keeps the label above both blocks */
+    z-index: 2;
     display: block;
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: clamp(0.625rem, 1.1vw, 0.75rem);
@@ -57,16 +206,23 @@ function isActive(href: string): boolean {
     text-decoration: none;
     color: var(--prussian-blue);
     padding: 0.75rem clamp(1rem, 2.6vw, 1.75rem);
-    transition: background-color 150ms ease, color 150ms ease;
+    transition: color 200ms ease;
   }
 
-  .cal-nav-link:hover,
-  .cal-nav-link:focus-visible {
-    background: var(--tana);
-  }
-
+  /* Fallback fill for no-JS and for the moment before Alpine measures */
   .cal-nav-link[aria-current='page'] {
     background: var(--prussian-blue);
     color: var(--satin-linen);
+  }
+
+  .cal-nav.is-ready .cal-nav-link[aria-current='page'] {
+    background: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cal-nav.is-ready .cal-nav-lava,
+    .cal-nav.is-ready .cal-nav-lava-hover {
+      transition: none;
+    }
   }
 </style>
