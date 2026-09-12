@@ -1,0 +1,37 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { loadPage } from '../lib/content';
+import PageTitle from '../components/PageTitle.astro';
+
+const { meta, content } = loadPage<{
+  eyebrow: string;
+  eyebrow_datetime: string;
+  heading: string;
+  intro: string;
+  last_updated?: string;
+}>('information');
+---
+
+<PageLayout
+  title={meta.title ?? undefined}
+  description={meta.description}
+  ogImage={meta.og_image}
+  lastUpdated={content.last_updated}
+>
+  <PageTitle
+    eyebrow={content.eyebrow}
+    eyebrowDatetime={content.eyebrow_datetime}
+    title={content.heading}
+  >
+    <p>{content.intro}</p>
+  </PageTitle>
+
+  <main id="main-content" class="info-main" tabindex="-1"></main>
+</PageLayout>
+
+<style>
+  .info-main {
+    margin-top: clamp(1.25rem, 2.5vw, 2rem);
+    min-height: 30vh;
+  }
+</style>

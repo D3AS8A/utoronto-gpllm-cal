@@ -2,6 +2,7 @@
 const links = [
   { label: 'Calendar', href: '/calendar' },
   { label: 'Courses', href: '/courses' },
+  { label: 'Information', href: '/information' }, // temporary, for multi-hop testing
 ];
 
 // Normalised so `/`, `/index.html`, and `/courses/` all match their link.
@@ -82,6 +83,7 @@ function isActive(href: string): boolean {
       tumbling: false,
       arriving: false,
       flipTimer: null,
+      flashTimers: [],
       activeIndex: null,
       anim: null,
 
@@ -181,11 +183,18 @@ function isActive(href: string): boolean {
         const EASE_ROCK_UP   = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         const EASE_ROCK_DOWN = 'cubic-bezier(0.55, 0.085, 0.68, 0.53)';
 
-        const frames = [];
+        const HOP_FAST = 420;
+        const HOP_FULL = 1250;
         const n = hops.length;
+        const durs = hops.map((_, k) => (k === n - 1 ? HOP_FULL : HOP_FAST));
+        const total = durs.reduce((a, b) => a + b, 0);
+        const starts = [0];
+        durs.forEach((d) => starts.push(starts[starts.length - 1] + d / total));
+
+        const frames = [];
         hops.forEach(([a, b], k) => {
-          const t0 = k / n;
-          const t1 = (k + 1) / n;
+          const t0 = starts[k];
+          const t1 = starts[k + 1];
           const L = t1 - t0;
           const last = k === n - 1;
           const xa = a.offsetLeft, wa = a.offsetWidth;
@@ -237,15 +246,29 @@ function isActive(href: string): boolean {
           frames.push(at(1, 0));
         });
 
-        const dur = 1250 * n;
         this.tumbling = true;
         clearTimeout(this.flipTimer);
+        this.flashTimers.forEach(clearTimeout);
+        this.flashTimers = [];
+        items.forEach((el) => el.classList.remove('is-flash'));
         this.arriving = true;
-        this.flipTimer = setTimeout(() => { this.arriving = false; }, Math.round((n - 1 + 0.36) * 1250));
-        this.anim = this.$refs.lava.animate(frames, { duration: dur, fill: 'none' });
+        this.flipTimer = setTimeout(() => { this.arriving = false; }, Math.round(total - 0.64 * HOP_FULL));
+
+        hops.slice(0, -1).forEach(([, mid], k) => {
+          const seat = starts[k + 1] * total;
+          this.flashTimers.push(
+            setTimeout(() => mid.classList.add('is-flash'), Math.max(0, seat - 100)),
+            setTimeout(() => mid.classList.remove('is-flash'), seat + 180),
+          );
+        });
+
+        this.anim = this.$refs.lava.animate(frames, { duration: total, fill: 'none' });
         this.anim.finished
           .then(() => { this.tumbling = false; this.anim = null; })
-          .catch(() => { this.tumbling = false; });
+          .catch(() => {
+            this.tumbling = false;
+            items.forEach((el) => el.classList.remove('is-flash'));
+          });
       },
     }));
   });
@@ -312,6 +335,12 @@ function isActive(href: string): boolean {
 
   .cal-nav.is-arriving .cal-nav-link[aria-current='page'] {
     color: var(--prussian-blue);
+  }
+
+  /* Intermediate labels light up for the instant the block seats on them */
+  .cal-nav-link.is-flash {
+    color: var(--satin-linen);
+    transition-duration: 90ms;
   }
 
   .cal-nav-link {
