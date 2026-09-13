@@ -1,26 +1,23 @@
 ---
-import CourseCard, { type CourseDef, type OfferingDef } from './CourseCard.astro';
+import CourseCard, { type CourseDef, type RunDef } from './CourseCard.astro';
 
-interface Slot {
-  name: string;
-  time: string;
-  courses: string;
-  note: string;
+export interface TimeEntry {
+  course: CourseDef;
+  run: RunDef;
+  /** Names the course's other run, when it has one. */
+  also?: string;
 }
 
 interface Props {
   id: string;
-  no: string;
   label: string;
   range: string;
-  slots: Slot[];
-  catalog: Record<string, CourseDef>;
+  slots: Array<{ name: string; time: string; note: string; entries: TimeEntry[] }>;
   concLabels: Record<string, { label: string; short: string }>;
-  offerings: Record<string, OfferingDef>;
   placeholder: string;
   urlBase: string;
 }
-const { id, no, label, range, slots, catalog, concLabels, offerings, placeholder, urlBase } = Astro.props;
+const { id, label, range, slots, concLabels, placeholder, urlBase } = Astro.props;
 ---
 <section id={`term-${id}`} class="cterm" aria-labelledby={`term-${id}-name`}>
   <header class="cterm-head">
@@ -37,10 +34,12 @@ const { id, no, label, range, slots, catalog, concLabels, offerings, placeholder
 
       <div class="cslot-courses">
         {slot.note && <p class="cslot-note">{slot.note}</p>}
-        {slot.courses.split('|').map((ref) => (
+        {slot.entries.map((entry) => (
           <CourseCard
-            course={catalog[ref.split(' ')[0]]}
-            offering={offerings[ref]}
+            course={entry.course}
+            runs={[entry.run]}
+            alsoTag={entry.also}
+            showRuns={false}
             concLabels={concLabels}
             placeholder={placeholder}
             urlBase={urlBase}
@@ -119,7 +118,7 @@ const { id, no, label, range, slots, catalog, concLabels, offerings, placeholder
   .cslot-courses {
     display: flex;
     flex-direction: column;
-    margin-bottom: -0.5rem; /* absorbs the trailing card margin */
+    margin-bottom: -0.5rem;
   }
 
   .cslot-note {

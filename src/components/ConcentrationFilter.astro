@@ -36,6 +36,8 @@ const { concentrations } = Astro.props;
       <span class="cfilter-clear-x" x-text="anyOn ? '✕' : '+'" aria-hidden="true">✕</span>
     </button>
   </div>
+
+  <slot />
 </aside>
 
 <style>

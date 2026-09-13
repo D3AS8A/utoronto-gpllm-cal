@@ -180,10 +180,11 @@ function triggerDownload(text: string, filename: string) {
 
 /* ---- Courses page filter transitions ------------------------------------ */
 
+const SORT_FADE = 170;
 const FILTER_DURATION = 280;
 const FILTER_EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
 
-/** Outermost first: a collapsing term should animate instead of its cards. */
+/** The course list is flat now, so cards are the only thing to animate. */
 const FILTER_LEVELS = ['.cterm', '.cslot', '.course-card'];
 
 interface FilterMetrics {
@@ -782,6 +783,59 @@ export default (Alpine: Alpine) => {
    */
   Alpine.data('courseFilters', () => ({
     conc: { cl: true, bl: true, ilt: true } as Record<string, boolean>,
+    /** 'time' follows the weekly schedule; 'course' lists each course once. */
+    sort: 'time' as 'course' | 'time',
+    sortLeft: 0,
+    sortWidth: 0,
+    sortReady: false,
+
+    init() {
+      this.$nextTick(() => {
+        this.syncSortPill();
+        // Enable the slide only after the first snap, so the pill doesn't
+        // travel in from the left on load
+        requestAnimationFrame(() => { this.sortReady = true; });
+        // Webfonts land after first paint and change the option widths
+        document.fonts?.ready.then(() => this.syncSortPill());
+      });
+    },
+
+    syncSortPill() {
+      const active = document.querySelector<HTMLElement>(
+        `.sort-options [data-sort="${this.sort}"]`,
+      );
+      if (active) this.moveSortPill(active);
+    },
+
+    moveSortPill(el: HTMLElement) {
+      this.sortLeft = el.offsetLeft;
+      this.sortWidth = el.offsetWidth;
+    },
+
+    /**
+     * Both views are in the DOM, so switching is a class change. Fading the
+     * pair out and back in hides the swap, and means the height change happens
+     * while nothing is visible rather than as a jump.
+     */
+    setSort(next: 'course' | 'time', el: HTMLElement) {
+      this.moveSortPill(el);
+      if (next === this.sort) return;
+
+      const views = document.querySelector<HTMLElement>('.courses-views');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!views || reduced) {
+        this.sort = next;
+        return;
+      }
+
+      views.style.opacity = '0';
+      setTimeout(() => {
+        this.sort = next;
+        this.$nextTick(() => {
+          views.style.opacity = '';
+        });
+      }, SORT_FADE);
+    },
 
     get anyOn(): boolean {
       return Object.values(this.conc).some(Boolean);
