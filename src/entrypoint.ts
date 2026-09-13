@@ -178,6 +178,87 @@ function triggerDownload(text: string, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 200);
 }
 
+/* ---- Courses page filter transitions ------------------------------------ */
+
+const FILTER_DURATION = 280;
+const FILTER_EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+/** Outermost first: a collapsing term should animate instead of its cards. */
+const FILTER_LEVELS = ['.cterm', '.cslot', '.course-card'];
+
+interface FilterMetrics {
+  shown: boolean;
+  height: number;
+  margin: number;
+  display: string;
+}
+
+type Filterable = HTMLElement & { __filterAnim?: Animation | null };
+
+function isShown(el: HTMLElement): boolean {
+  return getComputedStyle(el).display !== 'none';
+}
+
+function measure(el: HTMLElement): FilterMetrics {
+  const style = getComputedStyle(el);
+  const shown = style.display !== 'none';
+  return {
+    shown,
+    height: shown ? el.offsetHeight : 0,
+    margin: shown ? parseFloat(style.marginBottom) || 0 : 0,
+    display: shown ? style.display : '',
+  };
+}
+
+function cancelFilterAnim(el: HTMLElement) {
+  const target = el as Filterable;
+  target.__filterAnim?.cancel();
+  target.__filterAnim = null;
+  clearFilterStyles(target);
+}
+
+function clearFilterStyles(el: HTMLElement) {
+  el.style.display = '';
+  el.style.overflow = '';
+  el.classList.remove('is-filtering');
+}
+
+function runFilterAnim(el: HTMLElement, frames: Keyframe[], forcedDisplay?: string) {
+  const target = el as Filterable;
+  target.classList.add('is-filtering');
+  // Held visible by an inline style so it can collapse before CSS hides it
+  if (forcedDisplay) target.style.display = forcedDisplay;
+  target.style.overflow = 'hidden';
+
+  const anim = target.animate(frames, { duration: FILTER_DURATION, easing: FILTER_EASE });
+  target.__filterAnim = anim;
+  anim.finished
+    .then(() => {
+      target.__filterAnim = null;
+      clearFilterStyles(target);
+    })
+    .catch(() => {});
+}
+
+function animateFilterIn(el: HTMLElement) {
+  const to = measure(el);
+  runFilterAnim(el, [
+    { height: '0px', marginBottom: '0px', opacity: 0 },
+    { height: `${to.height}px`, marginBottom: `${to.margin}px`, opacity: 1 },
+  ]);
+}
+
+function animateFilterOut(el: HTMLElement, from: FilterMetrics) {
+  runFilterAnim(
+    el,
+    [
+      { height: `${from.height}px`, marginBottom: `${from.margin}px`, opacity: 1 },
+      { height: '0px', marginBottom: '0px', opacity: 0 },
+    ],
+    from.display,
+  );
+}
+
 export default (Alpine: Alpine) => {
   Alpine.data('calendar', () => ({
     filters: {} as Record<string, boolean>,
@@ -688,6 +769,89 @@ export default (Alpine: Alpine) => {
       // iPadOS 13+ reports Macintosh + touch — include maxTouchPoints > 1 to catch it.
       const iPadMasqueradingAsMac = ua.includes('Macintosh') && navigator.maxTouchPoints > 1;
       return /iPhone|iPad|iPod|Macintosh/.test(ua) || iPadMasqueradingAsMac;
+    },
+  }));
+
+  /**
+   * Courses page: the concentration filter bar.
+   *
+   * Registered here rather than in the component because alpine:init fires
+   * once per session. A component-level listener misses it entirely when the
+   * page is reached from another route, leaving x-data="courseFilters"
+   * pointing at nothing.
+   */
+  Alpine.data('courseFilters', () => ({
+    conc: { cl: true, bl: true, ilt: true } as Record<string, boolean>,
+
+    get anyOn(): boolean {
+      return Object.values(this.conc).some(Boolean);
+    },
+
+    toggle(key: string) {
+      this.transition(() => {
+        this.conc[key] = !this.conc[key];
+      });
+    },
+
+    clearOrShowAll() {
+      const on = this.anyOn;
+      this.transition(() => {
+        Object.keys(this.conc).forEach((key) => {
+          this.conc[key] = !on;
+        });
+      });
+    },
+
+    /**
+     * Filtering itself is CSS (see the show-* rules on the courses page), which
+     * means elements switch on `display` and can't be transitioned. So measure
+     * every filterable element, apply the change, then animate whatever flipped
+     * between the two states.
+     *
+     * Works top down: a term or slot that is disappearing animates as one
+     * block, and the cards inside it are left alone rather than animating
+     * twice over.
+     */
+    transition(mutate: () => void) {
+      // Queried from the document, not $el: inside a click handler Alpine
+      // scopes $el to the button that was pressed, not the component root
+      const root = document.querySelector<HTMLElement>('.courses-app');
+      if (!root) {
+        mutate();
+        return;
+      }
+
+      const levels = FILTER_LEVELS.map((sel) =>
+        [...root.querySelectorAll<HTMLElement>(sel)],
+      );
+      const all = levels.flat();
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        mutate();
+        return;
+      }
+
+      // Settle anything still in flight so the measurements below are honest
+      all.forEach((el) => cancelFilterAnim(el));
+      const before = new Map(all.map((el) => [el, measure(el)] as const));
+
+      mutate();
+
+      this.$nextTick(() => {
+        levels.forEach((list) => {
+          list.forEach((el) => {
+            const was = before.get(el);
+            if (!was) return;
+            const shown = isShown(el);
+            if (was.shown === shown) return;
+            // An ancestor is already collapsing or expanding this subtree
+            if (el.parentElement?.closest('.is-filtering')) return;
+
+            if (shown) animateFilterIn(el);
+            else animateFilterOut(el, was);
+          });
+        });
+      });
     },
   }));
 };

@@ -38,27 +38,6 @@ const { concentrations } = Astro.props;
   </div>
 </aside>
 
-<script is:inline>
-  document.addEventListener('alpine:init', () => {
-    Alpine.data('courseFilters', () => ({
-      conc: { cl: true, bl: true, ilt: true },
-
-      get anyOn() {
-        return Object.values(this.conc).some(Boolean);
-      },
-
-      toggle(key) {
-        this.conc[key] = !this.conc[key];
-      },
-
-      clearOrShowAll() {
-        const on = this.anyOn;
-        Object.keys(this.conc).forEach((key) => { this.conc[key] = !on; });
-      },
-    }));
-  });
-</script>
-
 <style>
   /* Full-bleed out of the app's padding, so the rules span the page the way
      the calendar's filter bar does */

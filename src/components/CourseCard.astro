@@ -136,6 +136,9 @@ const flags = [
      each colour solid at its end so both stay identifiable. Single-concentration
      cards set both stops to the same colour, so the ramp renders flat. */
   .course-card {
+    /* Margin rather than a parent gap, so a filtered-out card can collapse its
+       spacing along with its height */
+    margin-bottom: 0.5rem;
     padding-left: 1.375rem;
     background-color: #fff;
     background-image: linear-gradient(to bottom, var(--c1) 0 20%, var(--c2) 80% 100%);

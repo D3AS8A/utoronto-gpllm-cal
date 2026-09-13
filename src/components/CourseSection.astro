@@ -44,6 +44,10 @@ const { id, no, label, range, slots, catalog, concLabels, placeholder } = Astro.
 </section>
 
 <style>
+  .cterm {
+    margin-bottom: clamp(1.875rem, 4vw, 3rem);
+  }
+
   .cterm-head {
     display: flex;
     align-items: baseline;
@@ -107,7 +111,7 @@ const { id, no, label, range, slots, catalog, concLabels, placeholder } = Astro.
   .cslot-courses {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    margin-bottom: -0.5rem; /* absorbs the trailing card margin */
   }
 
   .cslot-note {
