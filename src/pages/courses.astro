@@ -18,6 +18,7 @@ interface CatalogRow {
 /** Non-credit and NCA courses: no course code, own schedule and description. */
 interface ProgramRow {
   key: string;
+  code: string;
   kind: string;
   title: string;
   when: string;
@@ -63,7 +64,7 @@ const catalog: Record<string, CourseDef> = Object.fromEntries([
   ...content.catalog.map((row) => [row.code, { ...row, conc: row.conc.split('/') }]),
   ...content.program_courses.map((row) => [
     row.key,
-    { ...row, code: undefined, req: false, conc: row.conc.split('/') },
+    { ...row, code: row.code || undefined, req: false, conc: row.conc.split('/') },
   ]),
 ]);
 ---
@@ -127,13 +128,16 @@ const catalog: Record<string, CourseDef> = Object.fromEntries([
     display: block;
   }
 
-  .courses-app.show-cl .cslot:has(.course-card[data-conc~='cl']),
-  .courses-app.show-bl .cslot:has(.course-card[data-conc~='bl']),
-  .courses-app.show-ilt .cslot:has(.course-card[data-conc~='ilt']),
   .courses-app.show-cl .cterm:has(.course-card[data-conc~='cl']),
   .courses-app.show-bl .cterm:has(.course-card[data-conc~='bl']),
   .courses-app.show-ilt .cterm:has(.course-card[data-conc~='ilt']) {
     display: block;
+  }
+
+  .courses-app.show-cl .cslot:has(.course-card[data-conc~='cl']),
+  .courses-app.show-bl .cslot:has(.course-card[data-conc~='bl']),
+  .courses-app.show-ilt .cslot:has(.course-card[data-conc~='ilt']) {
+    display: grid;
   }
 </style>
 

@@ -19,30 +19,32 @@ content:
     bl,Business Law,BUS
     ilt,Technology Law,TECH
 
-  program_courses[3]{key,kind,title,when,conc,capped,nca,desc}:
-    lm-cdn,Non-credit intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18 · 9:30 a.m. – 4:30 p.m.",cl,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
-    lm-bus,Non-credit intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20 · 9:30 a.m. – 4:30 p.m.",bl/ilt,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
-    alrw,NCA requirement,Applied Legal Research & Writing,"September 12, 13, 19 & 20 · 9:30 a.m. – 5:30 p.m.",cl,false,true,"Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement."
+  program_courses[3]{key,code,kind,title,when,conc,capped,nca,desc}:
+    lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18 · 9:30 a.m. – 4:30 p.m.",cl,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
+    lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20 · 9:30 a.m. – 4:30 p.m.",bl/ilt,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
+    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20 · 9:30 a.m. – 5:30 p.m.",cl,false,true,"Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement."
 
-  catalog[29]{code,title,conc,capped,nca,req}:
+  catalog[31]{code,title,conc,capped,nca,req}:
     LAW4026H,Introduction to Law and Technology,ilt,false,false,true
+    LAW4010H,Foundations of Canadian Law,cl,true,false,true
+    LAW4001H,Law and Business in a Global Economy,bl,false,false,true
     LAW4008H,Constitutional Law,cl,true,true,false
     LAW4009H,Criminal Law,cl,true,true,false
-    LAW4032H,Intellectual Property Law,bl/ilt,false,false,false
+    LAW4032H,Intellectual Property Law,bl,false,false,false
     LAW4002H,Comparative Corporate Governance,bl,false,false,false
     LAW4017H,Professional Responsibility,cl,true,true,false
     LAW4046H,Privacy and Data Governance,ilt,false,false,false
     LAW4055H,"Disruptive Innovations & Legal Infrastructure",ilt,false,false,false
     LAW4072H,Aboriginal Law,cl,true,false,false
     LAW4007H,Administrative Law,cl,true,true,false
-    LAW4036H,Applied Contract Law,bl/ilt,false,false,false
+    LAW4036H,Applied Contract Law,bl,false,false,false
     LAW4021H,Tort Law,cl,true,false,false
     LAW4069H,"Electrification and the Energy Transition: Law and Policy",bl,false,false,false
     LAW4030H,Financing Technological Innovation,ilt,false,false,false
     LAW4053H,Law and Regulation of Banks and Financial Institutions,bl,false,false,false
     LAW4063H,"Regulation of Artificial Intelligence: A Legal and Practical Study",ilt,false,false,false
     LAW4074H,Immigration Law,cl,true,false,false
-    LAW4028H,"Blockchain, Digital Assets, and the Law",bl/ilt,false,false,false
+    LAW4028H,"Blockchain, Digital Assets, and the Law",bl,false,false,false
     LAW4022H,Contract Law,cl,true,false,false
     LAW4031H,"Cybersecurity & Data Protection",ilt,false,false,false
     LAW4075H,Financial Crime in a Global Context,bl,false,false,false
@@ -53,7 +55,7 @@ content:
     LAW4071H,Family Law,cl,true,false,false
     LAW4023H,Business Organizations,cl,true,false,false
     LAW4003H,Securities Regulation and Corporate Finance,bl,false,false,false
-    LAW4073H,"Data Law: a Health Perspective",ilt,false,false,false
+    LAW4073H,"Data Law: A Health Perspective",ilt,false,false,false
 
   terms:
     fall:
@@ -62,7 +64,7 @@ content:
       range: September 25 – November 21, 2026
       slots[5]{name,time,courses,note}:
         Program Foundations,September 10 – 20,lm-cdn|lm-bus|alrw,"Intensives that run before the fall term begins. Attend the stream for your concentration"
-        Friday Evenings,4:00 – 9:00 p.m.,LAW4026H,"Every student takes the Friday evening course for their concentration in the fall term. It counts as one of the ten required courses"
+        Friday Evenings,4:00 – 9:00 p.m.,LAW4010H|LAW4001H|LAW4026H,"Every student takes the Friday evening course for their concentration in the fall term. It counts as one of the ten required courses"
         Saturday Mornings,8:30 a.m. – 1:00 p.m.,LAW4008H|LAW4009H|LAW4032H,""
         Saturday Afternoons,2:00 – 6:30 p.m.,LAW4002H|LAW4008H|LAW4017H|LAW4046H,""
         December Intensive,"December 11 – 13 & 18 – 20",LAW4055H|LAW4072H,"Friday evenings 4:00 – 9:00 p.m., Saturdays 8:30 a.m. – 5:30 p.m., Sundays 9:00 a.m. – 1:30 p.m. Dates and times may change"

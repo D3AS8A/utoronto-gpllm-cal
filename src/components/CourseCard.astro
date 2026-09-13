@@ -23,35 +23,41 @@ interface Props {
 const { course, concLabels, placeholder } = Astro.props;
 const desc = course.desc || placeholder.replace('{title}', course.title);
 
-// Full concentration names, since the summary only has room for abbreviations
-const meta = [
-  ...course.conc.map((key) => concLabels[key]?.label).filter(Boolean),
-  course.nca ? 'NCA required course' : null,
-].filter(Boolean).join(' · ');
+const flags = [
+  course.req ? 'Required' : null,
+  course.nca ? 'NCA' : null,
+  course.capped ? 'Capped at 60' : null,
+].filter((f) => f !== null);
 ---
+
 <details class="course-card" data-conc={course.conc.join(' ')}>
   <summary class="course-summary">
-    <div class="course-id">
+    <div class="course-main">
       <p class={course.code ? 'course-code' : 'course-kind'}>{course.code ?? course.kind}</p>
       <h4 class="course-title">{course.title}</h4>
+      <p class="course-conc">
+        {course.conc.map((key, i) => (
+          <>
+            {i > 0 && <span class="course-conc-sep" aria-hidden="true">and</span>}
+            <span class={`conc-${key}`}>{concLabels[key]?.label}</span>
+          </>
+        ))}
+      </p>
       {course.when && <p class="course-when">{course.when}</p>}
     </div>
-    <div class="course-tags">
-      {course.conc.map((key) => (
-        <span class={`course-chip chip-${key}`} title={concLabels[key]?.label}>
-          <span class="course-chip-swatch" aria-hidden="true"></span>
-          {concLabels[key]?.short}
-        </span>
-      ))}
-      {course.req && <span class="course-badge badge-req">Required</span>}
-      {course.capped && <span class="course-badge badge-cap">Capped · 60</span>}
-    </div>
+
+    {flags.length > 0 && (
+      <p class="course-flags">
+        {flags.map((flag) => <span class="course-flag">{flag}</span>)}
+      </p>
+    )}
+
     <span class="course-toggle" aria-hidden="true">+</span>
   </summary>
+
   <div class="course-desc">
     <div class="course-desc-inner">
       <p>{desc}</p>
-      <p class="course-meta">{meta}</p>
     </div>
   </div>
 </details>
@@ -125,131 +131,160 @@ const meta = [
 </script>
 
 <style>
+  /* The concentration is a painted edge down the card rather than a badge.
+     Courses open to two concentrations blend from one into the other, holding
+     each colour solid at its end so both stay identifiable. Single-concentration
+     cards set both stops to the same colour, so the ramp renders flat. */
   .course-card {
-    background: #fff;
-    border: 0.0625rem solid rgb(0 37 84 / 0.1);
-    border-radius: 0.625rem;
+    padding-left: 1.375rem;
+    background-color: #fff;
+    background-image: linear-gradient(to bottom, var(--c1) 0 20%, var(--c2) 80% 100%);
+    background-size: 0.375rem 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+    border-radius: 0.5rem;
     overflow: hidden;
-    box-shadow: 0 0.0625rem 0.125rem rgb(42 29 10 / 0.04), 0 0.25rem 0.875rem rgb(42 29 10 / 0.05);
+    box-shadow:
+      0 0.0625rem 0.125rem rgb(42 29 10 / 0.04),
+      0 0.25rem 0.75rem rgb(42 29 10 / 0.05);
     transition: box-shadow 200ms ease;
   }
 
+  .course-card[data-conc='cl']     { --c1: var(--stiletto); --c2: var(--stiletto); }
+  .course-card[data-conc='bl']     { --c1: var(--matisse);  --c2: var(--matisse); }
+  .course-card[data-conc='ilt']    { --c1: var(--sky);      --c2: var(--sky); }
+  .course-card[data-conc='bl ilt'] { --c1: var(--matisse);  --c2: var(--sky); }
+
   .course-card:hover {
-    box-shadow: 0 0.125rem 0.25rem rgb(42 29 10 / 0.05), 0 0.5rem 1.25rem rgb(42 29 10 / 0.08);
+    box-shadow:
+      0 0.125rem 0.25rem rgb(42 29 10 / 0.05),
+      0 0.5rem 1.25rem rgb(42 29 10 / 0.08);
   }
 
   .course-summary {
     display: grid;
     grid-template-columns: 1fr auto auto;
-    align-items: center;
-    gap: 0.5rem 1rem;
-    padding: 0.75rem 1rem;
+    align-items: baseline;
+    gap: 0.25rem 1.25rem;
+    padding: 0.8125rem 1rem 0.875rem 0;
     cursor: pointer;
     list-style: none;
-    transition: background-color 150ms ease;
   }
 
   .course-summary::-webkit-details-marker {
     display: none;
   }
 
-  .course-summary:hover {
-    background: rgb(243 236 224 / 0.55);
-  }
-
-  .course-code {
-    font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 0.6875rem;
-    letter-spacing: 0.14em;
-    font-weight: 700;
-    color: var(--driftwood);
-    margin: 0;
-  }
-
+  /* The code is how a course is picked on the enrolment form, so it leads;
+     the name reads as its expansion underneath. Courses without a code put
+     their kind here instead, set identically */
+  .course-code,
   .course-kind {
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 1.0625rem;
+    line-height: 1.15;
+    font-weight: 800;
     letter-spacing: 0.02em;
     color: var(--driftwood);
     margin: 0;
   }
 
+  .course-code {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .course-title {
+    font-size: 1rem;
+    line-height: 1.3;
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin: 0.25rem 0 0.1875rem;
+  }
+
+  .course-conc {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .course-conc-sep {
+    color: var(--pablo);
+    font-weight: 400;
+    margin: 0 0.1875rem;
+  }
+
+  .conc-cl  { color: var(--stiletto); }
+  .conc-bl  { color: var(--matisse); }
+  .conc-ilt { color: var(--sky-ink); }
+
   .course-when {
     font-size: 0.8125rem;
     font-weight: 500;
     color: var(--pablo);
-    margin: 0.25rem 0 0;
+    margin: 0.1875rem 0 0;
   }
 
-  .course-title {
-    font-size: 1.0625rem;
-    line-height: 1.3;
-    font-weight: 700;
-    color: var(--prussian-blue);
-    margin: 0.125rem 0 0;
-  }
-
-  .course-tags {
+  .course-flags {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
     justify-content: flex-end;
-    gap: 0.375rem 0.625rem;
+    gap: 0.3125rem;
+    margin: 0;
   }
 
-  .course-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    color: var(--oxford-blue);
-  }
-
-  .course-chip-swatch {
-    width: 0.625rem;
-    height: 0.625rem;
-    border-radius: 0.1875rem;
-    display: inline-block;
-  }
-
-  .chip-cl .course-chip-swatch  { background: var(--stiletto); }
-  .chip-bl .course-chip-swatch  { background: var(--matisse); }
-  .chip-ilt .course-chip-swatch { background: var(--sky); }
-
-  .course-badge {
-    font-size: 0.6875rem;
+  .course-flag {
+    font-size: 0.625rem;
     font-weight: 600;
     letter-spacing: 0.03em;
-    padding: 0.1875rem 0.5625rem;
+    line-height: 1.2;
+    padding: 0.1875rem 0.5rem;
     border-radius: 62.4375rem;
+    color: var(--driftwood);
+    background: rgb(147 110 66 / 0.12);
+    white-space: nowrap;
   }
 
-  .badge-req { color: var(--matisse); background: rgb(31 96 146 / 0.1); }
-  .badge-cap { color: var(--umber);   background: rgb(125 116 96 / 0.12); }
-
+  /* A fixed square with the glyph centred, so the rotation pivots on the
+     cross itself rather than on a text box that is taller than it is wide */
   .course-toggle {
-    font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 1rem;
-    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    align-self: start;
+    font-size: 1.125rem;
+    font-weight: 400;
     color: var(--driftwood);
     line-height: 1;
-    transition: transform 200ms ease;
+    /* Rotation and hover scale compose in one transform */
+    --toggle-rotate: 0deg;
+    --toggle-scale: 1;
+    transform: rotate(var(--toggle-rotate)) scale(var(--toggle-scale));
+    transition: transform 200ms ease, color 200ms ease;
   }
 
-  .course-card[open] .course-toggle {
-    transform: rotate(45deg);
+  .course-card[open] .course-toggle,
+  .course-card[data-state='open'] .course-toggle {
+    --toggle-rotate: 45deg;
   }
 
   /* Set the instant a card is clicked. On close it beats [open], which
      lingers until the collapse finishes */
-  .course-card[data-state='open'] .course-toggle {
-    transform: rotate(45deg);
+  .course-card[data-state='closed'] .course-toggle {
+    --toggle-rotate: 0deg;
   }
 
-  .course-card[data-state='closed'] .course-toggle {
-    transform: none;
+  @media (hover: hover) {
+    .course-card:hover .course-toggle {
+      --toggle-scale: 1.35;
+      color: var(--bronzetone);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .course-toggle {
+      transition: none;
+    }
   }
 
   .course-desc {
@@ -257,34 +292,43 @@ const meta = [
   }
 
   .course-desc-inner {
-    margin: 0 1rem;
-    border-top: 0.0625rem solid var(--tana);
-    padding: 0.75rem 0 1rem;
+    padding: 0 1.75rem 1rem 0;
   }
 
   .course-desc-inner p {
     font-size: 0.9375rem;
     line-height: 1.6;
-    font-weight: 400;
     color: var(--oxford-blue);
     margin: 0;
-  }
-
-  .course-desc-inner .course-meta {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    color: var(--pablo);
-    margin-top: 0.625rem;
+    max-width: 44ch;
   }
 
   @media (max-width: 40rem) {
+    /* Everything placed explicitly: auto-placement pushed the toggle onto a
+       row of its own once the flags claimed column 1 */
     .course-summary {
       grid-template-columns: 1fr auto;
     }
 
-    .course-tags {
+    .course-main {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .course-toggle {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .course-flags {
       grid-column: 1 / -1;
+      grid-row: 2;
       justify-content: flex-start;
+      margin-top: 0.375rem;
+    }
+
+    .course-desc-inner {
+      padding-right: 1rem;
     }
   }
 </style>

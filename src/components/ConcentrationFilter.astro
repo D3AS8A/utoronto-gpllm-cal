@@ -32,7 +32,7 @@ const { concentrations } = Astro.props;
     </div>
 
     <button type="button" class="cfilter-clear" @click="clearOrShowAll()">
-      <span x-text="anyOn ? 'clear all' : 'show all'">clear all</span>
+      <span class="cfilter-clear-text" x-text="anyOn ? 'clear all' : 'show all'">clear all</span>
       <span class="cfilter-clear-x" x-text="anyOn ? '✕' : '+'" aria-hidden="true">✕</span>
     </button>
   </div>
@@ -174,6 +174,10 @@ const { concentrations } = Astro.props;
     border: 0;
     padding: 0.25rem;
     cursor: pointer;
+  }
+
+  /* Underline the words only: the ✕ / + glyph shouldn't be struck through */
+  .cfilter-clear-text {
     text-decoration: underline;
     text-underline-offset: 0.1875rem;
   }
