@@ -201,14 +201,13 @@ function isActive(href: string): boolean {
         const dest = items[to];
         const sameRow = items.every((el) => el.offsetTop === dest.offsetTop);
 
-        // Corner-rolling needs a single row, a real pointer and room to swing.
-        // Touch and narrow screens take the plain slide: the tumble does not
-        // yet behave on iOS Safari, so it stays off there until it does.
+        // Needs a single row to roll along, and motion allowed. Touch is fine:
+        // a tap has no hover to lead the block, but the journey is driven by
+        // navigation rather than by the pointer. What looked like a broken
+        // tumble on iOS was the blocks sitting at opacity 0, because the
+        // requestAnimationFrame that unlocks them never fired there.
         const canTumble =
-          sameRow &&
-          matchMedia('(hover: hover)').matches &&
-          matchMedia('(min-width: 48rem)').matches &&
-          !matchMedia('(prefers-reduced-motion: reduce)').matches;
+          sameRow && !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         if (!canTumble) {
           this.settle();
@@ -368,6 +367,15 @@ function isActive(href: string): boolean {
   .cal-nav-lava-hover {
     background: rgb(0 37 84 / 0.08);
     z-index: 0;
+  }
+
+  /* Nothing to preview without a cursor: this block exists to run ahead of a
+     pointer, and a tap has no "ahead". Left in, it only shows as a stray tint
+     parked at the destination while the current block tumbles toward it. */
+  @media (hover: none) {
+    .cal-nav-lava-hover {
+      display: none;
+    }
   }
 
   .cal-nav.is-ready .cal-nav-lava,
