@@ -69,6 +69,26 @@ function isActive(href: string): boolean {
   alpine:init to register the component before Alpine processes the DOM.
 -->
 <script is:inline>
+  /**
+   * Runs on the next frame, or after a short wait if that never arrives.
+   *
+   * requestAnimationFrame does not fire in every context: Safari withholds it
+   * in some windows, and any browser throttles it in a background tab. Gating
+   * anything on rAF alone therefore risks never running at all, which left the
+   * nav's blocks stranded at opacity 0 in Safari. Whichever callback lands
+   * first wins; the other is dropped.
+   */
+  function onNextFrame(fn) {
+    let done = false;
+    const once = () => {
+      if (done) return;
+      done = true;
+      fn();
+    };
+    requestAnimationFrame(once);
+    setTimeout(once, 120);
+  }
+
   document.addEventListener('alpine:init', () => {
     Alpine.data('calNav', () => ({
       left: 0,
@@ -94,7 +114,7 @@ function isActive(href: string): boolean {
         this.$nextTick(() => {
           this.reset();
           // Enable transitions after first snap, so blocks don't slide from corner
-          requestAnimationFrame(() => { this.ready = true; });
+          onNextFrame(() => { this.ready = true; });
           // Webfonts land after first paint and change the link widths
           document.fonts?.ready.then(() => this.reset());
         });
@@ -182,8 +202,8 @@ function isActive(href: string): boolean {
         const sameRow = items.every((el) => el.offsetTop === dest.offsetTop);
 
         // Corner-rolling needs a single row, a real pointer and room to swing.
-        // On a phone the dip below the bar crosses the page title and reads as
-        // noise, so touch and narrow screens get the plain slide instead.
+        // Touch and narrow screens take the plain slide: the tumble does not
+        // yet behave on iOS Safari, so it stays off there until it does.
         const canTumble =
           sameRow &&
           matchMedia('(hover: hover)').matches &&
@@ -201,7 +221,7 @@ function isActive(href: string): boolean {
         // get there. Slide to the new target instead.
         if (this.anim) {
           this.settle();
-          requestAnimationFrame(() => this.park(dest));
+          onNextFrame(() => this.park(dest));
           return;
         }
 

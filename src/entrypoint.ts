@@ -180,6 +180,25 @@ function triggerDownload(text: string, filename: string) {
 
 /* ---- Courses page filter transitions ------------------------------------ */
 
+/**
+ * Runs on the next frame, or after a short wait if that never arrives.
+ *
+ * requestAnimationFrame does not fire in every context: Safari withholds it in
+ * some windows, and any browser throttles it in a background tab. Anything
+ * gated on rAF alone risks never running, which is how the sort pill and the
+ * nav's blocks ended up stranded at opacity 0 in Safari.
+ */
+function onNextFrame(fn: () => void) {
+  let done = false;
+  const once = () => {
+    if (done) return;
+    done = true;
+    fn();
+  };
+  requestAnimationFrame(once);
+  setTimeout(once, 120);
+}
+
 const SORT_FADE = 170;
 const FILTER_DURATION = 280;
 const FILTER_EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
@@ -794,7 +813,7 @@ export default (Alpine: Alpine) => {
         this.syncSortPill();
         // Enable the slide only after the first snap, so the pill doesn't
         // travel in from the left on load
-        requestAnimationFrame(() => { this.sortReady = true; });
+        onNextFrame(() => { this.sortReady = true; });
         // Webfonts land after first paint and change the option widths
         document.fonts?.ready.then(() => this.syncSortPill());
       });
