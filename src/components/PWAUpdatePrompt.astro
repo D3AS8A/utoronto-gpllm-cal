@@ -21,6 +21,25 @@
     onOfflineReady() {
       // Silent — no UI needed for first-time offline readiness
     },
+
+    /*
+     * A browser only checks for a new service worker on a real navigation.
+     * This site routes on the client, so clicking between pages never
+     * triggers that check and a returning visitor can sit on a stale worker
+     * indefinitely, which is why updates only appeared after a hard reload.
+     * Asking explicitly is what makes the toast show up on its own.
+     */
+    onRegisteredSW(_swUrl, registration) {
+      if (!registration) return;
+
+      const check = () => registration.update().catch(() => {});
+
+      document.addEventListener('astro:page-load', check);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') check();
+      });
+      setInterval(check, 60 * 60 * 1000);
+    },
   });
 
   reloadBtn?.addEventListener('click', () => {
