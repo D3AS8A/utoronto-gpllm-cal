@@ -8,6 +8,9 @@ export interface CourseDef {
   /** Schedule line for courses that don't follow their slot's times. */
   when?: string;
   conc: string[];
+  credits?: number;
+  /** Path of this course's page on the faculty site. */
+  slug?: string;
   capped: boolean;
   nca: boolean;
   req: boolean;
@@ -15,19 +18,43 @@ export interface CourseDef {
   desc?: string;
 }
 
+/** One scheduled run of a course. Instructor and room both vary between the
+ *  offerings of the same course, so they live here rather than on the course. */
+export interface OfferingDef {
+  ref: string;
+  room: string;
+  prof: string;
+}
+
 interface Props {
   course: CourseDef;
+  offering?: OfferingDef;
   concLabels: Record<string, { label: string; short: string }>;
   placeholder: string;
+  /** Prefix the course slug is appended to. */
+  urlBase: string;
 }
-const { course, concLabels, placeholder } = Astro.props;
+const { course, offering, concLabels, placeholder, urlBase } = Astro.props;
 const desc = course.desc || placeholder.replace('{title}', course.title);
 
+const facts = [
+  offering?.prof ? { label: 'Taught by', value: offering.prof } : null,
+].filter((fact) => fact !== null);
+
+// The collapsed bar carries only what a student filters or scans on
 const flags = [
   course.req ? 'Required' : null,
   course.nca ? 'NCA' : null,
-  course.capped ? 'Capped at 60' : null,
 ].filter((f) => f !== null);
+
+// Open cards gather everything into one row. The bar's flags travel here, so
+// they are marked to get the slide-in treatment; the rest are simply present.
+const panelTags = [
+  ...flags.map((label) => ({ label, fromBar: true })),
+  offering?.room ? { label: offering.room, fromBar: false } : null,
+  course.capped ? { label: 'Capped at 60', fromBar: false } : null,
+  course.credits ? { label: `${course.credits} credits`, fromBar: false } : null,
+].filter((tag) => tag !== null);
 ---
 
 <details class="course-card" data-conc={course.conc.join(' ')}>
@@ -57,7 +84,50 @@ const flags = [
 
   <div class="course-desc">
     <div class="course-desc-inner">
+      {facts.length > 0 && (
+        <dl class="course-facts">
+          {facts.map((fact) => (
+            <div class="course-fact">
+              <dt>{fact.label}</dt>
+              <dd>{fact.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {panelTags.length > 0 && (
+        <p class="course-panel-tags">
+          {panelTags.map((tag) => (
+            tag.fromBar
+              ? <span class="tag-slot"><span class="course-flag">{tag.label}</span></span>
+              : <span class="course-flag">{tag.label}</span>
+          ))}
+        </p>
+      )}
+
       <p>{desc}</p>
+
+      {course.slug && (
+        <a class="course-link" href={`${urlBase}${course.slug}`} target="_blank" rel="noopener noreferrer">
+          Full course page
+          <svg
+            class="course-link-icon"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path d="M6.5 3H3.5A1.5 1.5 0 0 0 2 4.5v8A1.5 1.5 0 0 0 3.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-3" />
+            <path d="M10 2h4v4" />
+            <path d="M7.25 8.75 14 2" />
+          </svg>
+          <span class="sr-only">Opens on the faculty site in a new tab</span>
+        </a>
+      )}
     </div>
   </div>
 </details>
@@ -71,6 +141,11 @@ const flags = [
 <script>
   const DURATION = 320;
   const EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  const HANDOFF_DURATION = 680;
+  // Lets the bar's flag clear the row before its twin arrives
+  const HANDOFF_DELAY = 90;
+  // Overshoots, so the tags it pushes rebound rather than stopping dead
+  const HANDOFF_EASE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
   interface AnimatedDetails extends HTMLDetailsElement {
     __anim?: Animation | null;
@@ -88,6 +163,8 @@ const flags = [
       card.open = opening;
       return;
     }
+
+    if (opening) slideTagsIn(card);
 
     card.__anim?.cancel();
 
@@ -113,6 +190,29 @@ const flags = [
         if (!opening) card.open = false;
       })
       .catch(() => {});
+  }
+
+  /**
+   * The flag that just left the bar arrives at the left of the panel's tag row.
+   * Its slot grows from zero width, which pushes the tags after it to the
+   * right, while the pill itself slides in clipped by that slot.
+   */
+  function slideTagsIn(card: HTMLElement) {
+    card.querySelectorAll<HTMLElement>('.tag-slot').forEach((slot) => {
+      const pill = slot.firstElementChild as HTMLElement | null;
+      if (!pill) return;
+      const width = pill.offsetWidth;
+      if (!width) return;
+
+      slot.animate(
+        [{ width: '0px' }, { width: `${width}px` }],
+        { duration: HANDOFF_DURATION, delay: HANDOFF_DELAY, easing: HANDOFF_EASE, fill: 'backwards' },
+      );
+      pill.animate(
+        [{ transform: 'translateX(-115%)' }, { transform: 'none' }],
+        { duration: HANDOFF_DURATION, delay: HANDOFF_DELAY, easing: HANDOFF_EASE, fill: 'backwards' },
+      );
+    });
   }
 
   if (!(window as any).__courseCardsBound) {
@@ -226,12 +326,48 @@ const flags = [
     margin: 0.1875rem 0 0;
   }
 
+  /* Clips its flag as that flag exits upward on open */
   .course-flags {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
     gap: 0.3125rem;
     margin: 0;
+    overflow: hidden;
+    transition: visibility 0s;
+  }
+
+  .course-flags .course-flag {
+    transition: transform 480ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Gone from the bar, and out of the accessibility tree once it has left, so
+     it isn't read twice alongside its twin in the panel */
+  .course-card[open] .course-flags,
+  .course-card[data-state='open'] .course-flags {
+    visibility: hidden;
+    transition: visibility 0s linear 480ms;
+  }
+
+  .course-card[open] .course-flags .course-flag,
+  .course-card[data-state='open'] .course-flags .course-flag {
+    transform: translateY(-160%);
+  }
+
+  /* Set the instant a card is clicked shut, while [open] still lingers */
+  .course-card[data-state='closed'] .course-flags {
+    visibility: visible;
+    transition: visibility 0s;
+  }
+
+  .course-card[data-state='closed'] .course-flags .course-flag {
+    transform: none;
+  }
+
+  /* Zero-width on arrival, widening to shove the tags after it along */
+  .tag-slot {
+    display: inline-flex;
+    overflow: hidden;
   }
 
   .course-flag {
@@ -285,7 +421,9 @@ const flags = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .course-toggle {
+    .course-toggle,
+    .course-flags,
+    .course-flags .course-flag {
       transition: none;
     }
   }
@@ -296,6 +434,59 @@ const flags = [
 
   .course-desc-inner {
     padding: 0 1.75rem 1rem 0;
+  }
+
+  .course-facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.25rem 1rem;
+    margin: 0 0 0.375rem;
+    font-size: 0.8125rem;
+  }
+
+  /* Scoped through the parent: `.course-desc-inner p` sets margin: 0 and would
+     otherwise outrank a lone class on this <p> */
+  .course-desc-inner .course-panel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3125rem;
+    margin: 0 0 1.125rem;
+  }
+
+  .course-fact {
+    display: contents;
+  }
+
+  .course-facts dt {
+    color: var(--pablo);
+    font-weight: 500;
+  }
+
+  .course-facts dd {
+    margin: 0;
+    color: var(--oxford-blue);
+    font-weight: 600;
+  }
+
+  .course-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--driftwood);
+    text-underline-offset: 0.1875rem;
+  }
+
+  .course-link:hover {
+    color: var(--bronzetone);
+  }
+
+  .course-link-icon {
+    width: 0.75rem;
+    height: 0.75rem;
+    flex: none;
   }
 
   .course-desc-inner p {

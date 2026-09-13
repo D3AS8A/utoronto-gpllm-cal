@@ -15,6 +15,21 @@ interface CatalogRow {
   req: boolean;
 }
 
+/** Instructor and description, scraped per course from the faculty site. */
+interface DetailRow {
+  code: string;
+  credits: number;
+  slug: string;
+  desc: string;
+}
+
+/** One scheduled run: its room, and who teaches that run. */
+interface OfferingRow {
+  ref: string;
+  room: string;
+  prof: string;
+}
+
 /** Non-credit and NCA courses: no course code, own schedule and description. */
 interface ProgramRow {
   key: string;
@@ -48,10 +63,13 @@ const { meta, content } = loadPage<{
   heading: string;
   intro: string;
   requirements: string;
+  course_url_base: string;
   desc_placeholder: string;
   last_updated?: string;
   concentrations: Array<{ key: string; label: string; short: string }>;
   program_courses: ProgramRow[];
+  details: DetailRow[];
+  offerings: OfferingRow[];
   catalog: CatalogRow[];
   terms: Record<string, Term>;
 }>('courses');
@@ -60,11 +78,26 @@ const concLabels = Object.fromEntries(
   content.concentrations.map((c) => [c.key, { label: c.label, short: c.short }]),
 );
 
+const details = Object.fromEntries(content.details.map((row) => [row.code, row]));
+const offerings = Object.fromEntries(content.offerings.map((row) => [row.ref, row]));
+
 const catalog: Record<string, CourseDef> = Object.fromEntries([
-  ...content.catalog.map((row) => [row.code, { ...row, conc: row.conc.split('/') }]),
+  ...content.catalog.map((row) => [
+    row.code,
+    { ...row, ...details[row.code], conc: row.conc.split('/') },
+  ]),
+  // Program courses keep their own description, which explains who the course
+  // is for; only the instructor comes from the scraped details
   ...content.program_courses.map((row) => [
     row.key,
-    { ...row, code: row.code || undefined, req: false, conc: row.conc.split('/') },
+    {
+      ...row,
+      credits: row.code ? details[row.code]?.credits : undefined,
+      slug: row.code ? details[row.code]?.slug : undefined,
+      code: row.code || undefined,
+      req: false,
+      conc: row.conc.split('/'),
+    },
   ]),
 ]);
 ---
@@ -105,7 +138,9 @@ const catalog: Record<string, CourseDef> = Object.fromEntries([
           slots={term.slots}
           catalog={catalog}
           concLabels={concLabels}
+          offerings={offerings}
           placeholder={content.desc_placeholder}
+          urlBase={content.course_url_base}
         />
       ))}
     </main>

@@ -1,5 +1,5 @@
 ---
-import CourseCard, { type CourseDef } from './CourseCard.astro';
+import CourseCard, { type CourseDef, type OfferingDef } from './CourseCard.astro';
 
 interface Slot {
   name: string;
@@ -16,9 +16,11 @@ interface Props {
   slots: Slot[];
   catalog: Record<string, CourseDef>;
   concLabels: Record<string, { label: string; short: string }>;
+  offerings: Record<string, OfferingDef>;
   placeholder: string;
+  urlBase: string;
 }
-const { id, no, label, range, slots, catalog, concLabels, placeholder } = Astro.props;
+const { id, no, label, range, slots, catalog, concLabels, offerings, placeholder, urlBase } = Astro.props;
 ---
 <section id={`term-${id}`} class="cterm" aria-labelledby={`term-${id}-name`}>
   <header class="cterm-head">
@@ -35,8 +37,14 @@ const { id, no, label, range, slots, catalog, concLabels, placeholder } = Astro.
 
       <div class="cslot-courses">
         {slot.note && <p class="cslot-note">{slot.note}</p>}
-        {slot.courses.split('|').map((code) => (
-          <CourseCard course={catalog[code]} concLabels={concLabels} placeholder={placeholder} />
+        {slot.courses.split('|').map((ref) => (
+          <CourseCard
+            course={catalog[ref.split(' ')[0]]}
+            offering={offerings[ref]}
+            concLabels={concLabels}
+            placeholder={placeholder}
+            urlBase={urlBase}
+          />
         ))}
       </div>
     </div>
