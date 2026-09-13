@@ -30,15 +30,20 @@ const { options } = Astro.props;
 </div>
 
 <style>
-  /* Sits in the filter bar, so it lines up with the concentration row above
-     rather than with the narrower column of cards */
   .sort-bar {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 0.375rem 0.75rem;
-    margin-top: 0.5rem;
-    padding: 0 0.9375rem;
+    padding-right: 1.25rem;
+    border-right: 0.0625rem solid rgb(0 37 84 / 0.12);
+  }
+
+  @media (max-width: 45rem) {
+    .sort-bar {
+      padding-right: 0;
+      border-right: 0;
+    }
   }
 
   .sort-label {

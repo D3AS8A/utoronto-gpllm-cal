@@ -13,6 +13,8 @@ const { concentrations } = Astro.props;
 -->
 <aside class="cfilter" role="toolbar" aria-label="Filter courses by concentration">
   <div class="cfilter-group">
+    <slot />
+
     <p class="cfilter-label" id="cfilter-label">CONCENTRATIONS</p>
 
     <div class="cfilter-switches" role="group" aria-labelledby="cfilter-label">
@@ -36,8 +38,6 @@ const { concentrations } = Astro.props;
       <span class="cfilter-clear-x" x-text="anyOn ? '✕' : '+'" aria-hidden="true">✕</span>
     </button>
   </div>
-
-  <slot />
 </aside>
 
 <style>
@@ -78,10 +78,26 @@ const { concentrations } = Astro.props;
     white-space: nowrap;
   }
 
+  /* Equal columns rather than flex: with `width: max-content`, three 1fr
+     tracks each resolve to the widest switch, so the labels and their tracks
+     line up instead of sitting ragged once they wrap */
   .cfilter-switches {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem 2.875rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    width: max-content;
+    gap: 0.25rem 1.75rem;
+  }
+
+  @media (max-width: 56rem) {
+    .cfilter-switches {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 26rem) {
+    .cfilter-switches {
+      grid-template-columns: 1fr;
+    }
   }
 
   /* Only three switches here, so they stand on their own: no pill container,
@@ -105,6 +121,13 @@ const { concentrations } = Astro.props;
     outline: 0.125rem solid var(--matisse);
     outline-offset: 0.25rem;
     border-radius: 0.25rem;
+  }
+
+  /* Takes up the slack in an equal-width button, so every switch sits flush
+     at the right edge and the column of them lines up */
+  .cfilter-toggle-label {
+    flex: 1;
+    text-align: left;
   }
 
   .cfilter-track {
