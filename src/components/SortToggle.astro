@@ -1,0 +1,115 @@
+---
+interface Props {
+  options: Array<{ key: string; label: string }>;
+}
+const { options } = Astro.props;
+---
+<div class="sort-bar">
+  <p class="sort-label" id="sort-label">Sort by</p>
+  <div class="sort-options" role="group" aria-labelledby="sort-label">
+    <span
+      class="sort-pill"
+      :class="{ 'is-ready': sortReady }"
+      :style="`left: ${sortLeft}px; width: ${sortWidth}px`"
+      aria-hidden="true"
+    ></span>
+
+    {options.map((option) => (
+      <button
+        type="button"
+        class="sort-option"
+        data-sort={option.key}
+        :class={`{ 'is-on': sort === '${option.key}' }`}
+        :aria-pressed={`sort === '${option.key}' ? 'true' : 'false'`}
+        @click={`setSort('${option.key}', $el)`}
+      >
+        {option.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+<style>
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.375rem 0.75rem;
+    padding-right: 1.25rem;
+    border-right: 0.0625rem solid rgb(0 37 84 / 0.12);
+  }
+
+  /* Takes the whole line, so the concentrations start a fresh one below. The
+     margin is what separates the two controls: the switches sit on a 2px row
+     gap, so without it this break would read as just another switch row. */
+  @media (max-width: 45rem) {
+    .sort-bar {
+      flex-basis: 100%;
+      margin-bottom: 0.4375rem;
+      padding-right: 0;
+      border-right: 0;
+    }
+  }
+
+  .sort-label {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: var(--driftwood);
+    margin: 0;
+  }
+
+  .sort-options {
+    position: relative; /* offset parent for the pill */
+    display: flex;
+    gap: 0.375rem;
+  }
+
+  /* Slides between the options rather than each holding its own background */
+  .sort-pill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    border-radius: 62.4375rem;
+    background: rgb(0 37 84 / 0.07);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .sort-pill.is-ready {
+    opacity: 1;
+    transition:
+      left 300ms cubic-bezier(0.34, 1.24, 0.64, 1),
+      width 300ms cubic-bezier(0.34, 1.24, 0.64, 1);
+  }
+
+  .sort-option {
+    position: relative; /* above the pill */
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--pablo);
+    background: none;
+    border: 0;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 62.4375rem;
+    cursor: pointer;
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  .sort-option:hover {
+    color: var(--prussian-blue);
+  }
+
+  .sort-option.is-on {
+    color: var(--prussian-blue);
+  }
+
+  .sort-option:focus-visible {
+    outline: 0.125rem solid var(--matisse);
+    outline-offset: 0.125rem;
+  }
+</style>

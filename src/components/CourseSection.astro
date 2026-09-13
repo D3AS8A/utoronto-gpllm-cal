@@ -1,0 +1,150 @@
+---
+import CourseCard, { type CourseDef, type RunDef } from './CourseCard.astro';
+
+export interface TimeEntry {
+  course: CourseDef;
+  run: RunDef;
+  /** Names the course's other run, when it has one. */
+  also?: string;
+}
+
+interface Props {
+  id: string;
+  label: string;
+  range: string;
+  slots: Array<{ name: string; time: string; note: string; entries: TimeEntry[] }>;
+  concLabels: Record<string, { label: string; short: string }>;
+  placeholder: string;
+  urlBase: string;
+}
+const { id, label, range, slots, concLabels, placeholder, urlBase } = Astro.props;
+---
+<section id={`term-${id}`} class="cterm" aria-labelledby={`term-${id}-name`}>
+  <header class="cterm-head">
+    <h2 id={`term-${id}-name`} class="cterm-name">{label}</h2>
+    <p class="cterm-range">{range}</p>
+  </header>
+
+  {slots.map((slot) => (
+    <div class="cslot">
+      <div class="cslot-when">
+        <h3 class="cslot-name">{slot.name}</h3>
+        <p class="cslot-time">{slot.time}</p>
+      </div>
+
+      <div class="cslot-courses">
+        {slot.note && <p class="cslot-note">{slot.note}</p>}
+        {slot.entries.map((entry) => (
+          <CourseCard
+            course={entry.course}
+            runs={[entry.run]}
+            alsoTag={entry.also}
+            showRuns={false}
+            concLabels={concLabels}
+            placeholder={placeholder}
+            urlBase={urlBase}
+          />
+        ))}
+      </div>
+    </div>
+  ))}
+</section>
+
+<style>
+  .cterm {
+    margin-bottom: clamp(1.875rem, 4vw, 3rem);
+  }
+
+  .cterm-head {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    border-bottom: 0.125rem solid var(--driftwood);
+    padding-bottom: 0.4375rem;
+  }
+
+  .cterm-name {
+    font-size: clamp(1.375rem, 2.8vw, 1.75rem);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.015em;
+    text-transform: uppercase;
+    color: var(--driftwood);
+    margin: 0;
+  }
+
+  .cterm-range {
+    margin: 0 0 0 auto;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--driftwood);
+  }
+
+  /* The program is built around working lawyers' weekends, so the meeting
+     time leads: it hangs in the left margin and the courses sit beside it */
+  .cslot {
+    display: grid;
+    grid-template-columns: 9.5rem 1fr;
+    gap: 0 1.75rem;
+    padding: 1.375rem 0 0.625rem;
+  }
+
+  .cslot + .cslot {
+    border-top: 0.0625rem solid var(--tana);
+  }
+
+  .cslot-when {
+    position: sticky;
+    top: 5rem;
+    align-self: start;
+  }
+
+  .cslot-name {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--prussian-blue);
+    margin: 0;
+  }
+
+  .cslot-time {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--pablo);
+    margin: 0.1875rem 0 0;
+  }
+
+  .cslot-courses {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: -0.5rem;
+  }
+
+  .cslot-note {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--oxford-blue);
+    max-width: 42ch;
+    margin: 0 0 0.375rem;
+  }
+
+  @media (max-width: 48rem) {
+    .cslot {
+      grid-template-columns: 1fr;
+      gap: 0.625rem 0;
+    }
+
+    .cslot-when {
+      position: static;
+      display: flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0 0.625rem;
+    }
+
+    .cslot-time {
+      margin-top: 0;
+    }
+  }
+</style>

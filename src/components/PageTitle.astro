@@ -1,0 +1,79 @@
+---
+interface Props {
+  /** Small mono line above the title. */
+  eyebrow?: string;
+  /** Machine-readable value when the eyebrow names a date or range. */
+  eyebrowDatetime?: string;
+  title: string;
+}
+const { eyebrow, eyebrowDatetime, title } = Astro.props;
+---
+<div class="page-title-row">
+  <hgroup>
+    {eyebrow && (
+      <p class="page-eyebrow">
+        {eyebrowDatetime ? <time datetime={eyebrowDatetime}>{eyebrow}</time> : eyebrow}
+      </p>
+    )}
+    <h1 class="page-title">{title}</h1>
+  </hgroup>
+  <div class="page-desc">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .page-title-row {
+    padding-top: clamp(0.875rem, 2vw, 1.375rem);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .page-title-row hgroup {
+    margin: 0;
+  }
+
+  .page-eyebrow {
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: clamp(0.625rem, 1.1vw, 0.75rem);
+    letter-spacing: 0.24em;
+    color: var(--driftwood);
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .page-title {
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.015em;
+    font-size: clamp(1.5625rem, 3.9vw, 2.4375rem);
+    margin: 0.375rem 0 0;
+    text-transform: uppercase;
+    color: var(--prussian-blue);
+  }
+
+  .page-desc {
+    max-width: 32.5rem;
+    font-size: clamp(0.8125rem, 1.4vw, 0.90625rem);
+    line-height: 1.35;
+    font-weight: 500;
+    color: var(--oxford-blue);
+    margin: 3rem 0 -0.25rem;
+    align-self: flex-end;
+  }
+
+  .page-desc :global(p) {
+    margin: 0 0 0.5rem;
+  }
+
+  .page-desc :global(p:last-child) {
+    margin-bottom: 0;
+  }
+
+  .page-desc :global(strong) {
+    color: var(--prussian-blue);
+  }
+</style>

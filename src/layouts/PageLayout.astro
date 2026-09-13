@@ -1,0 +1,58 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Masthead from '../components/Masthead.astro';
+import CalendarFooter from '../components/CalendarFooter.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  jsonLD?: Record<string, unknown>;
+  /** ISO YYYY-MM-DD of the last manual content update. */
+  lastUpdated?: string;
+}
+
+const { title, description, ogImage, jsonLD, lastUpdated } = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  ogImage={ogImage}
+  jsonLD={jsonLD}
+  showChrome={false}
+  lastUpdated={lastUpdated}
+>
+  <div class="cal-app rails-on">
+    <Masthead />
+    <slot />
+    <CalendarFooter lastUpdated={lastUpdated} />
+  </div>
+</BaseLayout>
+
+<style is:global>
+  /* Overrides for the calendar pages. global.scss paints a dark chrome; the
+     warm cream palette lives here. */
+  body:has(.cal-app) {
+    /* Undo global.scss's flex-column layout. .cal-app relies on plain block
+       flow so `max-width` + `margin: 0 auto` centers as expected. */
+    display: block;
+    background: var(--satin-linen);
+    color: var(--prussian-blue);
+    font-family: 'Archivo', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body:has(.cal-app) ::selection {
+    background: var(--sky);
+    color: var(--prussian-blue);
+  }
+</style>
+
+<style>
+  .cal-app {
+    max-width: 82.5rem;
+    margin: 0 auto;
+    padding: 0 clamp(0.875rem, 3.5vw, 2.5rem) 5rem;
+  }
+</style>

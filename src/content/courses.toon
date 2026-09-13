@@ -1,0 +1,187 @@
+meta:
+  title: Courses
+  description: The 2026-2027 course offerings for the GPLLM program at the UofT Jackman faculty of law.
+  og_image: /images/og-image.png
+
+options: null
+
+content:
+  eyebrow: 2026-2027 ACADEMIC YEAR
+  eyebrow_datetime: 2026-09/2027-08
+  heading: Courses
+  intro: All GPLLM courses are attended in person, with no remote option. Classes run on Friday evenings and Saturdays on alternating weekends, with intensive courses in September, December and April.
+  course_url_base: https://www.jackmanlaw.utoronto.ca/gpllm/gpllm-program/course/2026-2027/
+  desc_placeholder: "A full description for {title} will be available soon."
+  last_updated: "2026-09-13"
+
+  concentrations[3]{key,label,short}:
+    cl,Canadian Law,CAN
+    bl,Business Law,BUS
+    ilt,Technology Law,TECH
+
+  program_courses[3]{key,code,kind,title,when,conc,capped,nca,desc}:
+    lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18, 9:30am-4:30pm",cl,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
+    lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
+    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,true,"Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement."
+
+  profile_url_base: https://www.jackmanlaw.utoronto.ca
+
+  profiles[25]{name,path}:
+    Peter L. Biro,/people/peter-l-biro
+    Malcolm Thorburn,/people/malcolm-thorburn
+    Patrick Hartford,/people/patrick-hartford
+    Simone Sepe,/people/simone-sepe
+    Al Hounsell,/people/Al_Hounsell
+    Abraham Drassinower,/people/abraham-drassinower
+    Alex Stack,/people/alex-stack
+    Abdi Aidid,/people/abdi-aidid
+    Erica Richler,/people/erica-richler
+    Anastasia-Maria Hountalas,/people/anastasia-maria-hountalas
+    David Conklin,/people/david-conklin
+    Dera Nevin,/people/dera-nevin
+    David Walders,/people/david-walders
+    Cary Ferguson,/people/cary-ferguson
+    Anthony Mouchantaf,/people/anthony-mouchantaf
+    Carole Piovesan,/people/carole-piovesan
+    Adrienne Smith,/people/adrienne-smith
+    Andrew Matheson,/people/andrew-matheson
+    Tyler Hodgson,/people/tyler-hodgson
+    Larissa Katz,/people/larissa-katz
+    Rosario Cartagena,/people/rosario-cartagena
+    Jagtaran Singh,/people/jagtaran-singh
+    Nathalie Des Rosiers,/people/justice-nathalie-des-rosiers
+    David Goodis,/people/david-goodis
+    Rebecca Durcan,/people/rebecca-durcan
+
+  offerings[35]{ref,room,prof}:
+    alrw,LEC0102,
+    LAW4010H F LEC0102,LEC0102,Patrick Hartford
+    LAW4001H F LEC0101,LEC0101,Simone Sepe
+    LAW4026H F LEC0101,LEC0101,Al Hounsell
+    LAW4008H F LEC0102,LEC0102,Peter L. Biro
+    LAW4009H F LEC0101,LEC0101,Malcolm Thorburn
+    LAW4032H F LEC0101,LEC0101,"Abraham Drassinower, Alex Stack"
+    LAW4002H F LEC0101,LEC0101,David Conklin
+    LAW4008H F LEC0101,LEC0101,"Jagtaran Singh, Nathalie Des Rosiers"
+    LAW4017H F LEC0101,LEC0101,"Erica Richler, Anastasia-Maria Hountalas"
+    LAW4046H F LEC0101,LEC0101,Abdi Aidid
+    LAW4055H F LEC0101,LEC0101,Dera Nevin
+    LAW4072H S LEC0101,LEC0101,David Walders
+    LAW4007H S LEC0102,LEC0102,David Goodis
+    LAW4036H S LEC0101,LEC0101,Patrick Hartford
+    LAW4009H S LEC0101,LEC0101,Malcolm Thorburn
+    LAW4021H S LEC0101,LEC0101,Abdi Aidid
+    LAW4069H S LEC0101,LEC0101,Cary Ferguson
+    LAW4030H S LEC0101,LEC0101,Anthony Mouchantaf
+    LAW4017H S LEC0101,LEC0101,Rebecca Durcan
+    LAW4053H S LEC0101,LEC0101,Simone Sepe
+    LAW4063H S LEC0101,LEC0101,Carole Piovesan
+    LAW4074H S LEC0101,LEC0101,Adrienne Smith
+    LAW4028H S LEC0101,LEC0101,
+    LAW4022H Y LEC0101,LEC0101,
+    LAW4031H Y LEC0101,LEC0101,
+    LAW4075H Y LEC0101,LEC0101,"Andrew Matheson, Tyler Hodgson"
+    LAW4076H Y LEC0101,LEC0101,Joshua Morrison
+    LAW4004H Y LEC0101,LEC0101,
+    LAW4020H Y LEC0101,LEC0101,Larissa Katz
+    LAW4070H Y LEC0101,LEC0101,Abdi Aidid
+    LAW4071H Y LEC0101,LEC0101,
+    LAW4023H Y LEC0101,LEC0101,
+    LAW4003H Y LEC0101,LEC0101,
+    LAW4073H Y LEC0101,LEC0101,Rosario Cartagena
+
+  details[32]{code,credits,slug,desc}:
+    LAW4010H,3,foundations-canadian-law,"An introduction to the Canadian legal system: sources of authority, separation of powers, judicial review and common law reasoning, with attention to Aboriginal peoples and international law."
+    LAW4001H,3,law-and-business-global-economy,"The business law groundwork for the rest of the program, covering corporate governance, securities regulation, insolvency and financial oversight."
+    LAW4026H,3,introduction-law-and-technology,"Starts from first-year foundations in torts, contracts, property, constitutional and criminal law, then asks how technology reshapes each of them and the justice system with them."
+    LAW4008H,3,canadian-constitutional-law,"How Canada's Constitution is structured and interpreted: the division of powers between governments, and the rights it protects, from expression and religion to equality and Indigenous rights."
+    LAW4009H,3,canadian-criminal-law,"The fundamentals of criminal liability: where offences come from, intent and causation, extensions of liability, the defences, and procedure through sentencing and appeal."
+    LAW4032H,3,intellectual-property-law,"Patents, trademarks, copyright and neighbouring rights treated as an asset class, and how they work strategically for a business, especially in technology."
+    LAW4002H,3,comparative-corporate-governance,"The relationships between a company, its directors, management, shareholders and stakeholders, how ESG commitments shape decisions, and what governance failures teach about prevention."
+    LAW4017H,3,professional-responsibility,"The principles governing lawyers' conduct in Canada, centred on the Model Code of Professional Conduct, and how lawyers are licensed and regulated across jurisdictions."
+    LAW4046H,3,privacy-and-data-governance,"Privacy law and how it applies to emerging technology, including AI, data aggregation, surveillance and online advertising, seen from the consumer, business and regulator sides."
+    LAW4055H,3,disruptive-innovations-legal-infrastructure,"Where innovation and regulation fall out of step as new products reach market, and how shifts in legal technology, regulation and funding may reshape legal services."
+    LAW4072H,3,aboriginal-law,"The legal history of Indigenous-Crown relations from contact through treaties and the Indian Act, then the live questions: Aboriginal rights, modern agreements, the duty to consult and UNDRIP."
+    LAW4007H,3,canadian-administrative-law,"How government actually operates: the procedures, limits and jurisdiction of agencies and tribunals, and when public bodies answer to administrative law rather than to contract or tort."
+    LAW4036H,3,applied-contract-law,"Contract principles worked through business situations rather than doctrine alone, including digital agreements and breach of confidence, using leading Canadian cases."
+    LAW4021H,3,tort-law,"Disputes that arise when one person injures another or damages their property, the competing theories behind tort law, and the alternatives to tort for compensating injury."
+    LAW4069H,3,electrification-and-energy-transition-law-and-policy,"The law and regulation of Ontario's energy system and its decarbonisation, from electrifying transport and heating to electricity market structure and renewable deployment."
+    LAW4030H,3,financing-technological-innovation,"How technology companies raise money: the financing structures and legal arrangements used in the innovation sector, and the economics that shape them."
+    LAW4053H,3,law-and-regulation-banks-and-financial-institutions,The legal and regulatory framework governing banks and financial institutions.
+    LAW4063H,3,regulation-artificial-intelligence-legal-and-practical-study,"How artificial intelligence is being regulated around the world: the technical groundwork, the policy frameworks governments have built, and the data privacy law surrounding them."
+    LAW4074H,3,immigration-law,"Canada's temporary and permanent immigration pathways and the balance struck between economic policy and human rights obligations, with guest practitioners throughout."
+    LAW4028H,3,blockchain-digital-assets-and-law,"How blockchain works and where it is used, then the Canadian legal questions it raises across securities, privacy, tax, anti-money laundering, intellectual property and cybersecurity."
+    LAW4022H,3,contract-law,"What makes an agreement binding, what follows when it is broken, the remedies available, and how a contract reaches people who never signed it."
+    LAW4031H,3,cybersecurity-and-data-protection-global-information-economy,"The law and policy of cybersecurity: what government and private organisations must do to protect systems and networks, including national security and cross-border questions."
+    LAW4075H,3,financial-crime-global-context,"Financial crime across jurisdictions and how corporations and individuals are held to account, from detection through prosecution, including conflicts between national regimes."
+    LAW4076H,3,artificial-intelligence-policy-ethics-and-legal-governance,"Where artificial intelligence meets Canadian law and regulation, examined through real applications and set against the approaches taken in the United States, the EU and elsewhere."
+    LAW4004H,3,mergers-and-acquisitions,"The law of major corporate transactions, including cross-border deals, worked through real examples of how legal rules meet business practice and negotiation."
+    LAW4020H,3,property-law,"Real and personal property in Canadian common law: possession, ownership, adverse possession, estates, easements, and how competing claims to land get resolved."
+    LAW4070H,3,ethics-emerging-technology,"The ethical, legal and social questions raised by AI and platforms, with frameworks for responsible development and case studies on bias, privacy and accountability."
+    LAW4071H,3,family-law,"Family law past marriage and divorce: parentage, domestic contracts, the rights of unmarried cohabitants and dispute resolution, under both federal and Ontario legislation."
+    LAW4023H,3,business-organizations,"Sole proprietorships, partnerships and corporations compared, with the weight on corporate governance and the fiduciary duties directors and officers owe."
+    LAW4003H,3,securities-regulation-and-corporate-finance,"How businesses raise capital: exemptions in the private markets, the obligations that come with going public, insider duties, and the regulation of market intermediaries."
+    LAW4073H,3,data-law-health-perspective,"Data law applied to health care, across privacy, cybersecurity, intellectual property and AI, for students who will advise or lead inside a health system."
+    LAW4024H,3,applied-legal-research-and-writing,"Finding legal information, judging it critically and communicating the answer clearly: the research-to-writing path lawyers take on a hard question."
+
+  catalog[31]{code,title,conc,capped,nca,req}:
+    LAW4026H,Introduction to Law and Technology,ilt,false,false,true
+    LAW4010H,Foundations of Canadian Law,cl,true,false,true
+    LAW4001H,Law and Business in a Global Economy,bl,false,false,true
+    LAW4008H,Constitutional Law,cl,true,true,false
+    LAW4009H,Criminal Law,cl,true,true,false
+    LAW4032H,Intellectual Property Law,bl,false,false,false
+    LAW4002H,Comparative Corporate Governance,bl,false,false,false
+    LAW4017H,Professional Responsibility,cl,true,true,false
+    LAW4046H,Privacy and Data Governance,ilt,false,false,false
+    LAW4055H,"Disruptive Innovations & Legal Infrastructure",ilt,false,false,false
+    LAW4072H,Aboriginal Law,cl,true,false,false
+    LAW4007H,Administrative Law,cl,true,true,false
+    LAW4036H,Applied Contract Law,bl,false,false,false
+    LAW4021H,Tort Law,cl,true,false,false
+    LAW4069H,"Electrification and the Energy Transition: Law and Policy",bl,false,false,false
+    LAW4030H,Financing Technological Innovation,ilt,false,false,false
+    LAW4053H,Law and Regulation of Banks and Financial Institutions,bl,false,false,false
+    LAW4063H,"Regulation of Artificial Intelligence: A Legal and Practical Study",ilt,false,false,false
+    LAW4074H,Immigration Law,cl,true,false,false
+    LAW4028H,"Blockchain, Digital Assets, and the Law",bl,false,false,false
+    LAW4022H,Contract Law,cl,true,false,false
+    LAW4031H,"Cybersecurity & Data Protection",ilt,false,false,false
+    LAW4075H,Financial Crime in a Global Context,bl,false,false,false
+    LAW4076H,"Artificial Intelligence: Policy, Ethics, and Legal Governance",cl,true,false,false
+    LAW4004H,"Mergers & Acquisitions",bl,false,false,false
+    LAW4020H,Property Law,cl,true,false,false
+    LAW4070H,Ethics of Emerging Technology,ilt,false,false,false
+    LAW4071H,Family Law,cl,true,false,false
+    LAW4023H,Business Organizations,cl,true,false,false
+    LAW4003H,Securities Regulation and Corporate Finance,bl,false,false,false
+    LAW4073H,"Data Law: A Health Perspective",ilt,false,false,false
+
+  terms:
+    fall:
+      no: "01"
+      label: Fall
+      range: September 25 – November 21, 2026
+      slots[5]{name,time,courses,note}:
+        Program Foundations,September 10-20,lm-cdn|lm-bus|alrw,"Intensives that run before the fall term begins. Attend the stream for your concentration"
+        Friday Evenings,4:00pm-9:00pm,LAW4010H F LEC0102|LAW4001H F LEC0101|LAW4026H F LEC0101,"Every student takes the Friday evening course for their concentration in the fall term. It counts as one of the ten required courses"
+        Saturday Mornings,8:30am-1:00pm,LAW4008H F LEC0102|LAW4009H F LEC0101|LAW4032H F LEC0101,""
+        Saturday Afternoons,2:00pm-6:30pm,LAW4002H F LEC0101|LAW4008H F LEC0101|LAW4017H F LEC0101|LAW4046H F LEC0101,""
+        December Intensive,"December 11-13 & 18-20",LAW4055H F LEC0101|LAW4072H S LEC0101,"Friday evenings 4:00pm-9:00pm, Saturdays 8:30am-5:30pm, Sundays 9:00am-1:30pm Dates and times may change"
+    winter:
+      no: "02"
+      label: Winter
+      range: January 8 – March 20, 2027
+      slots[4]{name,time,courses,note}:
+        Friday Evenings,4:00pm-9:00pm,LAW4007H S LEC0102|LAW4036H S LEC0101,""
+        Saturday Mornings,8:30am-1:00pm,LAW4009H S LEC0101|LAW4021H S LEC0101|LAW4069H S LEC0101|LAW4030H S LEC0101,""
+        Saturday Afternoons,2:00pm-6:30pm,LAW4017H S LEC0101|LAW4053H S LEC0101|LAW4063H S LEC0101|LAW4074H S LEC0101,""
+        April Intensive,"April 9-11, 16-18 & 23-25",LAW4028H S LEC0101|LAW4072H S LEC0101,"Friday evenings 4:00pm-9:00pm, Saturdays 8:30am-5:30pm, Sundays 9:00am-2:30pm Dates and times may change"
+    summer:
+      no: "03"
+      label: Summer
+      range: April 30 – June 19, 2027
+      slots[3]{name,time,courses,note}:
+        Friday Evenings,4:00pm-9:00pm,LAW4022H Y LEC0101|LAW4031H Y LEC0101|LAW4075H Y LEC0101|LAW4076H Y LEC0101,""
+        Saturday Mornings,8:30am-1:00pm,LAW4004H Y LEC0101|LAW4020H Y LEC0101|LAW4070H Y LEC0101|LAW4071H Y LEC0101,""
+        Saturday Afternoons,2:00pm-6:30pm,LAW4023H Y LEC0101|LAW4003H Y LEC0101|LAW4073H Y LEC0101,""

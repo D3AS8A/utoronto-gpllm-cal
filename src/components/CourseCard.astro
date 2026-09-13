@@ -1,0 +1,599 @@
+---
+import ExternalIcon from './ExternalIcon.astro';
+
+export interface CourseDef {
+  /** Course code, e.g. LAW4008H. Absent on non-credit program courses. */
+  code?: string;
+  /** Stands in for the code when there isn't one, e.g. "Non-credit intensive". */
+  kind?: string;
+  title: string;
+  /** Schedule line for courses that don't follow their slot's times. */
+  when?: string;
+  conc: string[];
+  credits?: number;
+  /** Path of this course's page on the faculty site. */
+  slug?: string;
+  capped: boolean;
+  nca: boolean;
+  req: boolean;
+  /** Official description. The placeholder renders until one is provided. */
+  desc?: string;
+}
+
+/** One scheduled run of a course. Instructor and room both vary between the
+ *  offerings of the same course, so they live here rather than on the course. */
+/** One scheduled run of a course: when it meets, where, and who teaches it. */
+export interface RunDef {
+  term: string;
+  slot: string;
+  time: string;
+  room: string;
+  people: Array<{ name: string; url?: string }>;
+}
+
+interface Props {
+  course: CourseDef;
+  /** Every run of this course across the year, in calendar order. */
+  runs: RunDef[];
+  /** Names this course's other run, shown only in the time-of-day view. */
+  alsoTag?: string;
+  /** The time view already groups by slot, so the run lines are redundant there. */
+  showRuns?: boolean;
+  concLabels: Record<string, { label: string; short: string }>;
+  placeholder: string;
+  /** Prefix the course slug is appended to. */
+  urlBase: string;
+}
+const { course, runs, alsoTag, showRuns = true, concLabels, placeholder, urlBase } = Astro.props;
+
+/** "Saturday Mornings" reads as shouting mid-sentence; "Saturday mornings" doesn't. */
+const sentence = (slot: string) => slot.charAt(0) + slot.slice(1).toLowerCase();
+const desc = course.desc || placeholder.replace('{title}', course.title);
+
+// The collapsed bar carries only what a student filters or scans on
+const flags = [
+  alsoTag ?? null,
+  course.req ? 'Required' : null,
+  course.nca ? 'NCA' : null,
+].filter((f) => f !== null);
+
+// Open cards gather everything into one row. The bar's flags travel here, so
+// they are marked to get the slide-in treatment; the rest are simply present.
+// Room is per run, so it stays with its run rather than sitting here.
+const panelTags = [
+  ...flags.map((label) => ({ label, fromBar: true })),
+  course.capped ? { label: 'Capped at 60', fromBar: false } : null,
+  course.credits ? { label: `${course.credits} credits`, fromBar: false } : null,
+].filter((tag) => tag !== null);
+---
+
+<details class="course-card" data-conc={course.conc.join(' ')}>
+  <summary class="course-summary">
+    <div class="course-main">
+      <p class={course.code ? 'course-code' : 'course-kind'}>{course.code ?? course.kind}</p>
+      <h4 class="course-title">{course.title}</h4>
+      <p class="course-conc">
+        {course.conc.map((key, i) => (
+          <>
+            {i > 0 && <span class="course-conc-sep" aria-hidden="true">and</span>}
+            <span class={`conc-${key}`}>{concLabels[key]?.label}</span>
+          </>
+        ))}
+      </p>
+      {course.when ? (
+        <p class="course-when">{course.when}</p>
+      ) : showRuns ? (
+        <ul class="course-runs" role="list">
+          {runs.map((run) => (
+            <li>{run.term}, {sentence(run.slot)} {run.time}</li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+
+    {flags.length > 0 && (
+      <p class="course-flags">
+        {flags.map((flag) => <span class="course-flag">{flag}</span>)}
+      </p>
+    )}
+
+    <span class="course-toggle" aria-hidden="true">+</span>
+  </summary>
+
+  <div class="course-desc">
+    <div class="course-desc-inner">
+      {runs.some((run) => run.people.length > 0 || run.room) && (
+        <dl class="course-facts">
+          {runs.map((run) => (
+            <div class="course-fact">
+              <dt>
+                {runs.length > 1 ? `${run.term}, ${sentence(run.slot)}` : 'Taught by'}
+                {run.room && <span class="course-room">{run.room}</span>}
+              </dt>
+              <dd>
+                {run.people.length > 0
+                  ? run.people.map((person) => (
+                      <span class="course-prof-name">
+                        {person.url ? (
+                          <a class="course-prof-link" href={person.url} target="_blank" rel="noopener noreferrer">
+                            {person.name}
+                            <ExternalIcon size="0.6875rem" />
+                            <span class="sr-only">Faculty profile, opens in a new tab</span>
+                          </a>
+                        ) : (
+                          person.name
+                        )}
+                      </span>
+                    ))
+                  : 'Instructor to be announced'}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {panelTags.length > 0 && (
+        <p class="course-panel-tags">
+          {panelTags.map((tag) => (
+            tag.fromBar
+              ? <span class="tag-slot"><span class="course-flag">{tag.label}</span></span>
+              : <span class="course-flag">{tag.label}</span>
+          ))}
+        </p>
+      )}
+
+      <p>{desc}</p>
+
+      {course.slug && (
+        <a class="course-link" href={`${urlBase}${course.slug}`} target="_blank" rel="noopener noreferrer">
+          Full course page
+          <ExternalIcon />
+          <span class="sr-only">Opens on the faculty site in a new tab</span>
+        </a>
+      )}
+    </div>
+  </div>
+</details>
+
+<!--
+  Native <details> snaps open. This animates the panel's height with the Web
+  Animations API instead, keeping the element's semantics (and its keyboard
+  and screen-reader behaviour) intact. Bundled once per page and delegated,
+  so all cards share a single listener.
+-->
+<script>
+  const DURATION = 320;
+  const EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+  const HANDOFF_DURATION = 680;
+  // Lets the bar's flag clear the row before its twin arrives
+  const HANDOFF_DELAY = 90;
+  // Overshoots, so the tags it pushes rebound rather than stopping dead
+  const HANDOFF_EASE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
+
+  interface AnimatedDetails extends HTMLDetailsElement {
+    __anim?: Animation | null;
+  }
+
+  function toggleCard(card: AnimatedDetails, opening: boolean) {
+    const panel = card.querySelector<HTMLElement>('.course-desc');
+    const inner = card.querySelector<HTMLElement>('.course-desc-inner');
+    if (!panel || !inner) return;
+
+    // Drives the +/× glyph immediately, ahead of [open] flipping on close
+    card.dataset.state = opening ? 'open' : 'closed';
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      card.open = opening;
+      return;
+    }
+
+    if (opening) slideTagsIn(card);
+
+    card.__anim?.cancel();
+
+    // The wrapper has no padding of its own, so it can reach a true zero.
+    // border-box would otherwise floor its height at the panel's padding
+    const from = opening ? 0 : inner.offsetHeight;
+    if (opening) card.open = true;
+    const to = opening ? inner.offsetHeight : 0;
+
+    const anim = panel.animate(
+      [
+        { height: `${from}px`, opacity: opening ? 0 : 1 },
+        { height: `${to}px`, opacity: opening ? 1 : 0 },
+      ],
+      { duration: DURATION, easing: EASE },
+    );
+    card.__anim = anim;
+
+    anim.finished
+      .then(() => {
+        card.__anim = null;
+        // Held open through the collapse so the panel stays visible while it shrinks
+        if (!opening) card.open = false;
+      })
+      .catch(() => {});
+  }
+
+  /**
+   * The flag that just left the bar arrives at the left of the panel's tag row.
+   * Its slot grows from zero width, which pushes the tags after it to the
+   * right, while the pill itself slides in clipped by that slot.
+   */
+  function slideTagsIn(card: HTMLElement) {
+    card.querySelectorAll<HTMLElement>('.tag-slot').forEach((slot) => {
+      const pill = slot.firstElementChild as HTMLElement | null;
+      if (!pill) return;
+      const width = pill.offsetWidth;
+      if (!width) return;
+
+      slot.animate(
+        [{ width: '0px' }, { width: `${width}px` }],
+        { duration: HANDOFF_DURATION, delay: HANDOFF_DELAY, easing: HANDOFF_EASE, fill: 'backwards' },
+      );
+      pill.animate(
+        [{ transform: 'translateX(-115%)' }, { transform: 'none' }],
+        { duration: HANDOFF_DURATION, delay: HANDOFF_DELAY, easing: HANDOFF_EASE, fill: 'backwards' },
+      );
+    });
+  }
+
+  if (!(window as any).__courseCardsBound) {
+    (window as any).__courseCardsBound = true;
+
+    document.addEventListener('click', (event) => {
+      const summary = (event.target as HTMLElement)?.closest?.('.course-summary');
+      if (!summary) return;
+      const card = summary.parentElement as AnimatedDetails | null;
+      if (!card?.classList.contains('course-card')) return;
+
+      event.preventDefault();
+      toggleCard(card, !card.open);
+    });
+  }
+</script>
+
+<style>
+  /* The concentration is a painted edge down the card rather than a badge.
+     Courses open to two concentrations blend from one into the other, holding
+     each colour solid at its end so both stay identifiable. Single-concentration
+     cards set both stops to the same colour, so the ramp renders flat. */
+  .course-card {
+    /* Margin rather than a parent gap, so a filtered-out card can collapse its
+       spacing along with its height */
+    margin-bottom: 0.5rem;
+    padding-left: 1.375rem;
+    background-color: #fff;
+    background-image: linear-gradient(to bottom, var(--c1) 0 20%, var(--c2) 80% 100%);
+    background-size: 0.375rem 100%;
+    background-repeat: no-repeat;
+    background-position: left top;
+    border-radius: 0.5rem;
+    overflow: hidden;
+    box-shadow:
+      0 0.0625rem 0.125rem rgb(42 29 10 / 0.04),
+      0 0.25rem 0.75rem rgb(42 29 10 / 0.05);
+    transition: box-shadow 200ms ease;
+  }
+
+  .course-card[data-conc='cl']     { --c1: var(--stiletto); --c2: var(--stiletto); }
+  .course-card[data-conc='bl']     { --c1: var(--matisse);  --c2: var(--matisse); }
+  .course-card[data-conc='ilt']    { --c1: var(--sky);      --c2: var(--sky); }
+  .course-card[data-conc='bl ilt'] { --c1: var(--matisse);  --c2: var(--sky); }
+
+  .course-card:hover {
+    box-shadow:
+      0 0.125rem 0.25rem rgb(42 29 10 / 0.05),
+      0 0.5rem 1.25rem rgb(42 29 10 / 0.08);
+  }
+
+  .course-summary {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: baseline;
+    gap: 0.25rem 1.25rem;
+    padding: 0.8125rem 1rem 0.875rem 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .course-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* The code is how a course is picked on the enrolment form, so it leads;
+     the name reads as its expansion underneath. Courses without a code put
+     their kind here instead, set identically */
+  .course-code,
+  .course-kind {
+    font-size: 1.0625rem;
+    line-height: 1.15;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    color: var(--driftwood);
+    margin: 0;
+  }
+
+  .course-code {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .course-title {
+    font-size: 1rem;
+    line-height: 1.3;
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin: 0.25rem 0 0.1875rem;
+  }
+
+  .course-conc {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  .course-conc-sep {
+    color: var(--pablo);
+    font-weight: 400;
+    margin: 0 0.1875rem;
+  }
+
+  .conc-cl  { color: var(--stiletto); }
+  .conc-bl  { color: var(--matisse); }
+  .conc-ilt { color: var(--sky-ink); }
+
+  .course-runs {
+    margin: 0.3125rem 0 0;
+    padding: 0;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.45;
+    color: var(--pablo);
+  }
+
+  .course-runs li {
+    list-style: none;
+  }
+
+  .course-room {
+    margin-left: 0.375rem;
+    font-weight: 500;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    color: var(--driftwood);
+  }
+
+  .course-when {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--pablo);
+    margin: 0.1875rem 0 0;
+  }
+
+  /* Clips its flag as that flag exits upward on open */
+  .course-flags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.3125rem;
+    margin: 0;
+    overflow: hidden;
+    transition: visibility 0s;
+  }
+
+  .course-flags .course-flag {
+    transition: transform 480ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Gone from the bar, and out of the accessibility tree once it has left, so
+     it isn't read twice alongside its twin in the panel */
+  .course-card[open] .course-flags,
+  .course-card[data-state='open'] .course-flags {
+    visibility: hidden;
+    transition: visibility 0s linear 480ms;
+  }
+
+  .course-card[open] .course-flags .course-flag,
+  .course-card[data-state='open'] .course-flags .course-flag {
+    transform: translateY(-160%);
+  }
+
+  /* Set the instant a card is clicked shut, while [open] still lingers */
+  .course-card[data-state='closed'] .course-flags {
+    visibility: visible;
+    transition: visibility 0s;
+  }
+
+  .course-card[data-state='closed'] .course-flags .course-flag {
+    transform: none;
+  }
+
+  /* Zero-width on arrival, widening to shove the tags after it along */
+  .tag-slot {
+    display: inline-flex;
+    overflow: hidden;
+  }
+
+  .course-flag {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    padding: 0.1875rem 0.5rem;
+    border-radius: 62.4375rem;
+    color: var(--driftwood);
+    background: rgb(147 110 66 / 0.12);
+    white-space: nowrap;
+  }
+
+  /* A fixed square with the glyph centred, so the rotation pivots on the
+     cross itself rather than on a text box that is taller than it is wide */
+  .course-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    align-self: start;
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: var(--driftwood);
+    line-height: 1;
+    /* Rotation and hover scale compose in one transform */
+    --toggle-rotate: 0deg;
+    --toggle-scale: 1;
+    transform: rotate(var(--toggle-rotate)) scale(var(--toggle-scale));
+    transition: transform 200ms ease, color 200ms ease;
+  }
+
+  .course-card[open] .course-toggle,
+  .course-card[data-state='open'] .course-toggle {
+    --toggle-rotate: 45deg;
+  }
+
+  /* Set the instant a card is clicked. On close it beats [open], which
+     lingers until the collapse finishes */
+  .course-card[data-state='closed'] .course-toggle {
+    --toggle-rotate: 0deg;
+  }
+
+  @media (hover: hover) {
+    .course-card:hover .course-toggle {
+      --toggle-scale: 1.35;
+      color: var(--bronzetone);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .course-toggle,
+    .course-flags,
+    .course-flags .course-flag {
+      transition: none;
+    }
+  }
+
+  .course-desc {
+    overflow: hidden;
+  }
+
+  .course-desc-inner {
+    padding: 0 1.75rem 1rem 0;
+  }
+
+  .course-facts {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.3125rem 1rem;
+    margin: 0 0 0.375rem;
+    font-size: 0.8125rem;
+  }
+
+  /* Scoped through the parent: `.course-desc-inner p` sets margin: 0 and would
+     otherwise outrank a lone class on this <p> */
+  .course-desc-inner .course-panel-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.3125rem;
+    margin: 0 0 1.125rem;
+  }
+
+  .course-fact {
+    display: contents;
+  }
+
+  .course-facts dt {
+    color: var(--pablo);
+    font-weight: 500;
+  }
+
+  .course-facts dd {
+    margin: 0;
+    color: var(--oxford-blue);
+    font-weight: 600;
+  }
+
+  .course-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-top: 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--driftwood);
+    text-underline-offset: 0.1875rem;
+  }
+
+  .course-link:hover {
+    color: var(--bronzetone);
+  }
+
+  /* inline-flex so the markup's own newlines are dropped rather than rendering
+     as a space before the comma; the gap between names comes from the
+     whitespace between the spans themselves */
+  .course-prof-name {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .course-prof-name:not(:last-child)::after {
+    content: ',';
+  }
+
+  /* map() renders these adjacent, so the space after the comma is set here
+     rather than relying on whitespace in the markup */
+  .course-prof-name:not(:last-child) {
+    margin-right: 0.3125rem;
+  }
+
+  .course-prof-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--oxford-blue);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .course-prof-link:hover {
+    color: var(--driftwood);
+    text-decoration: underline;
+    text-underline-offset: 0.1875rem;
+  }
+
+  .course-desc-inner p {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--oxford-blue);
+    margin: 0;
+    max-width: 44ch;
+  }
+
+  @media (max-width: 40rem) {
+    /* Everything placed explicitly: auto-placement pushed the toggle onto a
+       row of its own once the flags claimed column 1 */
+    .course-summary {
+      grid-template-columns: 1fr auto;
+    }
+
+    .course-main {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .course-toggle {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    .course-flags {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: flex-start;
+      margin-top: 0.375rem;
+    }
+
+    .course-desc-inner {
+      padding-right: 1rem;
+    }
+  }
+</style>

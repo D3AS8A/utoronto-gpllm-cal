@@ -38,3 +38,11 @@ export function loadGlobal(): GlobalContent {
 export function loadPage<C = Record<string, unknown>>(name: string): PageContent<C> {
   return decode(readToon(`${name}.toon`)) as unknown as PageContent<C>;
 }
+
+/**
+ * Page name → ISO date its content last changed, stamped into
+ * src/content/modified.toon by the pre-commit hook.
+ */
+export function loadModified(): Record<string, string> {
+  return decode(readToon('modified.toon')) as unknown as Record<string, string>;
+}

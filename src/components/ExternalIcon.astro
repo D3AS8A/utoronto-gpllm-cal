@@ -1,0 +1,31 @@
+---
+interface Props {
+  /** Matched to the text it sits beside. */
+  size?: string;
+}
+const { size = '0.75rem' } = Astro.props;
+---
+<svg
+  class="ext-icon"
+  style={`width:${size};height:${size}`}
+  viewBox="0 0 16 16"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.6"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d="M6.5 3H3.5A1.5 1.5 0 0 0 2 4.5v8A1.5 1.5 0 0 0 3.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-3" />
+  <path d="M10 2h4v4" />
+  <path d="M7.25 8.75 14 2" />
+</svg>
+
+<style>
+  .ext-icon {
+    flex: none;
+    display: inline-block;
+    vertical-align: -0.0625em;
+  }
+</style>

@@ -1,0 +1,448 @@
+---
+const links = [
+  { label: 'Calendar', href: '/calendar' },
+  { label: 'Courses', href: '/courses' },
+  // Information is built at /information but kept out of the nav for now
+];
+
+// Normalised so `/`, `/index.html`, and `/courses/` all match their link.
+const pathname = normalise(Astro.url.pathname);
+
+function normalise(path: string): string {
+  return path.replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
+}
+
+function isActive(href: string): boolean {
+  const target = normalise(href);
+  return target === '/'
+    ? pathname === '/'
+    : pathname === target || pathname.startsWith(`${target}/`);
+}
+---
+
+<!-- Double lavalamp nav -->
+<nav
+  class="cal-nav"
+  aria-label="Main navigation"
+  transition:persist="main-nav"
+  x-data="calNav"
+  :class="{ 'is-ready': ready, 'is-tumbling': tumbling, 'is-arriving': arriving }"
+>
+  <ul
+    class="cal-nav-list"
+    role="list"
+    x-ref="list"
+    @mouseleave="reset()"
+    @focusout="if (!$el.contains($event.relatedTarget)) reset()"
+  >
+    <span
+      class="cal-nav-lava-hover"
+      :style="`left: ${hoverLeft}px; top: ${hoverTop}px; width: ${hoverWidth}px; height: ${hoverHeight}px`"
+      aria-hidden="true"
+    ></span>
+
+    <span
+      class="cal-nav-lava"
+      x-ref="lava"
+      :style="`left: ${left}px; top: ${top}px; width: ${width}px; height: ${height}px`"
+      aria-hidden="true"
+    ></span>
+
+    {links.map(({ label, href }) => (
+      <li>
+        <a
+          href={href}
+          class="cal-nav-link"
+          aria-current={isActive(href) ? 'page' : undefined}
+          @mouseenter="hover($el, true)"
+          @focus="hover($el, true)"
+        >
+          {label}
+        </a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<!--
+  is:inline so this runs before Alpine's bundled script, allowing
+  alpine:init to register the component before Alpine processes the DOM.
+-->
+<script is:inline>
+  /**
+   * Runs on the next frame, or after a short wait if that never arrives.
+   *
+   * requestAnimationFrame does not fire in every context: Safari withholds it
+   * in some windows, and any browser throttles it in a background tab. Gating
+   * anything on rAF alone therefore risks never running at all, which left the
+   * nav's blocks stranded at opacity 0 in Safari. Whichever callback lands
+   * first wins; the other is dropped.
+   */
+  function onNextFrame(fn) {
+    let done = false;
+    const once = () => {
+      if (done) return;
+      done = true;
+      fn();
+    };
+    requestAnimationFrame(once);
+    setTimeout(once, 120);
+  }
+
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('calNav', () => ({
+      left: 0,
+      top: 0,
+      width: 0,
+      height: 0,
+      hoverLeft: 0,
+      hoverTop: 0,
+      hoverWidth: 0,
+      hoverHeight: 0,
+      ready: false,
+      tumbling: false,
+      arriving: false,
+      flipTimer: null,
+      flashTimers: [],
+      activeIndex: null,
+      anim: null,
+
+      init() {
+        this.onPageLoad = () => this.sync();
+        document.addEventListener('astro:page-load', this.onPageLoad);
+
+        this.$nextTick(() => {
+          this.reset();
+          // Enable transitions after first snap, so blocks don't slide from corner
+          onNextFrame(() => { this.ready = true; });
+          // Webfonts land after first paint and change the link widths
+          document.fonts?.ready.then(() => this.reset());
+        });
+      },
+
+      destroy() {
+        document.removeEventListener('astro:page-load', this.onPageLoad);
+      },
+
+      items() {
+        return [...this.$refs.list.querySelectorAll('.cal-nav-link')];
+      },
+
+      // Mirrors isActive() in the frontmatter, for the persisted node
+      sync() {
+        const path = this.normalise(location.pathname);
+        const items = this.items();
+        let next = -1;
+        items.forEach((el, i) => {
+          const target = this.normalise(new URL(el.href).pathname);
+          const active = target === '/'
+            ? path === '/'
+            : path === target || path.startsWith(`${target}/`);
+          if (active) { next = i; el.setAttribute('aria-current', 'page'); }
+          else el.removeAttribute('aria-current');
+        });
+
+        const prev = this.activeIndex;
+        this.activeIndex = next === -1 ? null : next;
+        if (prev == null || next === -1 || next === prev) { this.reset(); return; }
+        this.tumble(items, prev, next);
+      },
+
+      normalise(path) {
+        return path.replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
+      },
+
+      hover(el, fromPointer = false) {
+        // A tap on a touch screen fires mouseenter with no mouseleave to
+        // follow, which would leave the hover block parked on whatever was
+        // last tapped. Only a real pointer gets to move it.
+        if (fromPointer && !matchMedia('(hover: hover)').matches) return;
+
+        this.hoverLeft = el.offsetLeft;
+        this.hoverTop = el.offsetTop;
+        this.hoverWidth = el.offsetWidth;
+        this.hoverHeight = el.offsetHeight;
+      },
+
+      /** Stops any journey in flight and clears what it scheduled. */
+      settle() {
+        this.anim?.cancel();
+        this.anim = null;
+        this.tumbling = false;
+        this.arriving = false;
+        clearTimeout(this.flipTimer);
+        this.flashTimers.forEach(clearTimeout);
+        this.flashTimers = [];
+        this.items().forEach((el) => el.classList.remove('is-flash'));
+      },
+
+      park(el) {
+        this.left = el.offsetLeft;
+        this.top = el.offsetTop;
+        this.width = el.offsetWidth;
+        this.height = el.offsetHeight;
+        this.hover(el);
+      },
+
+      reset() {
+        const items = this.items();
+        const i = items.findIndex((el) => el.getAttribute('aria-current') === 'page');
+        this.activeIndex = i === -1 ? null : i;
+        if (i === -1) {
+          this.width = 0;
+          this.hoverWidth = 0;
+          return;
+        }
+        this.park(items[i]);
+      },
+
+      // block tumbles rotationally 
+      tumble(items, from, to) {
+        const dest = items[to];
+        const sameRow = items.every((el) => el.offsetTop === dest.offsetTop);
+
+        // Needs a single row to roll along, and motion allowed. Touch is fine:
+        // a tap has no hover to lead the block, but the journey is driven by
+        // navigation rather than by the pointer. What looked like a broken
+        // tumble on iOS was the blocks sitting at opacity 0, because the
+        // requestAnimationFrame that unlocks them never fired there.
+        const canTumble =
+          sameRow && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!canTumble) {
+          this.settle();
+          this.reset();
+          return;
+        }
+
+        // Interrupted mid-journey. The block is somewhere in mid-air, so a
+        // fresh tumble would start from a seat it never reached and jump to
+        // get there. Slide to the new target instead.
+        if (this.anim) {
+          this.settle();
+          onNextFrame(() => this.park(dest));
+          return;
+        }
+
+        this.park(dest);
+
+        const h = dest.offsetHeight;
+        const dir = to > from ? 1 : -1;
+        const hops = [];
+        for (let i = from; i !== to; i += dir) hops.push([items[i], items[i + dir]]);
+
+        const EASE_TIP  = 'cubic-bezier(0.55, -0.28, 0.75, 0.25)';
+        const EASE_DROP = 'cubic-bezier(0.5, 0.04, 0.74, 0.28)';
+        const EASE_RISE = 'cubic-bezier(0.22, 0.52, 0.42, 0.9)';
+        const EASE_RUSH = 'cubic-bezier(0.3, 0, 0.7, 0.55)';
+        const EASE_ROCK_UP   = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+        const EASE_ROCK_DOWN = 'cubic-bezier(0.55, 0.085, 0.68, 0.53)';
+
+        const HOP_FAST = 420;
+        const HOP_FULL = 1250;
+        const n = hops.length;
+        const durs = hops.map((_, k) => (k === n - 1 ? HOP_FULL : HOP_FAST));
+        const total = durs.reduce((a, b) => a + b, 0);
+        const starts = [0];
+        durs.forEach((d) => starts.push(starts[starts.length - 1] + d / total));
+
+        const frames = [];
+        hops.forEach(([a, b], k) => {
+          const t0 = starts[k];
+          const t1 = starts[k + 1];
+          const L = t1 - t0;
+          const last = k === n - 1;
+          const xa = a.offsetLeft, wa = a.offsetWidth;
+          const xb = b.offsetLeft, wb = b.offsetWidth;
+          const wm = h * 1.8; // pinch to a short rect at vertical, then grow to the destination
+          const pivot = dir === 1 ? xa + wa : xa;
+          const down = k === 0 ? EASE_TIP : EASE_DROP;
+          const up = last ? EASE_RUSH : EASE_RISE;
+          const A = dir === 1
+            ? { o: '100% 100%', rot: -90, leftMid: `${pivot - wm}px` }
+            : { o: '0% 100%',   rot: 90,  leftMid: `${pivot}px` };
+          const B = dir === 1
+            ? { o: '0% 100%',   rot: 90,  leftMid: `${pivot - h}px` }
+            : { o: '100% 100%', rot: -90, leftMid: `${pivot + h - wm}px` };
+          const seam = t0 + (last ? 0.3 : 0.5) * L;
+
+          frames.push(
+            { offset: t0,   easing: down, transformOrigin: A.o, transform: 'rotate(0deg)',        left: `${xa}px`, width: `${wa}px` },
+            { offset: seam,               transformOrigin: A.o, transform: `rotate(${A.rot}deg)`, left: A.leftMid, width: `${wm}px` },
+            { offset: seam, easing: up,   transformOrigin: B.o, transform: `rotate(${B.rot}deg)`, left: B.leftMid, width: `${wm}px` },
+          );
+
+          if (!last) {
+            frames.push(
+              { offset: t1, transformOrigin: B.o, transform: 'rotate(0deg)', left: `${xb}px`, width: `${wb}px` },
+            );
+            return;
+          }
+
+          const sgn = dir === 1 ? 1 : -1;
+          const at = (f, deg, easing) => ({
+            offset: t0 + f * L,
+            ...(easing ? { easing } : {}),
+            transformOrigin: B.o,
+            transform: `rotate(${deg}deg)`,
+            left: `${xb}px`,
+            width: `${wb}px`,
+          });
+          const BOUNCES = [15, 6];
+          const SLOTS   = [0.3, 0.24];
+          let tc = 0.46; // touchdown, after the rushed ascent
+          BOUNCES.forEach((amp, i) => {
+            frames.push(
+              at(tc, 0, EASE_ROCK_UP),
+              at(tc + SLOTS[i] * 0.5, sgn * amp, EASE_ROCK_DOWN),
+            );
+            tc += SLOTS[i];
+          });
+          frames.push(at(1, 0));
+        });
+
+        this.tumbling = true;
+        clearTimeout(this.flipTimer);
+        this.flashTimers.forEach(clearTimeout);
+        this.flashTimers = [];
+        items.forEach((el) => el.classList.remove('is-flash'));
+        this.arriving = true;
+        this.flipTimer = setTimeout(() => { this.arriving = false; }, Math.round(total - 0.64 * HOP_FULL));
+
+        hops.slice(0, -1).forEach(([, mid], k) => {
+          const seat = starts[k + 1] * total;
+          this.flashTimers.push(
+            setTimeout(() => mid.classList.add('is-flash'), Math.max(0, seat - 100)),
+            setTimeout(() => mid.classList.remove('is-flash'), seat + 180),
+          );
+        });
+
+        const anim = this.$refs.lava.animate(frames, { duration: total, fill: 'none' });
+        this.anim = anim;
+
+        // Guarded by identity: cancelling settles asynchronously, so without
+        // this a discarded journey would clear is-tumbling out from under the
+        // journey that replaced it, handing left/width back to the CSS
+        // transition mid-flight.
+        const done = () => {
+          if (this.anim !== anim) return;
+          this.tumbling = false;
+          this.anim = null;
+          items.forEach((el) => el.classList.remove('is-flash'));
+        };
+        anim.finished.then(done).catch(done);
+      },
+    }));
+  });
+</script>
+
+<style>
+  .cal-nav {
+    margin-top: clamp(1rem, 2.5vw, 1.75rem);
+    border-top: 0.125rem solid var(--prussian-blue);
+  }
+
+  .cal-nav-list {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+  }
+
+  .cal-nav-lava,
+  .cal-nav-lava-hover {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .cal-nav-lava {
+    background: var(--prussian-blue);
+    z-index: 1;
+  }
+
+  .cal-nav-lava-hover {
+    background: rgb(0 37 84 / 0.08);
+    z-index: 0;
+  }
+
+  /* Nothing to preview without a cursor: this block exists to run ahead of a
+     pointer, and a tap has no "ahead". Left in, it only shows as a stray tint
+     parked at the destination while the current block tumbles toward it. */
+  @media (hover: none) {
+    .cal-nav-lava-hover {
+      display: none;
+    }
+  }
+
+  .cal-nav.is-ready .cal-nav-lava,
+  .cal-nav.is-ready .cal-nav-lava-hover {
+    opacity: 1;
+  }
+
+  .cal-nav.is-ready .cal-nav-lava {
+    transition:
+      left 350ms ease-out,
+      top 350ms ease-out,
+      width 350ms ease-out,
+      height 350ms ease-out;
+  }
+
+  .cal-nav.is-ready .cal-nav-lava-hover {
+    transition:
+      left 300ms ease-out,
+      top 300ms ease-out,
+      width 300ms ease-out,
+      height 300ms ease-out;
+  }
+
+  .cal-nav.is-tumbling .cal-nav-lava {
+    transition: none;
+  }
+
+
+  .cal-nav.is-arriving .cal-nav-link[aria-current='page'] {
+    color: var(--prussian-blue);
+  }
+
+  /* Intermediate labels light up for the instant the block seats on them */
+  .cal-nav-link.is-flash {
+    color: var(--satin-linen);
+    transition-duration: 90ms;
+  }
+
+  .cal-nav-link {
+    position: relative; /* keeps the label above both blocks */
+    z-index: 2;
+    display: block;
+    font-family: 'Space Mono', ui-monospace, monospace;
+    font-size: clamp(0.625rem, 1.1vw, 0.75rem);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--prussian-blue);
+    padding: 0.75rem clamp(1rem, 2.6vw, 1.75rem);
+    transition: color 200ms ease;
+  }
+
+  /* Fallback fill for no-JS and for the moment before Alpine measures */
+  .cal-nav-link[aria-current='page'] {
+    background: var(--prussian-blue);
+    color: var(--satin-linen);
+  }
+
+  .cal-nav.is-ready .cal-nav-link[aria-current='page'] {
+    background: transparent;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cal-nav.is-ready .cal-nav-lava,
+    .cal-nav.is-ready .cal-nav-lava-hover {
+      transition: none;
+    }
+  }
+</style>

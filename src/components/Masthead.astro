@@ -1,0 +1,41 @@
+---
+import MainNav from './MainNav.astro';
+---
+<header class="cal-masthead">
+  <div class="masthead-logos">
+    <img src="/images/gpllm-logo.png" alt="GPLLM" class="masthead-gpllm-mark" />
+    <img
+      src="/images/uoft-law-logo.png"
+      alt="Henry N.R. Jackman Faculty of Law, University of Toronto"
+      class="masthead-uoft-mark"
+    />
+  </div>
+
+  <MainNav />
+</header>
+
+<style>
+  .cal-masthead {
+    padding: clamp(1.125rem, 3vw, 2rem) 0 0;
+  }
+
+  .masthead-logos {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .masthead-gpllm-mark {
+    height: clamp(4.75rem, 9vw, 6.75rem);
+    width: auto;
+    display: block;
+  }
+
+  .masthead-uoft-mark {
+    height: clamp(3.375rem, 6.6vw, 4.875rem);
+    width: auto;
+    display: block;
+  }
+</style>

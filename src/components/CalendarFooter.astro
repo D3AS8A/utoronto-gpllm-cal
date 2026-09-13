@@ -1,18 +1,13 @@
 ---
+import { formatUpdated } from '../lib/date';
+
 interface Props {
   /** ISO YYYY-MM-DD of the last manual content update. */
   lastUpdated?: string;
 }
 const { lastUpdated } = Astro.props;
 
-let updatedLabel: string | null = null;
-if (lastUpdated) {
-  const [y, m, d] = lastUpdated.split('-').map(Number);
-  const dt = new Date(y, m - 1, d);
-  const wd = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][dt.getDay()];
-  const mo = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][dt.getMonth()];
-  updatedLabel = `${wd} ${mo} ${dt.getDate()}, ${dt.getFullYear()}`;
-}
+const updatedLabel = formatUpdated(lastUpdated);
 ---
 <footer class="cal-footer">
   <div class="footer-col-stack">

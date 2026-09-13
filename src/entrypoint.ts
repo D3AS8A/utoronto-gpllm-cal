@@ -178,6 +178,107 @@ function triggerDownload(text: string, filename: string) {
   setTimeout(() => URL.revokeObjectURL(url), 200);
 }
 
+/* ---- Courses page filter transitions ------------------------------------ */
+
+/**
+ * Runs on the next frame, or after a short wait if that never arrives.
+ *
+ * requestAnimationFrame does not fire in every context: Safari withholds it in
+ * some windows, and any browser throttles it in a background tab. Anything
+ * gated on rAF alone risks never running, which is how the sort pill and the
+ * nav's blocks ended up stranded at opacity 0 in Safari.
+ */
+function onNextFrame(fn: () => void) {
+  let done = false;
+  const once = () => {
+    if (done) return;
+    done = true;
+    fn();
+  };
+  requestAnimationFrame(once);
+  setTimeout(once, 120);
+}
+
+const SORT_FADE = 170;
+const FILTER_DURATION = 280;
+const FILTER_EASE = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+
+/** The course list is flat now, so cards are the only thing to animate. */
+const FILTER_LEVELS = ['.cterm', '.cslot', '.course-card'];
+
+interface FilterMetrics {
+  shown: boolean;
+  height: number;
+  margin: number;
+  display: string;
+}
+
+type Filterable = HTMLElement & { __filterAnim?: Animation | null };
+
+function isShown(el: HTMLElement): boolean {
+  return getComputedStyle(el).display !== 'none';
+}
+
+function measure(el: HTMLElement): FilterMetrics {
+  const style = getComputedStyle(el);
+  const shown = style.display !== 'none';
+  return {
+    shown,
+    height: shown ? el.offsetHeight : 0,
+    margin: shown ? parseFloat(style.marginBottom) || 0 : 0,
+    display: shown ? style.display : '',
+  };
+}
+
+function cancelFilterAnim(el: HTMLElement) {
+  const target = el as Filterable;
+  target.__filterAnim?.cancel();
+  target.__filterAnim = null;
+  clearFilterStyles(target);
+}
+
+function clearFilterStyles(el: HTMLElement) {
+  el.style.display = '';
+  el.style.overflow = '';
+  el.classList.remove('is-filtering');
+}
+
+function runFilterAnim(el: HTMLElement, frames: Keyframe[], forcedDisplay?: string) {
+  const target = el as Filterable;
+  target.classList.add('is-filtering');
+  // Held visible by an inline style so it can collapse before CSS hides it
+  if (forcedDisplay) target.style.display = forcedDisplay;
+  target.style.overflow = 'hidden';
+
+  const anim = target.animate(frames, { duration: FILTER_DURATION, easing: FILTER_EASE });
+  target.__filterAnim = anim;
+  anim.finished
+    .then(() => {
+      target.__filterAnim = null;
+      clearFilterStyles(target);
+    })
+    .catch(() => {});
+}
+
+function animateFilterIn(el: HTMLElement) {
+  const to = measure(el);
+  runFilterAnim(el, [
+    { height: '0px', marginBottom: '0px', opacity: 0 },
+    { height: `${to.height}px`, marginBottom: `${to.margin}px`, opacity: 1 },
+  ]);
+}
+
+function animateFilterOut(el: HTMLElement, from: FilterMetrics) {
+  runFilterAnim(
+    el,
+    [
+      { height: `${from.height}px`, marginBottom: `${from.margin}px`, opacity: 1 },
+      { height: '0px', marginBottom: '0px', opacity: 0 },
+    ],
+    from.display,
+  );
+}
+
 export default (Alpine: Alpine) => {
   Alpine.data('calendar', () => ({
     filters: {} as Record<string, boolean>,
@@ -688,6 +789,142 @@ export default (Alpine: Alpine) => {
       // iPadOS 13+ reports Macintosh + touch — include maxTouchPoints > 1 to catch it.
       const iPadMasqueradingAsMac = ua.includes('Macintosh') && navigator.maxTouchPoints > 1;
       return /iPhone|iPad|iPod|Macintosh/.test(ua) || iPadMasqueradingAsMac;
+    },
+  }));
+
+  /**
+   * Courses page: the concentration filter bar.
+   *
+   * Registered here rather than in the component because alpine:init fires
+   * once per session. A component-level listener misses it entirely when the
+   * page is reached from another route, leaving x-data="courseFilters"
+   * pointing at nothing.
+   */
+  Alpine.data('courseFilters', () => ({
+    conc: { cl: true, bl: true, ilt: true } as Record<string, boolean>,
+    /** 'time' follows the weekly schedule; 'course' lists each course once. */
+    sort: 'time' as 'course' | 'time',
+    sortLeft: 0,
+    sortWidth: 0,
+    sortReady: false,
+
+    init() {
+      this.$nextTick(() => {
+        this.syncSortPill();
+        // Enable the slide only after the first snap, so the pill doesn't
+        // travel in from the left on load
+        onNextFrame(() => { this.sortReady = true; });
+        // Webfonts land after first paint and change the option widths
+        document.fonts?.ready.then(() => this.syncSortPill());
+      });
+    },
+
+    syncSortPill() {
+      const active = document.querySelector<HTMLElement>(
+        `.sort-options [data-sort="${this.sort}"]`,
+      );
+      if (active) this.moveSortPill(active);
+    },
+
+    moveSortPill(el: HTMLElement) {
+      this.sortLeft = el.offsetLeft;
+      this.sortWidth = el.offsetWidth;
+    },
+
+    /**
+     * Both views are in the DOM, so switching is a class change. Fading the
+     * pair out and back in hides the swap, and means the height change happens
+     * while nothing is visible rather than as a jump.
+     */
+    setSort(next: 'course' | 'time', el: HTMLElement) {
+      this.moveSortPill(el);
+      if (next === this.sort) return;
+
+      const views = document.querySelector<HTMLElement>('.courses-views');
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!views || reduced) {
+        this.sort = next;
+        return;
+      }
+
+      views.style.opacity = '0';
+      setTimeout(() => {
+        this.sort = next;
+        this.$nextTick(() => {
+          views.style.opacity = '';
+        });
+      }, SORT_FADE);
+    },
+
+    get anyOn(): boolean {
+      return Object.values(this.conc).some(Boolean);
+    },
+
+    toggle(key: string) {
+      this.transition(() => {
+        this.conc[key] = !this.conc[key];
+      });
+    },
+
+    clearOrShowAll() {
+      const on = this.anyOn;
+      this.transition(() => {
+        Object.keys(this.conc).forEach((key) => {
+          this.conc[key] = !on;
+        });
+      });
+    },
+
+    /**
+     * Filtering itself is CSS (see the show-* rules on the courses page), which
+     * means elements switch on `display` and can't be transitioned. So measure
+     * every filterable element, apply the change, then animate whatever flipped
+     * between the two states.
+     *
+     * Works top down: a term or slot that is disappearing animates as one
+     * block, and the cards inside it are left alone rather than animating
+     * twice over.
+     */
+    transition(mutate: () => void) {
+      // Queried from the document, not $el: inside a click handler Alpine
+      // scopes $el to the button that was pressed, not the component root
+      const root = document.querySelector<HTMLElement>('.courses-app');
+      if (!root) {
+        mutate();
+        return;
+      }
+
+      const levels = FILTER_LEVELS.map((sel) =>
+        [...root.querySelectorAll<HTMLElement>(sel)],
+      );
+      const all = levels.flat();
+
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        mutate();
+        return;
+      }
+
+      // Settle anything still in flight so the measurements below are honest
+      all.forEach((el) => cancelFilterAnim(el));
+      const before = new Map(all.map((el) => [el, measure(el)] as const));
+
+      mutate();
+
+      this.$nextTick(() => {
+        levels.forEach((list) => {
+          list.forEach((el) => {
+            const was = before.get(el);
+            if (!was) return;
+            const shown = isShown(el);
+            if (was.shown === shown) return;
+            // An ancestor is already collapsing or expanding this subtree
+            if (el.parentElement?.closest('.is-filtering')) return;
+
+            if (shown) animateFilterIn(el);
+            else animateFilterOut(el, was);
+          });
+        });
+      });
     },
   }));
 };
