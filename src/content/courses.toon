@@ -24,6 +24,35 @@ content:
     lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
     alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,true,"Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement."
 
+  profile_url_base: https://www.jackmanlaw.utoronto.ca
+
+  profiles[25]{name,path}:
+    Peter L. Biro,/people/peter-l-biro
+    Malcolm Thorburn,/people/malcolm-thorburn
+    Patrick Hartford,/people/patrick-hartford
+    Simone Sepe,/people/simone-sepe
+    Al Hounsell,/people/Al_Hounsell
+    Abraham Drassinower,/people/abraham-drassinower
+    Alex Stack,/people/alex-stack
+    Abdi Aidid,/people/abdi-aidid
+    Erica Richler,/people/erica-richler
+    Anastasia-Maria Hountalas,/people/anastasia-maria-hountalas
+    David Conklin,/people/david-conklin
+    Dera Nevin,/people/dera-nevin
+    David Walders,/people/david-walders
+    Cary Ferguson,/people/cary-ferguson
+    Anthony Mouchantaf,/people/anthony-mouchantaf
+    Carole Piovesan,/people/carole-piovesan
+    Adrienne Smith,/people/adrienne-smith
+    Andrew Matheson,/people/andrew-matheson
+    Tyler Hodgson,/people/tyler-hodgson
+    Larissa Katz,/people/larissa-katz
+    Rosario Cartagena,/people/rosario-cartagena
+    Jagtaran Singh,/people/jagtaran-singh
+    Nathalie Des Rosiers,/people/justice-nathalie-des-rosiers
+    David Goodis,/people/david-goodis
+    Rebecca Durcan,/people/rebecca-durcan
+
   offerings[35]{ref,room,prof}:
     alrw,LEC0102,
     LAW4010H F LEC0102,LEC0102,Patrick Hartford

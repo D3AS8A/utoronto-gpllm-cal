@@ -30,6 +30,11 @@ interface OfferingRow {
   prof: string;
 }
 
+interface ProfileRow {
+  name: string;
+  path: string;
+}
+
 /** Non-credit and NCA courses: no course code, own schedule and description. */
 interface ProgramRow {
   key: string;
@@ -70,6 +75,8 @@ const { meta, content } = loadPage<{
   program_courses: ProgramRow[];
   details: DetailRow[];
   offerings: OfferingRow[];
+  profiles: ProfileRow[];
+  profile_url_base: string;
   catalog: CatalogRow[];
   terms: Record<string, Term>;
 }>('courses');
@@ -79,7 +86,24 @@ const concLabels = Object.fromEntries(
 );
 
 const details = Object.fromEntries(content.details.map((row) => [row.code, row]));
-const offerings = Object.fromEntries(content.offerings.map((row) => [row.ref, row]));
+const profiles = Object.fromEntries(content.profiles.map((row) => [row.name, row.path]));
+
+// Instructors are stored as one string; split them out and attach a profile
+// link where the faculty directory lists one
+const offerings = Object.fromEntries(
+  content.offerings.map((row) => [
+    row.ref,
+    {
+      ...row,
+      people: row.prof
+        ? row.prof.split(', ').map((name) => ({
+            name,
+            url: profiles[name] ? `${content.profile_url_base}${profiles[name]}` : undefined,
+          }))
+        : [],
+    },
+  ]),
+);
 
 const catalog: Record<string, CourseDef> = Object.fromEntries([
   ...content.catalog.map((row) => [

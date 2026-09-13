@@ -1,4 +1,6 @@
 ---
+import ExternalIcon from './ExternalIcon.astro';
+
 export interface CourseDef {
   /** Course code, e.g. LAW4008H. Absent on non-credit program courses. */
   code?: string;
@@ -24,6 +26,8 @@ export interface OfferingDef {
   ref: string;
   room: string;
   prof: string;
+  /** Instructors split out, each with a profile link where one exists. */
+  people?: Array<{ name: string; url?: string }>;
 }
 
 interface Props {
@@ -36,10 +40,6 @@ interface Props {
 }
 const { course, offering, concLabels, placeholder, urlBase } = Astro.props;
 const desc = course.desc || placeholder.replace('{title}', course.title);
-
-const facts = [
-  offering?.prof ? { label: 'Taught by', value: offering.prof } : null,
-].filter((fact) => fact !== null);
 
 // The collapsed bar carries only what a student filters or scans on
 const flags = [
@@ -84,14 +84,26 @@ const panelTags = [
 
   <div class="course-desc">
     <div class="course-desc-inner">
-      {facts.length > 0 && (
+      {offering?.people && offering.people.length > 0 && (
         <dl class="course-facts">
-          {facts.map((fact) => (
-            <div class="course-fact">
-              <dt>{fact.label}</dt>
-              <dd>{fact.value}</dd>
-            </div>
-          ))}
+          <div class="course-fact">
+            <dt>Taught by</dt>
+            <dd>
+              {offering.people.map((person) => (
+                <span class="course-prof-name">
+                  {person.url ? (
+                    <a class="course-prof-link" href={person.url} target="_blank" rel="noopener noreferrer">
+                      {person.name}
+                      <ExternalIcon size="0.6875rem" />
+                      <span class="sr-only">Faculty profile, opens in a new tab</span>
+                    </a>
+                  ) : (
+                    person.name
+                  )}
+                </span>
+              ))}
+            </dd>
+          </div>
         </dl>
       )}
 
@@ -110,21 +122,7 @@ const panelTags = [
       {course.slug && (
         <a class="course-link" href={`${urlBase}${course.slug}`} target="_blank" rel="noopener noreferrer">
           Full course page
-          <svg
-            class="course-link-icon"
-            viewBox="0 0 16 16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <path d="M6.5 3H3.5A1.5 1.5 0 0 0 2 4.5v8A1.5 1.5 0 0 0 3.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-3" />
-            <path d="M10 2h4v4" />
-            <path d="M7.25 8.75 14 2" />
-          </svg>
+          <ExternalIcon />
           <span class="sr-only">Opens on the faculty site in a new tab</span>
         </a>
       )}
@@ -483,10 +481,37 @@ const panelTags = [
     color: var(--bronzetone);
   }
 
-  .course-link-icon {
-    width: 0.75rem;
-    height: 0.75rem;
-    flex: none;
+  /* inline-flex so the markup's own newlines are dropped rather than rendering
+     as a space before the comma; the gap between names comes from the
+     whitespace between the spans themselves */
+  .course-prof-name {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .course-prof-name:not(:last-child)::after {
+    content: ',';
+  }
+
+  /* map() renders these adjacent, so the space after the comma is set here
+     rather than relying on whitespace in the markup */
+  .course-prof-name:not(:last-child) {
+    margin-right: 0.3125rem;
+  }
+
+  .course-prof-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--oxford-blue);
+    text-decoration: none;
+    transition: color 200ms ease;
+  }
+
+  .course-prof-link:hover {
+    color: var(--driftwood);
+    text-decoration: underline;
+    text-underline-offset: 0.1875rem;
   }
 
   .course-desc-inner p {
