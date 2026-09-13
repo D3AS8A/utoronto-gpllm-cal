@@ -8,7 +8,9 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "astro": "astro"
+    "astro": "astro",
+    "prepare": "git config core.hooksPath .githooks || true",
+    "stamp": "bun run scripts/stamp-modified.ts"
   },
   "dependencies": {
     "@astrojs/alpinejs": "^0.5.0",

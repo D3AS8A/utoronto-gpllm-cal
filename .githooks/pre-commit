@@ -1,0 +1,3 @@
+#!/bin/sh
+# Repo-shared hooks, wired up by the `prepare` script in package.json
+bun run scripts/stamp-modified.ts || exit 1

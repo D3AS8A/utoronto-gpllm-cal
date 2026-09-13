@@ -25,6 +25,38 @@ bun build      # outputs to ./dist
 bun preview    # preview the ./dist build locally
 ```
 
+## Content and last-updated dates
+
+Page content lives in `src/content/*.toon`. Each page shows when its content last
+changed, read from `src/content/modified.toon`:
+
+```
+calendar: 2026-08-17
+courses: 2026-09-13
+information: 2026-09-12
+```
+
+That file is stamped automatically. A pre-commit hook checks which content files
+are staged, sets those pages to today's date, and adds the change to the same
+commit, so the date always ships with the edit that earned it.
+
+```bash
+bun install       # also wires up the hook (see below)
+bun run stamp     # stamp manually, without committing
+```
+
+Hooks live in `.githooks/` rather than `.git/hooks/`, so they are shared through
+the repo. The `prepare` script points git at them via `core.hooksPath` on every
+install. Nothing extra is needed on a fresh clone beyond `bun install`.
+
+Two things to know:
+
+- The hook only fires on local commits. Edits made through the GitHub web UI will
+  not stamp a date.
+- Dates are derived at commit time, not build time. Reading them from `git log`
+  during a build looks tidier but breaks on hosts that do a shallow clone, where
+  every file reports the same single commit.
+
 ## Deployment
 
 Assuming a static site host like Cloudflare Pages, Github Pages, Netlify, etc.
@@ -33,6 +65,10 @@ Assuming a static site host like Cloudflare Pages, Github Pages, Netlify, etc.
 - Set output directory: `dist`
 - Ensure Node version is set to **22** or higher in environment settings
 - Add any environment variables (none by default)
+
+No build-time scripts beyond `bun run build` are needed. The `prepare` script runs
+during install and only configures local git hooks, which is a harmless no-op on a
+build host.
 
 ## PWA
 

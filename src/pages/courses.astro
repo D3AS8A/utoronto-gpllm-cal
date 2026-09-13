@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import { loadPage } from '../lib/content';
+import { loadPage, loadModified } from '../lib/content';
 import PageTitle from '../components/PageTitle.astro';
 import CourseCard, { type RunDef } from '../components/CourseCard.astro';
 import CourseSection, { type TimeEntry } from '../components/CourseSection.astro';
@@ -208,7 +208,7 @@ const courses = [...byCourse.values()].sort((a, b) => {
   title={meta.title ?? undefined}
   description={meta.description}
   ogImage={meta.og_image}
-  lastUpdated={content.last_updated}
+  lastUpdated={loadModified().courses ?? content.last_updated}
 >
   <PageTitle
     eyebrow={content.eyebrow}

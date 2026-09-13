@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import { loadGlobal, loadPage } from '../lib/content';
+import { loadGlobal, loadPage, loadModified } from '../lib/content';
 import { formatUpdated } from '../lib/date';
 import PageTitle from '../components/PageTitle.astro';
 import FilterBar from '../components/FilterBar.astro';
@@ -15,7 +15,7 @@ const { meta, content } = loadPage<{
   heading: string;
   last_updated?: string;
 }>('calendar');
-const lastUpdated = content.last_updated;
+const lastUpdated = loadModified().calendar ?? content.last_updated;
 const updatedLabel = formatUpdated(lastUpdated);
 
 const jsonLD = {

@@ -1,6 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
-import { loadPage } from '../lib/content';
+import { loadPage, loadModified } from '../lib/content';
 import PageTitle from '../components/PageTitle.astro';
 
 const { meta, content } = loadPage<{
@@ -16,7 +16,7 @@ const { meta, content } = loadPage<{
   title={meta.title ?? undefined}
   description={meta.description}
   ogImage={meta.og_image}
-  lastUpdated={content.last_updated}
+  lastUpdated={loadModified().information ?? content.last_updated}
 >
   <PageTitle
     eyebrow={content.eyebrow}
