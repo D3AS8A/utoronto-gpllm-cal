@@ -39,8 +39,13 @@ const { options } = Astro.props;
     border-right: 0.0625rem solid rgb(0 37 84 / 0.12);
   }
 
+  /* Takes the whole line, so the concentrations start a fresh one below. The
+     margin is what separates the two controls: the switches sit on a 2px row
+     gap, so without it this break would read as just another switch row. */
   @media (max-width: 45rem) {
     .sort-bar {
+      flex-basis: 100%;
+      margin-bottom: 0.4375rem;
       padding-right: 0;
       border-right: 0;
     }

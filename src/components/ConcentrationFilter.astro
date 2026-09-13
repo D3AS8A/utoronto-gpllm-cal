@@ -94,9 +94,56 @@ const { concentrations } = Astro.props;
     }
   }
 
-  @media (max-width: 26rem) {
+  /* Kept last in the sheet: these rules and the base ones they override match
+     on specificity, so whichever comes later wins. Sitting mid-sheet, the
+     padding below was silently losing to .cfilter-toggle's own shorthand.
+
+     display: contents drops the grid box so the switches become flex items of
+     the bar itself. They then flow inline after the label and wrap where they
+     run out of room, instead of sitting as one fixed-width column beside it.
+     min-width keeps them equal, which the grid was handling before. */
+  @media (max-width: 45rem) {
     .cfilter-switches {
-      grid-template-columns: 1fr;
+      display: contents;
+    }
+
+    .cfilter-toggle {
+      min-width: 8.125rem;
+    }
+
+    /* Paired with its concentration class to outweigh .cfilter-toggle's own
+       `padding` shorthand, which is declared later in this sheet and would
+       otherwise win the tie on source order */
+    .tog-cl.cfilter-toggle,
+    .tog-bl.cfilter-toggle,
+    .tog-ilt.cfilter-toggle {
+      padding-block: 0.125rem;
+    }
+
+    .cfilter-toggle-label {
+      line-height: 1.15;
+    }
+
+    /* Tight between switches, so the looser gap under the sort row reads as
+       the break between the two controls rather than as more of the same */
+    .cfilter-group {
+      column-gap: 0.5rem;
+      row-gap: 0.125rem;
+    }
+
+    /* Each switch already carries its concentration's name, so the group
+       label is redundant on a phone and costs the width of a whole switch.
+       Hidden visually only: aria-labelledby still names the group with it. */
+    .cfilter-label {
+      position: absolute;
+      width: 0.0625rem;
+      height: 0.0625rem;
+      padding: 0;
+      margin: -0.0625rem;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
   }
 
