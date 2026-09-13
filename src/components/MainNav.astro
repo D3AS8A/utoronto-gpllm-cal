@@ -54,8 +54,8 @@ function isActive(href: string): boolean {
           href={href}
           class="cal-nav-link"
           aria-current={isActive(href) ? 'page' : undefined}
-          @mouseenter="hover($el)"
-          @focus="hover($el)"
+          @mouseenter="hover($el, true)"
+          @focus="hover($el, true)"
         >
           {label}
         </a>
@@ -132,11 +132,28 @@ function isActive(href: string): boolean {
         return path.replace(/index\.html$/, '').replace(/\/+$/, '') || '/';
       },
 
-      hover(el) {
+      hover(el, fromPointer = false) {
+        // A tap on a touch screen fires mouseenter with no mouseleave to
+        // follow, which would leave the hover block parked on whatever was
+        // last tapped. Only a real pointer gets to move it.
+        if (fromPointer && !matchMedia('(hover: hover)').matches) return;
+
         this.hoverLeft = el.offsetLeft;
         this.hoverTop = el.offsetTop;
         this.hoverWidth = el.offsetWidth;
         this.hoverHeight = el.offsetHeight;
+      },
+
+      /** Stops any journey in flight and clears what it scheduled. */
+      settle() {
+        this.anim?.cancel();
+        this.anim = null;
+        this.tumbling = false;
+        this.arriving = false;
+        clearTimeout(this.flipTimer);
+        this.flashTimers.forEach(clearTimeout);
+        this.flashTimers = [];
+        this.items().forEach((el) => el.classList.remove('is-flash'));
       },
 
       park(el) {
@@ -163,12 +180,31 @@ function isActive(href: string): boolean {
       tumble(items, from, to) {
         const dest = items[to];
         const sameRow = items.every((el) => el.offsetTop === dest.offsetTop);
-        if (!sameRow || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+
+        // Corner-rolling needs a single row, a real pointer and room to swing.
+        // On a phone the dip below the bar crosses the page title and reads as
+        // noise, so touch and narrow screens get the plain slide instead.
+        const canTumble =
+          sameRow &&
+          matchMedia('(hover: hover)').matches &&
+          matchMedia('(min-width: 48rem)').matches &&
+          !matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!canTumble) {
+          this.settle();
           this.reset();
           return;
         }
 
-        this.anim?.cancel();
+        // Interrupted mid-journey. The block is somewhere in mid-air, so a
+        // fresh tumble would start from a seat it never reached and jump to
+        // get there. Slide to the new target instead.
+        if (this.anim) {
+          this.settle();
+          requestAnimationFrame(() => this.park(dest));
+          return;
+        }
+
         this.park(dest);
 
         const h = dest.offsetHeight;
@@ -262,13 +298,20 @@ function isActive(href: string): boolean {
           );
         });
 
-        this.anim = this.$refs.lava.animate(frames, { duration: total, fill: 'none' });
-        this.anim.finished
-          .then(() => { this.tumbling = false; this.anim = null; })
-          .catch(() => {
-            this.tumbling = false;
-            items.forEach((el) => el.classList.remove('is-flash'));
-          });
+        const anim = this.$refs.lava.animate(frames, { duration: total, fill: 'none' });
+        this.anim = anim;
+
+        // Guarded by identity: cancelling settles asynchronously, so without
+        // this a discarded journey would clear is-tumbling out from under the
+        // journey that replaced it, handing left/width back to the CSS
+        // transition mid-flight.
+        const done = () => {
+          if (this.anim !== anim) return;
+          this.tumbling = false;
+          this.anim = null;
+          items.forEach((el) => el.classList.remove('is-flash'));
+        };
+        anim.finished.then(done).catch(done);
       },
     }));
   });
