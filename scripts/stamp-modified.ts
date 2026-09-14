@@ -1,6 +1,6 @@
 /**
- * Stamps src/content/modified.toon with today's date for every content file
- * staged in the current commit.
+ * Stamps src/content/modified.toon with today's date whenever content changes
+ * in the current commit. One date covers the whole site, so every page agrees.
  *
  * Runs from .githooks/pre-commit, so the date lands in the same commit as the
  * change that earned it. Deliberately not a build step: deriving dates from
@@ -9,9 +9,14 @@
  */
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { basename } from 'node:path';
 
 const STAMP = 'src/content/modified.toon';
+
+/**
+ * Content that doesn't live in src/content. The calendar's schedule sits in
+ * TypeScript, so editing it would otherwise never stamp a date.
+ */
+const EXTRA = ['src/lib/calendar-data.ts'];
 
 function today(): string {
   // Local date, not toISOString: that is UTC and rolls over a day early here
@@ -20,28 +25,25 @@ function today(): string {
   return `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
 }
 
-const staged = execFileSync('git', ['diff', '--cached', '--name-only', '--', 'src/content'], {
-  encoding: 'utf-8',
-})
+const staged = execFileSync('git', ['diff', '--cached', '--name-only'], { encoding: 'utf-8' })
   .split('\n')
   .map((line) => line.trim())
-  .filter((line) => line.endsWith('.toon') && basename(line) !== basename(STAMP));
+  .filter(Boolean);
 
-if (staged.length === 0) process.exit(0);
+const changed = staged.some(
+  (file) =>
+    (file.startsWith('src/content/') && file.endsWith('.toon') && file !== STAMP) ||
+    EXTRA.includes(file),
+);
+
+if (!changed) process.exit(0);
 
 const stamp = readFileSync(STAMP, 'utf-8');
 const date = today();
-let next = stamp;
-
-for (const file of staged) {
-  const page = basename(file, '.toon');
-  if (page === 'global') continue; // site-wide, not a page
-  const line = new RegExp(`^${page}: .*$`, 'm');
-  next = line.test(next) ? next.replace(line, `${page}: ${date}`) : `${next.trimEnd()}\n${page}: ${date}\n`;
-}
+const next = `site: ${date}\n`;
 
 if (next === stamp) process.exit(0);
 
 writeFileSync(STAMP, next);
 execFileSync('git', ['add', STAMP]);
-console.log(`stamped ${date}: ${staged.map((f) => basename(f, '.toon')).join(', ')}`);
+console.log(`stamped ${date}`);

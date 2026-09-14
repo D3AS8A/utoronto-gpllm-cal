@@ -15,7 +15,7 @@ const { concentrations } = Astro.props;
   <div class="cfilter-group">
     <slot />
 
-    <p class="cfilter-label" id="cfilter-label">CONCENTRATIONS</p>
+    <p class="cfilter-label" id="cfilter-label">CONCENTRATION</p>
 
     <div class="cfilter-switches" role="group" aria-labelledby="cfilter-label">
       {concentrations.map((c) => (
@@ -237,9 +237,11 @@ const { concentrations } = Astro.props;
     color: var(--prussian-blue);
   }
 
+  /* Sits at the far right of whichever row it lands on, so it reads as the
+     bar's action rather than as a fourth switch trailing the third */
   @media (max-width: 45rem) {
     .cfilter-clear {
-      margin-left: 0;
+      margin-left: auto;
     }
   }
 </style>

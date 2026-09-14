@@ -8,7 +8,6 @@ const { meta, content } = loadPage<{
   eyebrow_datetime: string;
   heading: string;
   intro: string;
-  last_updated?: string;
 }>('information');
 ---
 
@@ -16,7 +15,7 @@ const { meta, content } = loadPage<{
   title={meta.title ?? undefined}
   description={meta.description}
   ogImage={meta.og_image}
-  lastUpdated={loadModified().information ?? content.last_updated}
+  lastUpdated={loadModified()}
 >
   <PageTitle
     eyebrow={content.eyebrow}
