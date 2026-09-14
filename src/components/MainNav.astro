@@ -228,6 +228,18 @@ function isActive(href: string): boolean {
 
         const h = dest.offsetHeight;
         const dir = to > from ? 1 : -1;
+
+        // The pivot rides inside the transform rather than in transform-origin.
+        // Animating the origin works on desktop WebKit and in the simulator,
+        // but on real iOS hardware the block is composited and the origin
+        // change at the seam is dropped: the second half of every hop then
+        // rotates about the corner it started from, throwing the block up over
+        // the logo instead of rolling it onward. Baked in this way there is no
+        // separate origin to lose, and the whole animation stays in transform.
+        const spin = (deg, w, right) => {
+          const px = right ? w : 0;
+          return `translate(${px}px, ${h}px) rotate(${deg}deg) translate(${-px}px, ${-h}px)`;
+        };
         const hops = [];
         for (let i = from; i !== to; i += dir) hops.push([items[i], items[i + dir]]);
 
@@ -259,22 +271,22 @@ function isActive(href: string): boolean {
           const down = k === 0 ? EASE_TIP : EASE_DROP;
           const up = last ? EASE_RUSH : EASE_RISE;
           const A = dir === 1
-            ? { o: '100% 100%', rot: -90, leftMid: `${pivot - wm}px` }
-            : { o: '0% 100%',   rot: 90,  leftMid: `${pivot}px` };
+            ? { right: true,  rot: -90, leftMid: `${pivot - wm}px` }
+            : { right: false, rot: 90,  leftMid: `${pivot}px` };
           const B = dir === 1
-            ? { o: '0% 100%',   rot: 90,  leftMid: `${pivot - h}px` }
-            : { o: '100% 100%', rot: -90, leftMid: `${pivot + h - wm}px` };
+            ? { right: false, rot: 90,  leftMid: `${pivot - h}px` }
+            : { right: true,  rot: -90, leftMid: `${pivot + h - wm}px` };
           const seam = t0 + (last ? 0.3 : 0.5) * L;
 
           frames.push(
-            { offset: t0,   easing: down, transformOrigin: A.o, transform: 'rotate(0deg)',        left: `${xa}px`, width: `${wa}px` },
-            { offset: seam,               transformOrigin: A.o, transform: `rotate(${A.rot}deg)`, left: A.leftMid, width: `${wm}px` },
-            { offset: seam, easing: up,   transformOrigin: B.o, transform: `rotate(${B.rot}deg)`, left: B.leftMid, width: `${wm}px` },
+            { offset: t0,   easing: down, transform: spin(0, wa, A.right),     left: `${xa}px`, width: `${wa}px` },
+            { offset: seam,               transform: spin(A.rot, wm, A.right), left: A.leftMid, width: `${wm}px` },
+            { offset: seam, easing: up,   transform: spin(B.rot, wm, B.right), left: B.leftMid, width: `${wm}px` },
           );
 
           if (!last) {
             frames.push(
-              { offset: t1, transformOrigin: B.o, transform: 'rotate(0deg)', left: `${xb}px`, width: `${wb}px` },
+              { offset: t1, transform: spin(0, wb, B.right), left: `${xb}px`, width: `${wb}px` },
             );
             return;
           }
@@ -283,8 +295,7 @@ function isActive(href: string): boolean {
           const at = (f, deg, easing) => ({
             offset: t0 + f * L,
             ...(easing ? { easing } : {}),
-            transformOrigin: B.o,
-            transform: `rotate(${deg}deg)`,
+            transform: spin(deg, wb, B.right),
             left: `${xb}px`,
             width: `${wb}px`,
           });
@@ -300,6 +311,10 @@ function isActive(href: string): boolean {
           });
           frames.push(at(1, 0));
         });
+
+        // Constant across every frame, so there is no origin change for the
+        // compositor to drop, and the CSS rule below is only a backstop
+        frames.forEach((f) => { f.transformOrigin = '0 0'; });
 
         this.tumbling = true;
         clearTimeout(this.flipTimer);
@@ -362,6 +377,8 @@ function isActive(href: string): boolean {
   .cal-nav-lava {
     background: var(--prussian-blue);
     z-index: 1;
+    /* The tumble's translate offsets are measured from this corner */
+    transform-origin: 0 0;
   }
 
   .cal-nav-lava-hover {
