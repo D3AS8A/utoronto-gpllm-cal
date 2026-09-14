@@ -257,7 +257,12 @@ function isActive(href: string): boolean {
         const hops = [];
         for (let i = from; i !== to; i += dir) hops.push([items[i], items[i + dir]]);
 
-        const EASE_TIP  = 'cubic-bezier(0.55, -0.28, 0.75, 0.25)';
+        // No negative control point: that gave the first hop a backward wind-up
+        // before it tipped. On iOS the opening of a composited animation can be
+        // replayed as the layer settles, which turned that one wind-up into a
+        // visible double rock against the rule. Tipping straight in has nothing
+        // to replay backwards.
+        const EASE_TIP  = 'cubic-bezier(0.55, 0, 0.75, 0.25)';
         const EASE_DROP = 'cubic-bezier(0.5, 0.04, 0.74, 0.28)';
         const EASE_RISE = 'cubic-bezier(0.22, 0.52, 0.42, 0.9)';
         const EASE_RUSH = 'cubic-bezier(0.3, 0, 0.7, 0.55)';
