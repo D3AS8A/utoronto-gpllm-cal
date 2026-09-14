@@ -229,16 +229,30 @@ function isActive(href: string): boolean {
         const h = dest.offsetHeight;
         const dir = to > from ? 1 : -1;
 
-        // The pivot rides inside the transform rather than in transform-origin.
-        // Animating the origin works on desktop WebKit and in the simulator,
-        // but on real iOS hardware the block is composited and the origin
-        // change at the seam is dropped: the second half of every hop then
-        // rotates about the corner it started from, throwing the block up over
-        // the logo instead of rolling it onward. Baked in this way there is no
-        // separate origin to lose, and the whole animation stays in transform.
-        const spin = (deg, w, right) => {
-          const px = right ? w : 0;
-          return `translate(${px}px, ${h}px) rotate(${deg}deg) translate(${-px}px, ${-h}px)`;
+        // The whole tumble lives in `transform`. park() above has already put
+        // the element's box on the destination, so each keyframe expresses its
+        // pose relative to that box: scaleX for the width, translate for the
+        // position, and a pivot baked around the rotate.
+        //
+        // It used to animate left/width and swap transform-origin between the
+        // two corners at the seam. That reads fine on desktop WebKit and in the
+        // simulator, but on real iOS hardware the block is promoted to its own
+        // layer, and a composited layer keeps the anchor point it was created
+        // with: the keyframed origin change is dropped, so one half of every hop
+        // rotated about the corner belonging to the other half. The block swung
+        // up over the logo and snapped back at the seam. Frame-by-frame, the
+        // break was a single frame wide and landed exactly on the origin swap.
+        //
+        // Expressed this way there is no origin to lose, and no layout property
+        // animating on the main thread that could drift from a composited one.
+        const xBox = dest.offsetLeft;
+        const wBox = dest.offsetWidth;
+        const pose = (x, w, deg, right) => {
+          const s = w / wBox;
+          const dx = x - xBox;
+          const qx = dx + (right ? w : 0);
+          return `translate(${qx}px, ${h}px) rotate(${deg}deg) translate(${-qx}px, ${-h}px)`
+            + ` translate(${dx}px, 0px) scaleX(${s})`;
         };
         const hops = [];
         for (let i = from; i !== to; i += dir) hops.push([items[i], items[i + dir]]);
@@ -271,23 +285,24 @@ function isActive(href: string): boolean {
           const down = k === 0 ? EASE_TIP : EASE_DROP;
           const up = last ? EASE_RUSH : EASE_RISE;
           const A = dir === 1
-            ? { right: true,  rot: -90, leftMid: `${pivot - wm}px` }
-            : { right: false, rot: 90,  leftMid: `${pivot}px` };
+            ? { right: true,  rot: -90, mid: pivot - wm }
+            : { right: false, rot: 90,  mid: pivot };
           const B = dir === 1
-            ? { right: false, rot: 90,  leftMid: `${pivot - h}px` }
-            : { right: true,  rot: -90, leftMid: `${pivot + h - wm}px` };
+            ? { right: false, rot: 90,  mid: pivot - h }
+            : { right: true,  rot: -90, mid: pivot + h - wm };
           const seam = t0 + (last ? 0.3 : 0.5) * L;
 
+          // The pair describes one pose two ways, handing the pivot from one
+          // corner to the other. Split by a hair rather than sharing an offset,
+          // so nothing downstream can collapse them into a single keyframe.
           frames.push(
-            { offset: t0,   easing: down, transform: spin(0, wa, A.right),     left: `${xa}px`, width: `${wa}px` },
-            { offset: seam,               transform: spin(A.rot, wm, A.right), left: A.leftMid, width: `${wm}px` },
-            { offset: seam, easing: up,   transform: spin(B.rot, wm, B.right), left: B.leftMid, width: `${wm}px` },
+            { offset: t0,   easing: down, transform: pose(xa, wa, 0, A.right) },
+            { offset: seam,               transform: pose(A.mid, wm, A.rot, A.right) },
+            { offset: seam + 1e-4, easing: up, transform: pose(B.mid, wm, B.rot, B.right) },
           );
 
           if (!last) {
-            frames.push(
-              { offset: t1, transform: spin(0, wb, B.right), left: `${xb}px`, width: `${wb}px` },
-            );
+            frames.push({ offset: t1, transform: pose(xb, wb, 0, B.right) });
             return;
           }
 
@@ -295,9 +310,7 @@ function isActive(href: string): boolean {
           const at = (f, deg, easing) => ({
             offset: t0 + f * L,
             ...(easing ? { easing } : {}),
-            transform: spin(deg, wb, B.right),
-            left: `${xb}px`,
-            width: `${wb}px`,
+            transform: pose(xb, wb, deg, B.right),
           });
           const BOUNCES = [15, 6];
           const SLOTS   = [0.3, 0.24];
@@ -312,8 +325,8 @@ function isActive(href: string): boolean {
           frames.push(at(1, 0));
         });
 
-        // Constant across every frame, so there is no origin change for the
-        // compositor to drop, and the CSS rule below is only a backstop
+        // One constant value, so there is no origin change to drop whichever
+        // path the engine takes. The CSS rule below says the same thing.
         frames.forEach((f) => { f.transformOrigin = '0 0'; });
 
         this.tumbling = true;
@@ -379,6 +392,8 @@ function isActive(href: string): boolean {
     z-index: 1;
     /* The tumble's translate offsets are measured from this corner */
     transform-origin: 0 0;
+    /* Promotes the layer up front, so it cannot happen mid-tumble */
+    will-change: transform;
   }
 
   .cal-nav-lava-hover {
