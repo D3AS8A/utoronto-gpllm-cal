@@ -72,7 +72,6 @@ const { meta, content } = loadPage<{
   requirements: string;
   course_url_base: string;
   desc_placeholder: string;
-  last_updated?: string;
   concentrations: Array<{ key: string; label: string; short: string }>;
   program_courses: ProgramRow[];
   details: DetailRow[];
@@ -208,7 +207,7 @@ const courses = [...byCourse.values()].sort((a, b) => {
   title={meta.title ?? undefined}
   description={meta.description}
   ogImage={meta.og_image}
-  lastUpdated={loadModified().courses ?? content.last_updated}
+  lastUpdated={loadModified()}
 >
   <PageTitle
     eyebrow={content.eyebrow}

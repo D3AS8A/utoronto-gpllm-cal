@@ -1,4 +1,7 @@
 ---
+import { loadModified } from '../lib/content';
+import { formatUpdated } from '../lib/date';
+
 interface Props {
   /** Small mono line above the title. */
   eyebrow?: string;
@@ -7,6 +10,9 @@ interface Props {
   title: string;
 }
 const { eyebrow, eyebrowDatetime, title } = Astro.props;
+
+const lastUpdated = loadModified();
+const updatedLabel = formatUpdated(lastUpdated);
 ---
 <div class="page-title-row">
   <hgroup>
@@ -19,6 +25,11 @@ const { eyebrow, eyebrowDatetime, title } = Astro.props;
   </hgroup>
   <div class="page-desc">
     <slot />
+    {updatedLabel && (
+      <p class="page-updated">
+        This site's content was last updated on <time datetime={lastUpdated}>{updatedLabel}</time>.
+      </p>
+    )}
   </div>
 </div>
 

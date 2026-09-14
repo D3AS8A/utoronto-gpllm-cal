@@ -40,9 +40,10 @@ export function loadPage<C = Record<string, unknown>>(name: string): PageContent
 }
 
 /**
- * Page name → ISO date its content last changed, stamped into
- * src/content/modified.toon by the pre-commit hook.
+ * ISO date any page's content last changed, stamped into
+ * src/content/modified.toon by the pre-commit hook. One date for the whole
+ * site, so every page agrees on when the content was last touched.
  */
-export function loadModified(): Record<string, string> {
-  return decode(readToon('modified.toon')) as unknown as Record<string, string>;
+export function loadModified(): string {
+  return (decode(readToon('modified.toon')) as unknown as { site: string }).site;
 }

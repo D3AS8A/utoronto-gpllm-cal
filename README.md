@@ -27,18 +27,17 @@ bun preview    # preview the ./dist build locally
 
 ## Content and last-updated dates
 
-Page content lives in `src/content/*.toon`. Each page shows when its content last
-changed, read from `src/content/modified.toon`:
+Page content lives in `src/content/*.toon`, except the calendar's schedule, which
+lives in `src/lib/calendar-data.ts`. Every page shows the same date, read from
+`src/content/modified.toon`:
 
 ```
-calendar: 2026-08-17
-courses: 2026-09-13
-information: 2026-09-12
+site: 2026-09-13
 ```
 
-That file is stamped automatically. A pre-commit hook checks which content files
-are staged, sets those pages to today's date, and adds the change to the same
-commit, so the date always ships with the edit that earned it.
+That file is stamped automatically. A pre-commit hook checks whether any content
+file is staged, sets the date to today, and adds the change to the same commit,
+so the date always ships with the edit that earned it.
 
 ```bash
 bun install       # also wires up the hook (see below)
@@ -49,10 +48,12 @@ Hooks live in `.githooks/` rather than `.git/hooks/`, so they are shared through
 the repo. The `prepare` script points git at them via `core.hooksPath` on every
 install. Nothing extra is needed on a fresh clone beyond `bun install`.
 
-Two things to know:
+Three things to know:
 
 - The hook only fires on local commits. Edits made through the GitHub web UI will
   not stamp a date.
+- Content outside `src/content` has to be listed in the `EXTRA` array in
+  `scripts/stamp-modified.ts`, or changes to it go unstamped.
 - Dates are derived at commit time, not build time. Reading them from `git log`
   during a build looks tidier but breaks on hosts that do a shallow clone, where
   every file reports the same single commit.

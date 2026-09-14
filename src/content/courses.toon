@@ -12,7 +12,6 @@ content:
   intro: All GPLLM courses are attended in person, with no remote option. Classes run on Friday evenings and Saturdays on alternating weekends, with intensive courses in September, December and April.
   course_url_base: https://www.jackmanlaw.utoronto.ca/gpllm/gpllm-program/course/2026-2027/
   desc_placeholder: "A full description for {title} will be available soon."
-  last_updated: "2026-09-13"
 
   concentrations[3]{key,label,short}:
     cl,Canadian Law,CAN

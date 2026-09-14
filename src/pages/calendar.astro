@@ -1,7 +1,6 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { loadGlobal, loadPage, loadModified } from '../lib/content';
-import { formatUpdated } from '../lib/date';
 import PageTitle from '../components/PageTitle.astro';
 import FilterBar from '../components/FilterBar.astro';
 import CalendarSection from '../components/CalendarSection.astro';
@@ -13,10 +12,8 @@ const { meta, content } = loadPage<{
   eyebrow: string;
   eyebrow_datetime: string;
   heading: string;
-  last_updated?: string;
 }>('calendar');
-const lastUpdated = loadModified().calendar ?? content.last_updated;
-const updatedLabel = formatUpdated(lastUpdated);
+const lastUpdated = loadModified();
 
 const jsonLD = {
   '@context': 'https://schema.org',
@@ -44,9 +41,6 @@ const jsonLD = {
       <strong>Saturdays</strong> (8:30am–6:30pm). Select any coloured date for details,
       or open the key to filter by session type.
     </p>
-    {updatedLabel && (
-      <p>This site's content was last updated on <time datetime={lastUpdated}>{updatedLabel}</time>.</p>
-    )}
   </PageTitle>
 
   <div
