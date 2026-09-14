@@ -14,7 +14,8 @@ export interface CourseDef {
   /** Path of this course's page on the faculty site. */
   slug?: string;
   capped: boolean;
-  nca: boolean;
+  /** '' | 'yes' (counts toward the NCA) | 'required' (an NCA core subject). */
+  nca?: string;
   req: boolean;
   /** Official description. The placeholder renders until one is provided. */
   desc?: string;
@@ -54,7 +55,7 @@ const desc = course.desc || placeholder.replace('{title}', course.title);
 const flags = [
   alsoTag ?? null,
   course.req ? 'Required' : null,
-  course.nca ? 'NCA' : null,
+  course.nca === 'required' ? 'NCA required' : course.nca ? 'NCA' : null,
 ].filter((f) => f !== null);
 
 // Open cards gather everything into one row. The bar's flags travel here, so

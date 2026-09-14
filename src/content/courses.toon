@@ -20,9 +20,9 @@ content:
     ilt,Technology Law,TECH
 
   program_courses[3]{key,code,kind,title,when,conc,capped,nca,desc}:
-    lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18, 9:30am-4:30pm",cl,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
-    lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,false,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
-    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,true,"Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement."
+    lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18, 9:30am-4:30pm",cl,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
+    lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
+    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,required,Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement.
 
   profile_url_base: https://www.jackmanlaw.utoronto.ca
 
@@ -125,37 +125,37 @@ content:
     LAW4024H,3,applied-legal-research-and-writing,"Finding legal information, judging it critically and communicating the answer clearly: the research-to-writing path lawyers take on a hard question."
 
   catalog[31]{code,title,conc,capped,nca,req}:
-    LAW4026H,Introduction to Law and Technology,ilt,false,false,true
-    LAW4010H,Foundations of Canadian Law,cl,true,false,true
-    LAW4001H,Law and Business in a Global Economy,bl,false,false,true
-    LAW4008H,Constitutional Law,cl,true,true,false
-    LAW4009H,Criminal Law,cl,true,true,false
-    LAW4032H,Intellectual Property Law,bl,false,false,false
-    LAW4002H,Comparative Corporate Governance,bl,false,false,false
-    LAW4017H,Professional Responsibility,cl,true,true,false
-    LAW4046H,Privacy and Data Governance,ilt,false,false,false
-    LAW4055H,"Disruptive Innovations & Legal Infrastructure",ilt,false,false,false
-    LAW4072H,Aboriginal Law,cl,true,false,false
-    LAW4007H,Administrative Law,cl,true,true,false
-    LAW4036H,Applied Contract Law,bl,false,false,false
-    LAW4021H,Tort Law,cl,true,false,false
-    LAW4069H,"Electrification and the Energy Transition: Law and Policy",bl,false,false,false
-    LAW4030H,Financing Technological Innovation,ilt,false,false,false
-    LAW4053H,Law and Regulation of Banks and Financial Institutions,bl,false,false,false
-    LAW4063H,"Regulation of Artificial Intelligence: A Legal and Practical Study",ilt,false,false,false
-    LAW4074H,Immigration Law,cl,true,false,false
-    LAW4028H,"Blockchain, Digital Assets, and the Law",bl,false,false,false
-    LAW4022H,Contract Law,cl,true,false,false
-    LAW4031H,"Cybersecurity & Data Protection",ilt,false,false,false
-    LAW4075H,Financial Crime in a Global Context,bl,false,false,false
-    LAW4076H,"Artificial Intelligence: Policy, Ethics, and Legal Governance",cl,true,false,false
-    LAW4004H,"Mergers & Acquisitions",bl,false,false,false
-    LAW4020H,Property Law,cl,true,false,false
-    LAW4070H,Ethics of Emerging Technology,ilt,false,false,false
-    LAW4071H,Family Law,cl,true,false,false
-    LAW4023H,Business Organizations,cl,true,false,false
-    LAW4003H,Securities Regulation and Corporate Finance,bl,false,false,false
-    LAW4073H,"Data Law: A Health Perspective",ilt,false,false,false
+    LAW4026H,Introduction to Law and Technology,ilt,false,,true
+    LAW4010H,Foundations of Canadian Law,cl,true,required,true
+    LAW4001H,Law and Business in a Global Economy,bl,false,,true
+    LAW4008H,Constitutional Law,cl,true,required,false
+    LAW4009H,Criminal Law,cl,true,required,false
+    LAW4032H,Intellectual Property Law,bl,false,,false
+    LAW4002H,Comparative Corporate Governance,bl,false,,false
+    LAW4017H,Professional Responsibility,cl,true,required,false
+    LAW4046H,Privacy and Data Governance,ilt,false,,false
+    LAW4055H,Disruptive Innovations & Legal Infrastructure,ilt,false,,false
+    LAW4072H,Aboriginal Law,cl,true,yes,false
+    LAW4007H,Administrative Law,cl,true,required,false
+    LAW4036H,Applied Contract Law,bl,false,,false
+    LAW4021H,Tort Law,cl,true,yes,false
+    LAW4069H,Electrification and the Energy Transition: Law and Policy,bl,false,,false
+    LAW4030H,Financing Technological Innovation,ilt,false,,false
+    LAW4053H,Law and Regulation of Banks and Financial Institutions,bl,false,,false
+    LAW4063H,Regulation of Artificial Intelligence: A Legal and Practical Study,ilt,false,,false
+    LAW4074H,Immigration Law,cl,true,yes,false
+    LAW4028H,"Blockchain, Digital Assets, and the Law",bl,false,,false
+    LAW4022H,Contract Law,cl,true,yes,false
+    LAW4031H,Cybersecurity & Data Protection,ilt,false,,false
+    LAW4075H,Financial Crime in a Global Context,bl,false,,false
+    LAW4076H,"Artificial Intelligence: Policy, Ethics, and Legal Governance",cl,true,yes,false
+    LAW4004H,Mergers & Acquisitions,bl,false,,false
+    LAW4020H,Property Law,cl,true,yes,false
+    LAW4070H,Ethics of Emerging Technology,ilt,false,,false
+    LAW4071H,Family Law,cl,true,yes,false
+    LAW4023H,Business Organizations,cl,true,yes,false
+    LAW4003H,Securities Regulation and Corporate Finance,bl,false,,false
+    LAW4073H,Data Law: A Health Perspective,ilt,false,,false
 
   terms:
     fall:
