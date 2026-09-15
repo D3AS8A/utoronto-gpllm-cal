@@ -64,20 +64,8 @@ function isActive(href: string): boolean {
   </ul>
 </nav>
 
-<!--
-  is:inline so this runs before Alpine's bundled script, allowing
-  alpine:init to register the component before Alpine processes the DOM.
--->
+
 <script is:inline>
-  /**
-   * Runs on the next frame, or after a short wait if that never arrives.
-   *
-   * requestAnimationFrame does not fire in every context: Safari withholds it
-   * in some windows, and any browser throttles it in a background tab. Gating
-   * anything on rAF alone therefore risks never running at all, which left the
-   * nav's blocks stranded at opacity 0 in Safari. Whichever callback lands
-   * first wins; the other is dropped.
-   */
   function onNextFrame(fn) {
     let done = false;
     const once = () => {
@@ -153,9 +141,7 @@ function isActive(href: string): boolean {
       },
 
       hover(el, fromPointer = false) {
-        // A tap on a touch screen fires mouseenter with no mouseleave to
-        // follow, which would leave the hover block parked on whatever was
-        // last tapped. Only a real pointer gets to move it.
+
         if (fromPointer && !matchMedia('(hover: hover)').matches) return;
 
         this.hoverLeft = el.offsetLeft;
@@ -200,12 +186,6 @@ function isActive(href: string): boolean {
       tumble(items, from, to) {
         const dest = items[to];
         const sameRow = items.every((el) => el.offsetTop === dest.offsetTop);
-
-        // Needs a single row to roll along, and motion allowed. Touch is fine:
-        // a tap has no hover to lead the block, but the journey is driven by
-        // navigation rather than by the pointer. What looked like a broken
-        // tumble on iOS was the blocks sitting at opacity 0, because the
-        // requestAnimationFrame that unlocks them never fired there.
         const canTumble =
           sameRow && !matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -215,9 +195,7 @@ function isActive(href: string): boolean {
           return;
         }
 
-        // Interrupted mid-journey. The block is somewhere in mid-air, so a
-        // fresh tumble would start from a seat it never reached and jump to
-        // get there. Slide to the new target instead.
+        // Interrupted mid-journey
         if (this.anim) {
           this.settle();
           onNextFrame(() => this.park(dest));
@@ -229,22 +207,6 @@ function isActive(href: string): boolean {
         const h = dest.offsetHeight;
         const dir = to > from ? 1 : -1;
 
-        // The whole tumble lives in `transform`. park() above has already put
-        // the element's box on the destination, so each keyframe expresses its
-        // pose relative to that box: scaleX for the width, translate for the
-        // position, and a pivot baked around the rotate.
-        //
-        // It used to animate left/width and swap transform-origin between the
-        // two corners at the seam. That reads fine on desktop WebKit and in the
-        // simulator, but on real iOS hardware the block is promoted to its own
-        // layer, and a composited layer keeps the anchor point it was created
-        // with: the keyframed origin change is dropped, so one half of every hop
-        // rotated about the corner belonging to the other half. The block swung
-        // up over the logo and snapped back at the seam. Frame-by-frame, the
-        // break was a single frame wide and landed exactly on the origin swap.
-        //
-        // Expressed this way there is no origin to lose, and no layout property
-        // animating on the main thread that could drift from a composited one.
         const xBox = dest.offsetLeft;
         const wBox = dest.offsetWidth;
         const pose = (x, w, deg, right) => {
@@ -257,11 +219,7 @@ function isActive(href: string): boolean {
         const hops = [];
         for (let i = from; i !== to; i += dir) hops.push([items[i], items[i + dir]]);
 
-        // No negative control point: that gave the first hop a backward wind-up
-        // before it tipped. On iOS the opening of a composited animation can be
-        // replayed as the layer settles, which turned that one wind-up into a
-        // visible double rock against the rule. Tipping straight in has nothing
-        // to replay backwards.
+        // Bounce animation
         const EASE_TIP  = 'cubic-bezier(0.55, 0, 0.75, 0.25)';
         const EASE_DROP = 'cubic-bezier(0.5, 0.04, 0.74, 0.28)';
         const EASE_RISE = 'cubic-bezier(0.22, 0.52, 0.42, 0.9)';
@@ -285,7 +243,7 @@ function isActive(href: string): boolean {
           const last = k === n - 1;
           const xa = a.offsetLeft, wa = a.offsetWidth;
           const xb = b.offsetLeft, wb = b.offsetWidth;
-          const wm = h * 1.8; // pinch to a short rect at vertical, then grow to the destination
+          const wm = h * 1.8; // pinch to a shorter rect at vertical
           const pivot = dir === 1 ? xa + wa : xa;
           const down = k === 0 ? EASE_TIP : EASE_DROP;
           const up = last ? EASE_RUSH : EASE_RISE;
@@ -297,9 +255,7 @@ function isActive(href: string): boolean {
             : { right: true,  rot: -90, mid: pivot + h - wm };
           const seam = t0 + (last ? 0.3 : 0.5) * L;
 
-          // The pair describes one pose two ways, handing the pivot from one
-          // corner to the other. Split by a hair rather than sharing an offset,
-          // so nothing downstream can collapse them into a single keyframe.
+          // Handing the pivot from one corner to the other
           frames.push(
             { offset: t0,   easing: down, transform: pose(xa, wa, 0, A.right) },
             { offset: seam,               transform: pose(A.mid, wm, A.rot, A.right) },
@@ -330,8 +286,6 @@ function isActive(href: string): boolean {
           frames.push(at(1, 0));
         });
 
-        // One constant value, so there is no origin change to drop whichever
-        // path the engine takes. The CSS rule below says the same thing.
         frames.forEach((f) => { f.transformOrigin = '0 0'; });
 
         this.tumbling = true;
@@ -350,13 +304,13 @@ function isActive(href: string): boolean {
           );
         });
 
+        // iOS Safari animation fixes
         const anim = this.$refs.lava.animate(frames, { duration: total, fill: 'none' });
+        anim.pause();
+        anim.currentTime = 0;
         this.anim = anim;
 
-        // Guarded by identity: cancelling settles asynchronously, so without
-        // this a discarded journey would clear is-tumbling out from under the
-        // journey that replaced it, handing left/width back to the CSS
-        // transition mid-flight.
+        // Cancelling settles asynchronously, hands the block back to the CSS transition mid-flight
         const done = () => {
           if (this.anim !== anim) return;
           this.tumbling = false;
@@ -364,6 +318,22 @@ function isActive(href: string): boolean {
           items.forEach((el) => el.classList.remove('is-flash'));
         };
         anim.finished.then(done).catch(done);
+
+        let clock = 0;
+        let stamp = performance.now();
+        const drive = () => {
+          if (this.anim !== anim) return; // settled or replaced mid-journey
+          const now = performance.now();
+          clock += Math.min(now - stamp, 50);
+          stamp = now;
+          if (clock < total) {
+            anim.currentTime = clock;
+            requestAnimationFrame(drive);
+            return;
+          }
+          anim.cancel();
+        };
+        requestAnimationFrame(drive);
       },
     }));
   });
@@ -406,9 +376,6 @@ function isActive(href: string): boolean {
     z-index: 0;
   }
 
-  /* Nothing to preview without a cursor: this block exists to run ahead of a
-     pointer, and a tap has no "ahead". Left in, it only shows as a stray tint
-     parked at the destination while the current block tumbles toward it. */
   @media (hover: none) {
     .cal-nav-lava-hover {
       display: none;
@@ -445,14 +412,13 @@ function isActive(href: string): boolean {
     color: var(--prussian-blue);
   }
 
-  /* Intermediate labels light up for the instant the block seats on them */
   .cal-nav-link.is-flash {
     color: var(--satin-linen);
     transition-duration: 90ms;
   }
 
   .cal-nav-link {
-    position: relative; /* keeps the label above both blocks */
+    position: relative;
     z-index: 2;
     display: block;
     font-family: 'Space Mono', ui-monospace, monospace;
