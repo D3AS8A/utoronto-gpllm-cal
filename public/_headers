@@ -29,13 +29,13 @@
 /
   Cache-Control: public, max-age=0, must-revalidate
 
-/calendar
+/calendar/
   Cache-Control: public, max-age=0, must-revalidate
 
-/courses
+/courses/
   Cache-Control: public, max-age=0, must-revalidate
 
-/information
+/information/
   Cache-Control: public, max-age=0, must-revalidate
 
 /*.html

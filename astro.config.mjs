@@ -4,14 +4,21 @@ import sitemap from '@astrojs/sitemap';
 import AstroPWA from '@vite-pwa/astro';
 
 export default defineConfig({
-  // Set this to your production domain — required for sitemap + canonical URLs
+  // Set to production domain, required for sitemap + canonical URLs
   site: 'https://gpllm.pages.dev',
 
   output: 'static',
 
-  // The calendar is the site's landing page; `/` bounces to it.
+  /*
+   * Cloudflare Pages serves a directory route with trailing slash `/calendar/`, 
+   * it 308s to the bare `/calendar`; always use trailing slash here to make the 
+   * precache manifest agree
+   */
+  trailingSlash: 'always',
+
+  // The calendar is the site's landing page, `/` bounces to it
   redirects: {
-    '/': '/calendar',
+    '/': '/calendar/',
   },
 
   devToolbar: {
@@ -32,7 +39,7 @@ export default defineConfig({
         name: 'UofT GPLLM Calendar',
         short_name: 'GPLLM Cal',
         description: 'An interactive academic calendar for the GPLLM program at the UofT Jackman faculty of law.',
-        start_url: '/calendar',
+        start_url: '/calendar/',
         scope: '/',
         display: 'standalone',
         background_color: '#f4f1ea',
@@ -52,8 +59,24 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{html,css,js,svg,png,ico,webmanifest,ics,txt,xml}'],
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/ics\//, /\.ics$/],
+
+        /*
+         * Cloudflare serves the not-found page at `/404`, the one route whose
+         * canonical shape is the opposite of every other page's. Precaching it
+         * meant asking for `/404/`, and a precache entry that 404s fails the
+         * whole install, which takes the service worker down with it. Nothing
+         * needs a cached not-found page.
+         */
+        globIgnores: ['404.html'],
+        /*
+         * No navigateFallback. @vite-pwa/astro rewrites the root page to the
+         * scope (`/`) and never emits `/index.html`, so binding the fallback
+         * to it threw non-precached-url. The worker body runs inside the AMD
+         * factory's promise, so that throw was an unhandled rejection rather
+         * than a fatal script error: the worker still installed and precached,
+         * then stopped before registering anything below this line. Every page
+         * is precached anyway, so the fallback bought nothing.
+         */
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {
