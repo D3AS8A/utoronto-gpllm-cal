@@ -1,7 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { loadPage, loadModified } from '../lib/content';
-import { shapeCourses, courseToken, type CoursesContent, type RunDef, type CourseDef } from '../lib/courses';
+import { shapeCourses, courseToken, type CoursesContent, type RunDef } from '../lib/courses';
 import PageTitle from '../components/PageTitle.astro';
 import CourseCard from '../components/CourseCard.astro';
 import CourseSection, { type TimeEntry } from '../components/CourseSection.astro';
@@ -83,14 +83,8 @@ const courses = [...byCourse.entries()]
     class="courses-app"
     x-data="courseFilters"
     @hashchange.window="revealFromHash()"
-    @course:toggle.document="$nextTick(() => syncOpenHash())"
-    :class="{
-      'show-cl': conc.cl,
-      'show-bl': conc.bl,
-      'show-ilt': conc.ilt,
-      'sort-course': sort === 'course',
-      'sort-time': sort === 'time',
-    }"
+    @course:toggle.document="onCourseToggle()"
+    :class="appClass"
   >
     <ConcentrationFilter concentrations={content.concentrations}>
       <SortToggle

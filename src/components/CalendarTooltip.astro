@@ -11,7 +11,7 @@
   @click="openTooltipDetail()"
 >
   <div class="tooltip-slot-stack">
-    <div class="tooltip-slot" :class="{ 'is-active': tooltip.active === 0 }" aria-hidden="tooltip.active !== 0">
+    <div class="tooltip-slot" :class="{ 'is-active': tooltip.active === 0 }" :aria-hidden="tooltip.active !== 0">
       <template x-if="tooltip.slot0">
         <div class="tooltip-slot-inner">
           <p class="tooltip-date">
@@ -35,7 +35,7 @@
         </div>
       </template>
     </div>
-    <div class="tooltip-slot" :class="{ 'is-active': tooltip.active === 1 }" aria-hidden="tooltip.active !== 1">
+    <div class="tooltip-slot" :class="{ 'is-active': tooltip.active === 1 }" :aria-hidden="tooltip.active !== 1">
       <template x-if="tooltip.slot1">
         <div class="tooltip-slot-inner">
           <p class="tooltip-date">

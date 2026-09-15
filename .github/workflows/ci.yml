@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A newer push to the same branch supersedes the run still in flight
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Type check and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Reads the `packageManager` field, so CI uses the bun the repo pins
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: package.json
+
+      # Same file Cloudflare Pages reads, so CI and the deploy agree on Node
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - run: bun install --frozen-lockfile
+
+      # Types first: it is the faster of the two and the likelier to fail
+      - run: bun run check
+
+      - run: bun run build

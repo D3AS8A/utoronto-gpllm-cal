@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "check": "astro check",
     "preview": "astro preview",
     "astro": "astro",
     "prepare": "git config core.hooksPath .githooks || true",
@@ -21,8 +22,10 @@
     "ics": "^3.12.0"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.10",
     "@vite-pwa/astro": "^1.2.0",
     "sass": "^1.100.0",
+    "typescript": "^6",
     "workbox-window": "^7.4.1"
   }
 }

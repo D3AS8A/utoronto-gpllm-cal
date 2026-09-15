@@ -978,6 +978,19 @@ export default (Alpine: Alpine) => {
     sortWidth: 0,
     sortReady: false,
 
+    /* A getter rather than an inline object in the markup: Astro's TSX
+       transform, which `astro check` reads, can't parse an attribute value
+       spanning several lines, and one long line is worse than this */
+    get appClass() {
+      return {
+        'show-cl': this.conc.cl,
+        'show-bl': this.conc.bl,
+        'show-ilt': this.conc.ilt,
+        'sort-course': this.sort === 'course',
+        'sort-time': this.sort === 'time',
+      };
+    },
+
     init() {
       // Restored before the first paint below, so the pill snaps straight to
       // the view the link asked for instead of sliding across to it
@@ -1089,6 +1102,13 @@ export default (Alpine: Alpine) => {
      * replaceState rather than assigning location.hash: the latter fires
      * hashchange, which would send revealFromHash straight back here.
      */
+    /* A toggle fires before the card's own state lands, so wait a tick. Lives
+       here rather than in the attribute: an arrow function in Astro markup
+       reads as the end of the tag to the compiler's TSX transform */
+    onCourseToggle() {
+      this.$nextTick(() => this.syncOpenHash());
+    },
+
     syncOpenHash() {
       const cards = [...document.querySelectorAll<HTMLElement>('.course-card')];
       const open = cards.filter((card) => {
