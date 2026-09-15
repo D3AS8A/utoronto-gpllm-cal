@@ -33,48 +33,70 @@
               <p class="detail-item-time" x-text="item.time"></p>
               <p class="detail-item-note" x-show="item.note" x-text="item.note"></p>
 
-              <!-- Shown only where the day resolves to more than one class.
-                   A single match is folded into the event without asking. -->
-              <fieldset class="detail-pick-set" x-show="item.options && item.options.length > 1">
-                <legend class="detail-pick-legend">Select a class</legend>
-                <template x-for="opt in item.options" :key="opt.ref">
-                  <label class="detail-pick">
-                    <input
-                      type="radio"
-                      class="detail-pick-input"
-                      :name="`pick-${item.name}`"
-                      :value="opt.ref"
-                      x-model="courseChoice[item.name]"
-                    />
-                    <span class="detail-pick-mark" aria-hidden="true"></span>
-                    <span class="detail-pick-text">
-                      <span class="detail-pick-title" x-text="opt.title"></span>
-                      <span class="detail-pick-slot" x-text="opt.slot"></span>
-                    </span>
-                  </label>
-                </template>
-              </fieldset>
+              <!-- Boxed together: the picker and the buttons are one
+                   control, and the buttons act on whatever the picker holds -->
+              <div
+                class="detail-pick-box"
+                :class="{ 'has-picker': item.options && item.options.length > 1 }"
+              >
+                <fieldset class="detail-pick-set" x-show="item.options && item.options.length > 1">
+                  <legend class="detail-pick-legend">Select a class</legend>
 
-              <div class="detail-item-cta" x-show="item.isoStart">
-                <span class="detail-item-cta-label">Add to</span>
-                <a
-                  class="cta"
-                  target="_blank"
-                  rel="noopener"
-                  :href="googleCalUrl(item)"
-                >Google Cal</a>
-                <a
-                  class="cta"
-                  x-show="isApple"
-                  :href="appleCalUrl(item)"
-                  title="Open this event in the built-in Calendar app"
-                >iCal</a>
-                <button
-                  type="button"
-                  class="cta"
-                  @click="downloadIcs(item)"
-                  title="Download an .ics file for any other calendar app"
-                >.ics</button>
+                  <div class="detail-pick-list">
+                    <template x-for="opt in item.options" :key="opt.ref">
+                      <label class="detail-pick">
+                        <input
+                          type="radio"
+                          class="detail-pick-input"
+                          :name="`pick-${item.name}`"
+                          :value="opt.ref"
+                          x-model="courseChoice[item.name]"
+                          @change="movePickDot(item.name, $el)"
+                        />
+                        <span class="detail-pick-ring" aria-hidden="true"></span>
+                        <!-- Covers the rail, punched through at this row's ring.
+                             One strip per row rather than a single overlay, so
+                             the rows can be any height they like. -->
+                        <span class="detail-pick-mask" aria-hidden="true"></span>
+                        <span class="detail-pick-text">
+                          <span class="detail-pick-title" x-text="opt.title"></span>
+                          <span class="detail-pick-slot" x-text="opt.slot"></span>
+                        </span>
+                      </label>
+                    </template>
+
+                    <!-- Travels behind the strips, so it is only ever seen
+                         through a ring it has arrived at -->
+                    <span
+                      class="detail-pick-dot"
+                      :class="{ 'is-on': courseChoice[item.name] }"
+                      :style="`transform: translateY(${pickDot[item.name] ?? 0}px)`"
+                      aria-hidden="true"
+                    ></span>
+                  </div>
+                </fieldset>
+
+                <div class="detail-item-cta" x-show="item.isoStart">
+                  <span class="detail-item-cta-label">Add to</span>
+                  <a
+                    class="cta"
+                    target="_blank"
+                    rel="noopener"
+                    :href="googleCalUrl(item)"
+                  >Google Cal</a>
+                  <a
+                    class="cta"
+                    x-show="isApple"
+                    :href="appleCalUrl(item)"
+                    title="Open this event in the built-in Calendar app"
+                  >iCal</a>
+                  <button
+                    type="button"
+                    class="cta"
+                    @click="downloadIcs(item)"
+                    title="Download an .ics file for any other calendar app"
+                  >.ics</button>
+                </div>
               </div>
             </div>
           </li>
@@ -88,13 +110,37 @@
 <style>
   /* Prefixed throughout: Foundation is loaded globally and owns .button,
      .switch and friends, and its rules reach into scoped styles */
+
+  /* The picker and the add buttons read as one control: the buttons act on
+     whatever the picker is holding, so they are boxed together rather than
+     left sitting loose under the day's details. */
+  .detail-pick-box:not(.has-picker) {
+    margin-top: 0.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  .detail-pick-box {
+    --pick-surface: #fbf9f5;
+    --pick-rail: 1.75rem;
+    --pick-ring: 0.875rem;
+    --pick-pad-top: 0.75rem;
+    --pick-pad-bottom: 0.25rem;
+    --pick-hole: 0.5625rem;
+    --pick-dot: 0.4375rem;
+
+    margin-top: 0.625rem;
+    padding: 0.5rem 0.6875rem 0.625rem;
+    border: 0.0625rem solid var(--tana);
+    border-radius: 0.375rem;
+    background: var(--pick-surface);
+  }
+
   .detail-pick-set {
     border: 0;
-    margin: 0.5rem 0 0;
+    margin: 0;
     padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.0625rem;
   }
 
   .detail-pick-legend {
@@ -107,22 +153,32 @@
     margin-bottom: 0.25rem;
   }
 
-  .detail-pick {
+  /* No gap: the strips have to tile without seams, or the dot shows between
+     rows on its way past */
+  .detail-pick-list {
+    position: relative;
     display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    padding: 0.3125rem 0.4375rem;
-    border-radius: 0.25rem;
-    cursor: pointer;
-    transition: background 0.15s linear;
+    flex-direction: column;
   }
 
-  .detail-pick:hover {
-    background: rgb(0 37 84 / 0.05);
+  /* Padding rather than a gap: the strips tile edge to edge and any gap would
+     let the dot show between rows. Padding sits inside the strip, so it buys
+     the separation a wrapped two-line title needs without opening a seam.
+     Weighted to the top, which groups a slot label with the title above it
+     rather than leaving it stranded between two rows. */
+  .detail-pick {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: var(--pick-pad-top) 0.5rem var(--pick-pad-bottom) 0;
+    cursor: pointer;
   }
 
   /* Visually hidden, not display:none — the real input keeps the keyboard and
-     screen reader behaviour that a div dressed as a radio would have to fake */
+     screen reader behaviour a div dressed as a radio would have to fake */
   .detail-pick-input {
     position: absolute;
     width: 0.0625rem;
@@ -131,33 +187,81 @@
     margin: 0;
   }
 
-  .detail-pick-mark {
-    position: relative;
-    top: 0.1875rem;
+  .detail-pick-ring {
     flex: none;
-    width: 0.8125rem;
-    height: 0.8125rem;
+    width: var(--pick-ring);
+    height: var(--pick-ring);
+    margin-left: calc((var(--pick-rail) - var(--pick-ring)) / 2);
     border: 0.09375rem solid var(--chino);
     border-radius: 50%;
-    background: #fff;
-    transition: border-color 0.15s linear;
+    transition: border-color 0.3s linear;
   }
 
-  .detail-pick-input:checked + .detail-pick-mark {
+  .detail-pick-input:checked ~ .detail-pick-ring {
     border-color: var(--matisse);
   }
 
-  .detail-pick-input:checked + .detail-pick-mark::after {
-    content: '';
-    position: absolute;
-    inset: 0.125rem;
-    border-radius: 50%;
-    background: var(--matisse);
-  }
-
-  .detail-pick-input:focus-visible + .detail-pick-mark {
+  .detail-pick-input:focus-visible ~ .detail-pick-ring {
     outline: 0.125rem solid var(--matisse);
     outline-offset: 0.125rem;
+  }
+
+  /* The rail, painted over in the box's own colour and punched through at this
+     row's ring. The hole sits at 50% of the row, so a row that wraps to two
+     lines still lines up without anyone recalculating a pitch. */
+  .detail-pick-mask {
+    /* Centre of the content box, not of the strip. The row's padding is
+       deliberately lopsided, so `50%` would put the hole above the ring and
+       clip its lower edge. */
+    --pick-hole-y: calc(
+      var(--pick-pad-top) +
+      (100% - var(--pick-pad-top) - var(--pick-pad-bottom)) / 2
+    );
+
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: var(--pick-rail);
+    height: 100%;
+    background: var(--pick-surface);
+    pointer-events: none;
+    -webkit-mask-image: radial-gradient(
+      circle at 50% var(--pick-hole-y),
+      transparent var(--pick-hole),
+      #000 calc(var(--pick-hole) + 0.5px)
+    );
+    mask-image: radial-gradient(
+      circle at 50% var(--pick-hole-y),
+      transparent var(--pick-hole),
+      #000 calc(var(--pick-hole) + 0.5px)
+    );
+  }
+
+  /* One dot for the whole list. It slides to the chosen row and is masked
+     everywhere in between, so it reads as travelling down the rail. */
+  .detail-pick-dot {
+    position: absolute;
+    z-index: 1;
+    left: calc((var(--pick-rail) - var(--pick-dot)) / 2);
+    top: calc(var(--pick-dot) / -2);
+    width: var(--pick-dot);
+    height: var(--pick-dot);
+    border-radius: 50%;
+    background: var(--matisse);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+  }
+
+  /* Nothing to travel from on the first pick, so it simply arrives */
+  .detail-pick-dot.is-on {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .detail-pick-dot {
+      transition: none;
+    }
   }
 
   .detail-pick-text {
@@ -165,18 +269,20 @@
     flex-wrap: wrap;
     align-items: baseline;
     gap: 0.0625rem 0.4375rem;
+    min-width: 0;
   }
 
   .detail-pick-title {
     font-size: 0.8125rem;
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.1;
     color: var(--prussian-blue);
   }
 
   .detail-pick-slot {
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.59375rem;
+    line-height: 1.2;
     letter-spacing: 0.06em;
     color: var(--driftwood);
     white-space: nowrap;
@@ -207,7 +313,13 @@
     box-shadow: 0 0 0 100vmax rgba(0, 37, 84, 0.20);
   }
 
+  /* Capped so a day with eight classes cannot run off a short screen; the
+     header stays put and the list below it takes the scroll. */
   .detail-card {
+    max-height: calc(100vh - 2.25rem);
+    max-height: calc(100dvh - 2.25rem);
+    display: flex;
+    flex-direction: column;
     position: relative;
     z-index: 1;
     background: #fff;
@@ -273,10 +385,12 @@
   .detail-close:active { transform: scale(0.9); }
 
   .detail-body {
+    overflow-y: auto;
+    overscroll-behavior: contain;
     padding: 1rem 1.125rem;
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1.375rem;
     list-style: none;
     margin: 0;
   }
@@ -299,6 +413,15 @@
 
   .detail-item-swatch { display: block; }
 
+  /* Foundation's global `p { margin-bottom: 1rem }` reaches these, and stacked
+     on the flex gap it put more air inside an event than between two of them.
+     Spacing is the gap's job. */
+  .detail-item-name,
+  .detail-item-time,
+  .detail-item-note {
+    margin: 0;
+  }
+
   .detail-item-name {
     font-weight: 800;
     font-size: 0.9375rem;
@@ -309,14 +432,12 @@
     font-family: 'Space Mono', ui-monospace, monospace;
     font-size: 0.75rem;
     color: var(--pablo);
-    margin-top: 0.125rem;
   }
 
   .detail-item-note {
     font-size: 0.8125rem;
     font-style: italic;
     color: var(--pablo);
-    margin-top: 0.25rem;
     line-height: 1.35;
   }
 
@@ -331,8 +452,14 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.5rem;
     flex-wrap: wrap;
+  }
+
+  /* Only when a picker sits above it */
+  .detail-pick-box.has-picker .detail-item-cta {
+    margin-top: 0.5625rem;
+    padding-top: 0.5625rem;
+    border-top: 0.0625rem solid var(--tana);
   }
 
   .detail-item-cta-label {

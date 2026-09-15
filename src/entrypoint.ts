@@ -379,6 +379,8 @@ export default (Alpine: Alpine) => {
     detail: null as CalendarDetail | null,
     /** Chosen class per detail item, keyed by item name. Empty = none. */
     courseChoice: {} as Record<string, string>,
+    /** Y of the travelling dot per item, measured from the chosen row. */
+    pickDot: {} as Record<string, number>,
     _courseIndex: null as Record<string, EventCourse> | null,
     _cells: null as Record<string, CalendarDetail> | null,
     tooltip: {
@@ -606,6 +608,7 @@ export default (Alpine: Alpine) => {
       vibrate(9);
       this.detail = detail;
       this.courseChoice = {};
+      this.pickDot = {};
       this.tooltip.visible = false;
       this.tooltip.travel = false;
       this.tooltip.slot0 = null;
@@ -837,6 +840,22 @@ export default (Alpine: Alpine) => {
       document.body.style.cursor = 'grabbing';
       el.style.animation = 'none';
       el.classList.add('is-dragging');
+    },
+
+    /**
+     * Rows can be any height — a long course title wraps — so the dot's stop is
+     * measured off the chosen row rather than assumed from a fixed pitch. Same
+     * approach the sort pill and the nav's block already take.
+     */
+    movePickDot(name: string, input: HTMLElement) {
+      const row = input.closest<HTMLElement>('.detail-pick');
+      const ring = row?.querySelector<HTMLElement>('.detail-pick-ring');
+      const list = row?.parentElement;
+      if (!row || !ring || !list) return;
+      // Measured off the ring, not the row: the row's padding is lopsided, so
+      // its box centre sits above the ring the dot has to land in
+      const top = ring.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      this.pickDot[name] = top + ring.offsetHeight / 2;
     },
 
     /**
