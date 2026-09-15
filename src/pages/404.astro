@@ -1,71 +1,202 @@
 ---
-import BaseLayout from '../layouts/BaseLayout.astro';
+import PageLayout from '../layouts/PageLayout.astro';
 import { loadPage } from '../lib/content';
 
-const { meta, options, content } = loadPage('404');
-const c = content as {
+const { meta, options, content } = loadPage<{
   code: string;
-  heading: string;
+  lines: string[];
   message: string;
-  cta: string;
-  cta_href: string;
-};
+}>('404');
+
+/*
+ * The composition is drawn rather than derived: which side of a phrase a block
+ * falls on is a typesetting decision, not something to infer from the words. A
+ * `fill` block takes whatever the line has left, so the first two rows stay
+ * flush right at any width. The last row's blocks are sized instead, so it
+ * stops short and leaves the white space the design wants.
+ *
+ * `drift` blocks breathe on their own slow cycle, which walks the phrase
+ * beside them a few pixels left and right. See the keyframes below.
+ */
+const rows = [
+  { before: [], after: [{ tone: 'navy', fill: true }] },
+  { before: [{ tone: 'navy', drift: 1 }], after: [{ tone: 'matisse', fill: true }] },
+  { before: [{ tone: 'sand', drift: 4 }], after: [{ tone: 'sand', drift: 2 }, { tone: 'navy', drift: 3 }] },
+].map((row, i) => ({ ...row, text: content.lines[i] }));
+
+const barClass = (bar: { tone: string; fill?: boolean; drift?: number }) =>
+  ['nf-bar', `nf-bar-${bar.tone}`, bar.fill ? 'nf-bar-fill' : `nf-drift-${bar.drift}`].join(' ');
 ---
 
-<BaseLayout
+<PageLayout
   title={meta.title ?? undefined}
   description={meta.description}
+  ogImage={meta.og_image}
   noindex={options?.noindex ?? false}
 >
-  <section class="error-page">
-    <div class="container">
-      <p class="error-code" aria-hidden="true">{c.code}</p>
-      <h1>{c.heading}</h1>
-      <p class="error-message">{c.message}</p>
-      <a href={c.cta_href} class="btn btn-primary magnify-onhover">{c.cta}</a>
-    </div>
-  </section>
-</BaseLayout>
+  <main id="main-content" class="nf" tabindex="-1">
+    <h1 class="nf-headline">
+      {rows.map(({ text, before, after }, i) => (
+        <span class="nf-line">
+          {i === 0 && <span class="nf-code"><span class="nf-code-num">{content.code}</span></span>}
+          {before.map((bar) => <span class={barClass(bar)} aria-hidden="true"></span>)}
+          <span class="nf-phrase">{text}</span>
+          {after.map((bar) => <span class={barClass(bar)} aria-hidden="true"></span>)}
+        </span>
+      ))}
+    </h1>
 
-<style lang="scss">
-  @use '../styles/breakpoints' as *;
-  .error-page {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-block: 6rem;
-    text-align: center;
+    <p class="nf-message">{content.message}</p>
+  </main>
+</PageLayout>
+
+<style>
+  .nf {
+    padding-top: clamp(2rem, 7vw, 5rem);
   }
 
-  .error-page .container {
+  /* A row per phrase rather than one wrapping run, so the bars always land
+     beside the words they finish instead of being pushed onto a line of their
+     own at whatever width the text happens to break */
+  .nf-headline {
+    --nf-gap: clamp(0.5rem, 1.2vw, 0.875rem);
     display: flex;
     flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .error-code {
-    font-size: clamp(5rem, 20vw, 10rem);
-    font-weight: 700;
+    gap: 0.12em;
+    margin: 0;
+    font-size: clamp(1.875rem, 8.4vw, 5.25rem);
+    font-weight: 800;
     line-height: 1;
-    color: var(--tuna);
-    letter-spacing: -0.04em;
-    -webkit-user-select: none;
-    user-select: none;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    color: var(--prussian-blue);
   }
 
-  .error-message {
-    color: var(--sandstone);
-    max-width: 40ch;
+  /* Centred on the type rather than sat on its baseline: the bars stand a
+     little taller than the caps and overlap them top and bottom, which is
+     what stops them reading as underlines */
+  .nf-line {
+    display: flex;
+    align-items: center;
+    gap: var(--nf-gap);
   }
 
-  @include small {
-    .error-page {
-      padding-block: 3rem;
+  .nf-phrase {
+    white-space: nowrap;
+  }
+
+  /* The same band as the bars with a number centred in it, so it reads as one
+     of them. Height is fixed to the bar, and inline padding is the only thing
+     setting the width. */
+  .nf-code {
+    display: flex;
+    align-items: center;
+    height: 0.95em;
+    padding-inline: 1em;
+    line-height: 1;
+    background: var(--prussian-blue);
+    color: var(--satin-linen);
+    white-space: nowrap;
+    animation: nfDriftCode 28s ease-in-out infinite;
+  }
+
+  /* Tracking adds a trailing space after the last digit too, so pull it back
+     or the number sits off-centre in its block */
+  .nf-code-num {
+    letter-spacing: 0.5rem;
+    margin-inline-end: -0.5rem;
+  }
+
+  .nf-bar {
+    height: 0.95em;
+  }
+
+  /* Takes the rest of the line, which is what keeps a row flush right */
+  .nf-bar-fill {
+    flex: 1 1 0;
+    min-width: 1.25rem;
+  }
+
+  /* Sized as a share of the line, so they hold their proportions at every
+     width rather than needing a breakpoint each */
+  .nf-drift-1,
+  .nf-drift-2,
+  .nf-drift-3,
+  .nf-drift-4 {
+    flex: 0 0 auto;
+  }
+
+  /* Row 2 opens wide and closes, rows 1 and 3 open and widen, so a row always
+     travels against the one above it. The periods are close but not equal, so
+     they hold that opposition for a couple of minutes, slide through each
+     other, and come back. Nothing here ever repeats exactly. */
+  .nf-drift-1 { width: 27%; animation: nfDrift1 31s ease-in-out infinite; }
+  .nf-drift-2 { width: 14%; animation: nfDrift2 35s ease-in-out infinite; }
+  .nf-drift-3 { width: 18%; animation: nfDrift3 35s ease-in-out infinite; }
+
+  @keyframes nfDrift1 { 0%, 100% { width: 28.5%; } 50% { width: 25%; } }
+  @keyframes nfDrift2 { 0%, 100% { width: 13.2%; } 50% { width: 14.6%; } }
+  @keyframes nfDrift3 { 0%, 100% { width: 17.4%; } 50% { width: 18.2%; } }
+
+  /* Row 3's leading block. It closes to nothing, so at its narrowest the words
+     have to sit hard against the margin like the rows above them: the negative
+     end margin cancels the line's gap at that point and opens back up as the
+     block grows, rather than parking a gap's worth of indent there forever. */
+  .nf-drift-4 {
+    width: 0;
+    animation: nfDrift4 35s ease-in-out infinite;
+  }
+
+  @keyframes nfDrift4 {
+    0%, 100% { width: 0; margin-inline-end: calc(-1 * var(--nf-gap)); }
+    50%      { width: 5%; margin-inline-end: 0; }
+  }
+
+  /* The first row has no block ahead of its words, so the chip is what walks
+     it. Same idea, same slow scale. */
+  @keyframes nfDriftCode { 0%, 100% { padding-inline: 0.92em; } 50% { padding-inline: 1.14em; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nf-code,
+    .nf-drift-1,
+    .nf-drift-2,
+    .nf-drift-3,
+    .nf-drift-4 {
+      animation: none;
+    }
+  }
+
+  .nf-bar-navy    { background: var(--prussian-blue); }
+  .nf-bar-matisse { background: var(--matisse); }
+  .nf-bar-sand    { background: var(--hillary); }
+
+  .nf-message {
+    max-width: 32.5rem;
+    margin: clamp(1.75rem, 4vw, 3rem) 0 0;
+    font-size: clamp(0.8125rem, 1.4vw, 0.90625rem);
+    line-height: 1.35;
+    font-weight: 500;
+    color: var(--oxford-blue);
+  }
+
+  @media (max-width: 45rem) {
+    .nf-message {
+      max-width: none;
+    }
+  }
+
+  /* The chip's inline padding is a share of a font size that has already hit
+     its floor, so on the narrowest screens it stops scaling with the line and
+     starts pushing it wide. Trim it there and let the bars go thinner. */
+  @media (max-width: 26rem) {
+    .nf-code {
+      padding-inline: 0.5em;
+      animation: none;
     }
 
-    .error-code {
-      font-size: clamp(4rem, 15vw, 6rem);
+    .nf-bar-fill {
+      min-width: 0.75rem;
     }
   }
+
 </style>

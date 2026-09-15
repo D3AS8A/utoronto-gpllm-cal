@@ -10,9 +10,11 @@ interface Props {
   jsonLD?: Record<string, unknown>;
   /** ISO YYYY-MM-DD of the last manual content update. */
   lastUpdated?: string;
+  /** Prevents indexing — use on 404, thank-you pages, etc. */
+  noindex?: boolean;
 }
 
-const { title, description, ogImage, jsonLD, lastUpdated } = Astro.props;
+const { title, description, ogImage, jsonLD, lastUpdated, noindex } = Astro.props;
 ---
 
 <BaseLayout
@@ -22,6 +24,7 @@ const { title, description, ogImage, jsonLD, lastUpdated } = Astro.props;
   jsonLD={jsonLD}
   showChrome={false}
   lastUpdated={lastUpdated}
+  noindex={noindex}
 >
   <div class="cal-app rails-on">
     <Masthead />

@@ -72,14 +72,22 @@ export default defineConfig({
          */
         globIgnores: ['404.html'],
         /*
-         * No navigateFallback. @vite-pwa/astro rewrites the root page to the
-         * scope (`/`) and never emits `/index.html`, so binding the fallback
-         * to it threw non-precached-url. The worker body runs inside the AMD
-         * factory's promise, so that throw was an unhandled rejection rather
-         * than a fatal script error: the worker still installed and precached,
-         * then stopped before registering anything below this line. Every page
-         * is precached anyway, so the fallback bought nothing.
+         * Explicitly undefined, not merely absent. @vite-pwa/astro tests with
+         * `'navigateFallback' in workbox`, so leaving the key out lets it
+         * default the fallback to the scope, and `/` here is the redirect stub
+         * that bounces to the calendar. Every navigation missing the precache
+         * then lands on the calendar, including the not-found page, which no
+         * controlled visitor would ever get to see. Falling through to the
+         * network is what lets a real 404 answer as one.
+         *
+         * The earlier value, `/index.html`, was a page the plugin never emits,
+         * and binding the fallback to it threw non-precached-url. The worker
+         * body runs inside the AMD factory's promise, so that throw was an
+         * unhandled rejection rather than a fatal script error: the worker
+         * still installed and precached, then stopped before registering
+         * anything below it.
          */
+        navigateFallback: undefined,
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {

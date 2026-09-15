@@ -8,7 +8,5 @@ options:
 
 content:
   code: "404"
-  heading: Page not found
-  message: "Sorry, we couldn't find what you were looking for."
-  cta: Go home
-  cta_href: /calendar
+  lines[3]: This page,could not,be found
+  message: "Are you sure you have the right URL? Try navigating back, or to a different page on this site."
