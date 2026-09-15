@@ -1,36 +1,10 @@
 ---
 import ExternalIcon from './ExternalIcon.astro';
 
-export interface CourseDef {
-  /** Course code, e.g. LAW4008H. Absent on non-credit program courses. */
-  code?: string;
-  /** Stands in for the code when there isn't one, e.g. "Non-credit intensive". */
-  kind?: string;
-  title: string;
-  /** Schedule line for courses that don't follow their slot's times. */
-  when?: string;
-  conc: string[];
-  credits?: number;
-  /** Path of this course's page on the faculty site. */
-  slug?: string;
-  capped: boolean;
-  /** '' | 'yes' (counts toward the NCA) | 'required' (an NCA core subject). */
-  nca?: string;
-  req: boolean;
-  /** Official description. The placeholder renders until one is provided. */
-  desc?: string;
-}
-
-/** One scheduled run of a course. Instructor and room both vary between the
- *  offerings of the same course, so they live here rather than on the course. */
-/** One scheduled run of a course: when it meets, where, and who teaches it. */
-export interface RunDef {
-  term: string;
-  slot: string;
-  time: string;
-  room: string;
-  people: Array<{ name: string; url?: string }>;
-}
+/* Shape lives in lib/courses.ts, which is where both pages get their data
+   from. Re-exported here so the component tree can keep importing it. */
+export type { CourseDef, RunDef } from '../lib/courses';
+import type { CourseDef, RunDef } from '../lib/courses';
 
 interface Props {
   course: CourseDef;

@@ -1,6 +1,8 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { createEvent, type DateArray } from 'ics';
 import { MONTHS, META, pickHours, toLocalIso, itemNote, type CatKey } from '../../lib/calendar-data';
+import { buildDescription, courseEventTitle } from '../../lib/event';
+import { candidatesFor, courseEventIndex } from '../../lib/courses';
 
 const MONTH_NUM: Record<string, number> = {
   January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
@@ -30,16 +32,19 @@ function safeFilename(name: string): string {
   return name.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '') || 'event';
 }
 
-interface EventItem {
+// Index signature satisfies Astro's GetStaticPaths props constraint
+interface EventItem extends Record<string, unknown> {
   isoStart: string;
   isoEnd: string;
   name: string;
-  note?: string;
+  /** Pre-built description — already carries the note and the attribution. */
+  description: string;
 }
 
 function allEvents(): Array<{ slug: string; event: EventItem }> {
   const out: Array<{ slug: string; event: EventItem }> = [];
   const seen = new Set<string>();
+  const index = courseEventIndex();
 
   for (const month of MONTHS) {
     const monthNum = MONTH_NUM[month.name];
@@ -74,9 +79,32 @@ function allEvents(): Array<{ slug: string; event: EventItem }> {
             isoStart: toLocalIso(iso, specific.start),
             isoEnd: toLocalIso(iso, specific.end),
             name,
-            ...(combinedNote ? { note: combinedNote } : {}),
+            description: buildDescription(combinedNote || null, null),
           },
         });
+
+        /*
+         * A variant per class that meets this day, so the webcal:// CTA still
+         * resolves once someone picks one. Titles come from the same helper the
+         * client uses, which is what keeps the two slug schemes in step rather
+         * than merely alike.
+         */
+        for (const opt of candidatesFor(iso, cat, dow, month.season)) {
+          const course = index[opt.ref];
+          if (!course) continue;
+          const courseName = courseEventTitle(course, cat);
+          if (seen.has(opt.slug)) continue;
+          seen.add(opt.slug);
+          out.push({
+            slug: opt.slug,
+            event: {
+              isoStart: opt.isoStart ?? toLocalIso(iso, specific.start),
+              isoEnd:   opt.isoEnd   ?? toLocalIso(iso, specific.end),
+              name: courseName,
+              description: buildDescription(combinedNote || null, course),
+            },
+          });
+        }
       }
     }
   }
@@ -96,9 +124,7 @@ function makeIcs(e: EventItem): Promise<string> {
       endInputType:    'utc',
       endOutputType:   'utc',
       title: e.name,
-      description: e.note
-        ? `${e.note}\n\nUofT GPLLM program calendar`
-        : 'UofT GPLLM program calendar',
+      description: e.description,
       productId: 'utoronto-gpllm-cal/ics',
       calName: 'UofT GPLLM Calendar',
     }, (error, value) => {
