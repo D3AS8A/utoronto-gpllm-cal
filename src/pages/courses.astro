@@ -1,7 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { loadPage, loadModified } from '../lib/content';
-import { shapeCourses, type CoursesContent, type RunDef, type CourseDef } from '../lib/courses';
+import { shapeCourses, courseToken, type CoursesContent, type RunDef, type CourseDef } from '../lib/courses';
 import PageTitle from '../components/PageTitle.astro';
 import CourseCard from '../components/CourseCard.astro';
 import CourseSection, { type TimeEntry } from '../components/CourseSection.astro';
@@ -41,6 +41,7 @@ const timeView = Object.entries(content.terms).map(([id, term]) => ({
       );
       return {
         course: catalog[key],
+        token: courseToken(catalog[key], key),
         run,
         also: twin
           ? twin.slot !== run.slot
@@ -53,12 +54,14 @@ const timeView = Object.entries(content.terms).map(([id, term]) => ({
 }));
 
 // Non-credit intensives lead, since they run before term; the rest by code
-const courses = [...byCourse.values()].sort((a, b) => {
-  const left = a.course.code ?? '';
-  const right = b.course.code ?? '';
-  if (!left !== !right) return left ? 1 : -1;
-  return left.localeCompare(right);
-});
+const courses = [...byCourse.entries()]
+  .map(([key, entry]) => ({ ...entry, key }))
+  .sort((a, b) => {
+    const left = a.course.code ?? '';
+    const right = b.course.code ?? '';
+    if (!left !== !right) return left ? 1 : -1;
+    return left.localeCompare(right);
+  });
 ---
 
 <PageLayout
@@ -79,6 +82,8 @@ const courses = [...byCourse.values()].sort((a, b) => {
   <div
     class="courses-app"
     x-data="courseFilters"
+    @hashchange.window="revealFromHash()"
+    @course:toggle.document="$nextTick(() => syncOpenHash())"
     :class="{
       'show-cl': conc.cl,
       'show-bl': conc.bl,
@@ -117,9 +122,11 @@ const courses = [...byCourse.values()].sort((a, b) => {
       </div>
 
         <ol class="courses-view view-course courses-list" role="list">
-        {courses.map(({ course, runs }) => (
+        {courses.map(({ course, runs, key }) => (
           <li>
             <CourseCard
+              token={courseToken(course, key)}
+              anchored
               course={course}
               runs={runs}
               concLabels={concLabels}

@@ -36,7 +36,7 @@
               <!-- Shown only where the day resolves to more than one class.
                    A single match is folded into the event without asking. -->
               <fieldset class="detail-pick-set" x-show="item.options && item.options.length > 1">
-                <legend class="detail-pick-legend">Which class?</legend>
+                <legend class="detail-pick-legend">Select a class</legend>
                 <template x-for="opt in item.options" :key="opt.ref">
                   <label class="detail-pick">
                     <input

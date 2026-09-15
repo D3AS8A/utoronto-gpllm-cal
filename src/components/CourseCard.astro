@@ -18,8 +18,12 @@ interface Props {
   placeholder: string;
   /** Prefix the course slug is appended to. */
   urlBase: string;
+  /** URL token for this course, e.g. `law4024`. */
+  token?: string;
+  /** Sets the id too. Catalogue copies only, so the id stays unique. */
+  anchored?: boolean;
 }
-const { course, runs, alsoTag, showRuns = true, concLabels, placeholder, urlBase } = Astro.props;
+const { course, runs, alsoTag, showRuns = true, concLabels, placeholder, urlBase, token, anchored } = Astro.props;
 
 /** "Saturday Mornings" reads as shouting mid-sentence; "Saturday mornings" doesn't. */
 const sentence = (slot: string) => slot.charAt(0) + slot.slice(1).toLowerCase();
@@ -42,7 +46,12 @@ const panelTags = [
 ].filter((tag) => tag !== null);
 ---
 
-<details class="course-card" data-conc={course.conc.join(' ')}>
+<details
+  class="course-card"
+  id={anchored ? token : undefined}
+  data-course={token}
+  data-conc={course.conc.join(' ')}
+>
   <summary class="course-summary">
     <div class="course-main">
       <p class={course.code ? 'course-code' : 'course-kind'}>{course.code ?? course.kind}</p>
@@ -223,12 +232,30 @@ const panelTags = [
       if (!card?.classList.contains('course-card')) return;
 
       event.preventDefault();
-      toggleCard(card, !card.open);
+      const opening = !card.open;
+      toggleCard(card, opening);
+      // The page mirrors the open card in the address bar; `opening` is the
+      // intent, which on close lands well before [open] actually flips
+      document.dispatchEvent(
+        new CustomEvent('course:toggle', { detail: { token: card.dataset.course, opening } }),
+      );
     });
   }
 </script>
 
 <style>
+  /* Keeps a card clear of the sticky filter bar when a #law4024 link scrolls
+     to it. The bar is taller on a phone, where the switches wrap. */
+  .course-card {
+    scroll-margin-top: 5.75rem;
+  }
+
+  @media (max-width: 45rem) {
+    .course-card {
+      scroll-margin-top: 8.75rem;
+    }
+  }
+
   /* The concentration is a painted edge down the card rather than a badge.
      Courses open to two concentrations blend from one into the other, holding
      each colour solid at its end so both stay identifiable. Single-concentration

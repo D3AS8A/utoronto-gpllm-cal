@@ -23,6 +23,8 @@ export interface ProfileRow { name: string; path: string }
 export interface ProgramRow {
   key: string; code: string; kind: string; title: string; when: string;
   conc: string; capped: boolean; nca: string; desc: string;
+  /** URL token for the two program courses that have no code to build one from. */
+  slug?: string;
 }
 export interface Slot { name: string; time: string; courses: string; note: string }
 export interface Term {
@@ -105,7 +107,7 @@ export function shapeCourses(): ShapedCourses {
       {
         ...row,
         credits: row.code ? details[row.code]?.credits : undefined,
-        slug: row.code ? details[row.code]?.slug : undefined,
+        slug: row.slug || (row.code ? details[row.code]?.slug : undefined),
         code: row.code || undefined,
         req: false,
         conc: row.conc.split('/'),
@@ -142,6 +144,19 @@ export function shapeCourses(): ShapedCourses {
 
   cache = { content, concLabels, catalog, offerings, byCourse };
   return cache;
+}
+
+/**
+ * The token a course is addressed by in a URL, e.g. `law4024` or
+ * `legal-methods-cdn`.
+ *
+ * Registrar codes all carry the H that marks a half credit, so dropping it
+ * reads better and cannot collide — every code here shares the suffix. The two
+ * Legal Methods courses have no code at all and carry their own slug instead.
+ */
+export function courseToken(course: CourseDef, key: string): string {
+  if (course.code) return course.code.replace(/H$/i, '').toLowerCase();
+  return course.slug ?? key;
 }
 
 /* ---- Calendar bridge ----------------------------------------------------- */

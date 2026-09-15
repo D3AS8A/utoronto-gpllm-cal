@@ -246,7 +246,11 @@ function syncCoursesToUrl(conc: Record<string, boolean>, sort: SortMode) {
   else params.set('c', active.join(','));
 
   const q = params.toString().replace(/%2C/g, ',');
-  const url = q ? `${window.location.pathname}?${q}` : window.location.pathname;
+  // Hash carried through: a #law4024 link switches the view on arrival, and
+  // rebuilding the URL from pathname and query alone would drop the anchor it
+  // had just been asked to open
+  const url = (q ? `${window.location.pathname}?${q}` : window.location.pathname)
+    + window.location.hash;
   window.history.replaceState(null, '', url);
 }
 
@@ -957,6 +961,8 @@ export default (Alpine: Alpine) => {
       const sort = readSortFromUrl();
       if (sort) this.sort = sort;
 
+      this.revealFromHash();
+
       this.$nextTick(() => {
         this.syncSortPill();
         // Enable the slide only after the first snap, so the pill doesn't
@@ -996,6 +1002,7 @@ export default (Alpine: Alpine) => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!views || reduced) {
         this.sort = next;
+        this.$nextTick(() => this.syncOpenHash());
         return;
       }
 
@@ -1004,8 +1011,72 @@ export default (Alpine: Alpine) => {
         this.sort = next;
         this.$nextTick(() => {
           views.style.opacity = '';
+          this.syncOpenHash();
         });
       }, SORT_FADE);
+    },
+
+    /**
+     * /courses/#law4024 opens that course.
+     *
+     * The anchor sits on the catalogue copy only — the schedule view lists a
+     * twice-taught course twice, and an id has to be unique — so a link has to
+     * put that view in play. Both views are always rendered but the inactive
+     * one is display:none, and a card filtered out by concentration is too, so
+     * neither can be scrolled to until it is actually on the page.
+     */
+    revealFromHash() {
+      const token = decodeURIComponent(location.hash.slice(1));
+      if (!token) return;
+      const card = document.getElementById(token) as HTMLDetailsElement | null;
+      if (!card?.classList.contains('course-card')) return;
+
+      if (this.sort !== 'course') {
+        this.sort = 'course';
+        this.syncUrl();
+      }
+
+      const concs = (card.dataset.conc ?? '').split(/\s+/).filter(Boolean);
+      if (concs.length && !concs.some((key) => this.conc[key])) {
+        concs.forEach((key) => { this.conc[key] = true; });
+        this.syncUrl();
+      }
+
+      this.$nextTick(() => {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        card.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        // Reuses the delegated summary handler, so the panel opens on the same
+        // animated path a click takes
+        if (!card.open) card.querySelector<HTMLElement>('.course-summary')?.click();
+      });
+    },
+
+    /**
+     * Mirrors the open card in the address bar, so a course someone opened is
+     * a link they can copy.
+     *
+     * Only when exactly one course is open: two open cards have no single URL
+     * between them, and the honest answer is no fragment at all. Counts
+     * distinct courses rather than cards, since the schedule view lists a
+     * twice-taught course twice, and only visible ones, which drops both the
+     * inactive view's cards and anything filtered out.
+     *
+     * replaceState rather than assigning location.hash: the latter fires
+     * hashchange, which would send revealFromHash straight back here.
+     */
+    syncOpenHash() {
+      const cards = [...document.querySelectorAll<HTMLElement>('.course-card')];
+      const open = cards.filter((card) => {
+        if (card.offsetParent === null) return false;
+        const state = card.dataset.state;
+        return state ? state === 'open' : (card as HTMLDetailsElement).open;
+      });
+      const tokens = new Set(open.map((card) => card.dataset.course).filter(Boolean));
+      const token = tokens.size === 1 ? [...tokens][0] : '';
+      const { pathname, search, hash } = window.location;
+      const next = token ? `#${token}` : '';
+      if (hash === next) return;
+      window.history.replaceState(null, '', `${pathname}${search}${next}`);
     },
 
     get anyOn(): boolean {
@@ -1024,6 +1095,9 @@ export default (Alpine: Alpine) => {
       this.transition(() => {
         this.conc[key] = !this.conc[key];
         this.syncUrl();
+        // A filter can hide the card the fragment names, so recheck once the
+        // change has landed rather than leaving the URL claiming it is open
+        this.$nextTick(() => this.syncOpenHash());
       });
     },
 
@@ -1034,6 +1108,7 @@ export default (Alpine: Alpine) => {
           this.conc[key] = !on;
         });
         this.syncUrl();
+        this.$nextTick(() => this.syncOpenHash());
       });
     },
 
