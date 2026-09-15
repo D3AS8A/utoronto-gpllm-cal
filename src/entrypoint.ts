@@ -166,6 +166,76 @@ function syncFiltersToUrl(filters: Record<string, boolean>) {
   window.history.replaceState(null, '', url);
 }
 
+/* ---- Courses page URL state --------------------------------------------- */
+
+/**
+ * Friendly names for the concentrations, so a shared link reads
+ * ?c=cdn,bus rather than carrying the internal keys.
+ */
+const CONC_URL_KEYS: Record<string, string> = {
+  cl:  'cdn',
+  bl:  'bus',
+  ilt: 'tech',
+};
+
+const ALL_CONC_KEYS = Object.keys(CONC_URL_KEYS);
+
+const SORT_MODES = ['time', 'course'] as const;
+type SortMode = (typeof SORT_MODES)[number];
+const DEFAULT_SORT: SortMode = 'time';
+
+/**
+ * Null when the param is absent, which leaves the page on its all-on default.
+ *
+ * Every key is written, not just the ones that are on: clearOrShowAll() walks
+ * Object.keys(conc), so a sparse object would drop concentrations from the
+ * show-all action entirely. The calendar's equivalent can return a sparse one
+ * because it iterates its own key list instead.
+ */
+function readConcFromUrl(): Record<string, boolean> | null {
+  const p = new URLSearchParams(window.location.search);
+  if (!p.has('c')) return null;
+  const val = p.get('c')!;
+  const active = new Set(val.split(',').filter(Boolean));
+  const all = val === 'all';
+  const next: Record<string, boolean> = {};
+  for (const key of ALL_CONC_KEYS) {
+    next[key] = all || active.has(CONC_URL_KEYS[key]);
+  }
+  return next;
+}
+
+// Anything unrecognised falls back to the default rather than leaving the sort
+// pill pointing at a view that doesn't exist
+function readSortFromUrl(): SortMode | null {
+  const val = new URLSearchParams(window.location.search).get('v');
+  return SORT_MODES.includes(val as SortMode) ? (val as SortMode) : null;
+}
+
+/**
+ * Both params are dropped at their default, so an untouched page keeps a clean
+ * /courses/ and a link only ever carries what the reader actually changed.
+ */
+function syncCoursesToUrl(conc: Record<string, boolean>, sort: SortMode) {
+  const active: string[] = [];
+  for (const key of ALL_CONC_KEYS) {
+    if (conc[key]) active.push(CONC_URL_KEYS[key]);
+  }
+
+  const params = new URLSearchParams(window.location.search);
+
+  if (sort === DEFAULT_SORT) params.delete('v');
+  else params.set('v', sort);
+
+  if (active.length === ALL_CONC_KEYS.length) params.delete('c');
+  else if (active.length === 0) params.set('c', 'none');
+  else params.set('c', active.join(','));
+
+  const q = params.toString().replace(/%2C/g, ',');
+  const url = q ? `${window.location.pathname}?${q}` : window.location.pathname;
+  window.history.replaceState(null, '', url);
+}
+
 function triggerDownload(text: string, filename: string) {
   const blob = new Blob([text], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);
@@ -809,6 +879,13 @@ export default (Alpine: Alpine) => {
     sortReady: false,
 
     init() {
+      // Restored before the first paint below, so the pill snaps straight to
+      // the view the link asked for instead of sliding across to it
+      const conc = readConcFromUrl();
+      if (conc) this.conc = conc;
+      const sort = readSortFromUrl();
+      if (sort) this.sort = sort;
+
       this.$nextTick(() => {
         this.syncSortPill();
         // Enable the slide only after the first snap, so the pill doesn't
@@ -840,6 +917,10 @@ export default (Alpine: Alpine) => {
       this.moveSortPill(el);
       if (next === this.sort) return;
 
+      // Written from `next` rather than waiting on the fade below, so the
+      // address bar answers the click straight away
+      this.syncUrl(next);
+
       const views = document.querySelector<HTMLElement>('.courses-views');
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!views || reduced) {
@@ -860,9 +941,16 @@ export default (Alpine: Alpine) => {
       return Object.values(this.conc).some(Boolean);
     },
 
+    syncUrl(sort: SortMode = this.sort) {
+      syncCoursesToUrl(this.conc, sort);
+    },
+
+    // Sync inside the callback: transition() runs it exactly once whichever
+    // path it takes, and only ever after the state has changed
     toggle(key: string) {
       this.transition(() => {
         this.conc[key] = !this.conc[key];
+        this.syncUrl();
       });
     },
 
@@ -872,6 +960,7 @@ export default (Alpine: Alpine) => {
         Object.keys(this.conc).forEach((key) => {
           this.conc[key] = !on;
         });
+        this.syncUrl();
       });
     },
 

@@ -242,7 +242,7 @@ export const MONTHS: MonthDef[] = [
       3: ['fin'], 4: ['fin'], 8: ['fin'], 9: ['intc'], 10: ['intc'], 11: ['intc'],
       16: ['intc'], 17: ['intc'], 18: ['intc'], 30: ['reg'] },
     callouts: [{ label: 'April Intensive',
-      detail: 'Some dates to be released — please hold for now.', tone: 'cream' }] },
+      detail: 'Some dates to be released', tone: 'cream' }] },
   { name: 'May', year: '2027', season: 'summer', fdow: 6, days: 31, marks: {
       1: ['reg'], 7: ['reg'], 8: ['reg'], 9: ['makeup'], 14: ['reg'], 15: ['reg'],
       16: ['fin'], 29: ['fin'], 30: ['fin'] },
