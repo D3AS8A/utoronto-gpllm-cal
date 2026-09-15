@@ -10,6 +10,10 @@
 import type { Alpine } from 'alpinejs';
 import { createEvent, type DateArray } from 'ics';
 import { cellVisual, type CatKey } from './lib/calendar-data';
+import {
+  buildDescription, courseEventTitle, eventSummary,
+  EVENT_ALARMS, EVENT_LOCATION, EVENT_TZ, withTimezone, type EventCourse,
+} from './lib/event';
 
 // Filter key → cats mapping. Mirrors FILTERS_CLASSES + FILTERS_EXAMS in
 // src/lib/calendar-data.ts. Kept in sync manually; small and easy to spot-check.
@@ -40,6 +44,19 @@ interface DetailItem {
   isoEnd:   string | null;
   /** Day-level free-form note; embedded in ICS + Google Cal description. */
   note: string | null;
+  /** Category this item came from; picks the qualifier on a class's title. */
+  cat?: string;
+  /** Classes meeting this day. One is folded in; several offer a choice. */
+  options?: CourseOption[];
+}
+
+interface CourseOption {
+  ref: string;
+  title: string;
+  slot: string;
+  isoStart?: string;
+  isoEnd?: string;
+  slug: string;
 }
 
 interface CalendarDetail {
@@ -232,7 +249,11 @@ function syncCoursesToUrl(conc: Record<string, boolean>, sort: SortMode) {
   else params.set('c', active.join(','));
 
   const q = params.toString().replace(/%2C/g, ',');
-  const url = q ? `${window.location.pathname}?${q}` : window.location.pathname;
+  // Hash carried through: a #law4024 link switches the view on arrival, and
+  // rebuilding the URL from pathname and query alone would drop the anchor it
+  // had just been asked to open
+  const url = (q ? `${window.location.pathname}?${q}` : window.location.pathname)
+    + window.location.hash;
   window.history.replaceState(null, '', url);
 }
 
@@ -356,6 +377,12 @@ export default (Alpine: Alpine) => {
     examsOpen: false,
     fbHidden: false,
     detail: null as CalendarDetail | null,
+    /** Chosen class per detail item, keyed by item name. Empty = none. */
+    courseChoice: {} as Record<string, string>,
+    /** Y of the travelling dot per item, measured from the chosen row. */
+    pickDot: {} as Record<string, number>,
+    _courseIndex: null as Record<string, EventCourse> | null,
+    _cells: null as Record<string, CalendarDetail> | null,
     tooltip: {
       visible: false,
       travel: false,
@@ -560,9 +587,28 @@ export default (Alpine: Alpine) => {
       return `clear ${n} filter${n === 1 ? '' : 's'}`;
     },
 
-    openDetail(detail: CalendarDetail, sourceEl?: HTMLElement) {
+    /**
+     * Day payloads, parsed once from the per-month blobs the grid emits. They
+     * used to be inlined into each cell's click, mouseenter and focus
+     * attributes, which wrote every day into the page three times over.
+     */
+    cellDetail(iso: string): CalendarDetail | null {
+      if (!this._cells) {
+        const merged: Record<string, CalendarDetail> = {};
+        document.querySelectorAll('script.gp-cells').forEach((el) => {
+          Object.assign(merged, JSON.parse(el.textContent || '{}'));
+        });
+        this._cells = merged;
+      }
+      return this._cells[iso] ?? null;
+    },
+
+    openDetail(detail: CalendarDetail | null, sourceEl?: HTMLElement) {
+      if (!detail) return;
       vibrate(9);
       this.detail = detail;
+      this.courseChoice = {};
+      this.pickDot = {};
       this.tooltip.visible = false;
       this.tooltip.travel = false;
       this.tooltip.slot0 = null;
@@ -639,7 +685,8 @@ export default (Alpine: Alpine) => {
      * When the anchor axis flips (above ↔ below), we force fresh entry so
      * the arrow doesn't rotate mid-glide.
      */
-    showTooltip(iso: string, detail: CalendarDetail, rect: DOMRect) {
+    showTooltip(iso: string, detail: CalendarDetail | null, rect: DOMRect) {
+      if (!detail) return;
       if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
       if (this._ttHideTimer) { clearTimeout(this._ttHideTimer); this._ttHideTimer = 0; }
       if (this._ttClearTimer) { clearTimeout(this._ttClearTimer); this._ttClearTimer = 0; }
@@ -795,18 +842,69 @@ export default (Alpine: Alpine) => {
       el.classList.add('is-dragging');
     },
 
+    /**
+     * Rows can be any height — a long course title wraps — so the dot's stop is
+     * measured off the chosen row rather than assumed from a fixed pitch. Same
+     * approach the sort pill and the nav's block already take.
+     */
+    movePickDot(name: string, input: HTMLElement) {
+      const row = input.closest<HTMLElement>('.detail-pick');
+      const ring = row?.querySelector<HTMLElement>('.detail-pick-ring');
+      const list = row?.parentElement;
+      if (!row || !ring || !list) return;
+      // Measured off the ring, not the row: the row's padding is lopsided, so
+      // its box centre sits above the ring the dot has to land in
+      const top = ring.getBoundingClientRect().top - list.getBoundingClientRect().top;
+      this.pickDot[name] = top + ring.offsetHeight / 2;
+    },
+
+    /**
+     * The course dictionary the page emits once, rather than a copy per cell.
+     * Parsed on first use and kept.
+     */
+    get courseIndex(): Record<string, EventCourse> {
+      if (!this._courseIndex) {
+        const el = document.getElementById('gp-course-index');
+        this._courseIndex = el ? JSON.parse(el.textContent || '{}') : {};
+      }
+      return this._courseIndex!;
+    },
+
+    /**
+     * One detail item resolved into the event it would produce. A day that
+     * names a single class folds it in unasked; a day that names several waits
+     * for a choice and stays generic until it gets one. A chosen class brings
+     * its own hours, which is what narrows a Saturday to its actual sitting.
+     */
+    resolveEvent(item: DetailItem) {
+      const options = item.options ?? [];
+      const chosen = options.length === 1
+        ? options[0]
+        : options.find((o) => o.ref === this.courseChoice[item.name]);
+      const course = chosen ? this.courseIndex[chosen.ref] ?? null : null;
+      return {
+        name: course ? courseEventTitle(course, item.cat as CatKey) : item.name,
+        isoStart: chosen?.isoStart ?? item.isoStart,
+        isoEnd:   chosen?.isoEnd   ?? item.isoEnd,
+        description: buildDescription(item.note, course),
+        /* Built server-side alongside the static file, so the two cannot
+           disagree — and so two runs of one course on the same day resolve to
+           their own files rather than sharing the first one's. */
+        slug: course ? chosen!.slug : null,
+      };
+    },
+
     /** Google Calendar "add event" URL for one detail item. */
     googleCalUrl(item: DetailItem): string | null {
-      if (!item.isoStart || !item.isoEnd) return null;
-      const details = item.note
-        ? `${item.note}\n\nUofT GPLLM program calendar`
-        : 'UofT GPLLM program calendar';
+      const e = this.resolveEvent(item);
+      if (!e.isoStart || !e.isoEnd) return null;
       const params = new URLSearchParams({
         action: 'TEMPLATE',
-        text: item.name,
-        dates: `${toGcalStamp(item.isoStart)}/${toGcalStamp(item.isoEnd)}`,
-        ctz: 'America/Toronto',
-        details,
+        text: eventSummary(e.name),
+        dates: `${toGcalStamp(e.isoStart)}/${toGcalStamp(e.isoEnd)}`,
+        ctz: EVENT_TZ,
+        location: EVENT_LOCATION,
+        details: e.description,
       });
       return `https://calendar.google.com/calendar/render?${params.toString()}`;
     },
@@ -822,33 +920,35 @@ export default (Alpine: Alpine) => {
      * Calendar handler — Blob URLs only work in Safari.
      */
     appleCalUrl(item: DetailItem): string {
-      if (!item.isoStart) return '';
-      const day = item.isoStart.slice(0, 10);
-      const slug = `${day}-${safeFilename(item.name)}`;
+      const e = this.resolveEvent(item);
+      if (!e.isoStart) return '';
+      const day = e.isoStart.slice(0, 10);
+      const slug = e.slug ?? `${day}-${safeFilename(e.name)}`;
       const host = window.location.host;
       return `webcal://${host}/ics/${slug}.ics`;
     },
 
     _withIcs(item: DetailItem, cb: (value: string, filename: string) => void) {
-      if (!item.isoStart || !item.isoEnd) return;
+      const e = this.resolveEvent(item);
+      if (!e.isoStart || !e.isoEnd) return;
       vibrate(6);
       createEvent({
-        start: torontoToUtcArray(item.isoStart),
-        end:   torontoToUtcArray(item.isoEnd),
+        start: torontoToUtcArray(e.isoStart),
+        end:   torontoToUtcArray(e.isoEnd),
         startInputType:  'utc',
         startOutputType: 'utc',
         endInputType:    'utc',
         endOutputType:   'utc',
-        title: item.name,
-        description: item.note
-          ? `${item.note}\n\nUofT GPLLM program calendar`
-          : 'UofT GPLLM program calendar',
+        title: eventSummary(e.name),
+        description: e.description,
+        location: EVENT_LOCATION,
+        alarms: EVENT_ALARMS,
         productId: 'utoronto-gpllm-cal/ics',
         calName: 'UofT GPLLM Calendar',
       }, (error, value) => {
         if (error) { console.error('ics error', error); return; }
-        const day = item.isoStart!.slice(0, 10);
-        cb(value, `${day}-${safeFilename(item.name)}.ics`);
+        const day = e.isoStart!.slice(0, 10);
+        cb(withTimezone(value), `${day}-${safeFilename(e.name)}.ics`);
       });
     },
 
@@ -885,6 +985,8 @@ export default (Alpine: Alpine) => {
       if (conc) this.conc = conc;
       const sort = readSortFromUrl();
       if (sort) this.sort = sort;
+
+      this.revealFromHash();
 
       this.$nextTick(() => {
         this.syncSortPill();
@@ -925,6 +1027,7 @@ export default (Alpine: Alpine) => {
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (!views || reduced) {
         this.sort = next;
+        this.$nextTick(() => this.syncOpenHash());
         return;
       }
 
@@ -933,16 +1036,82 @@ export default (Alpine: Alpine) => {
         this.sort = next;
         this.$nextTick(() => {
           views.style.opacity = '';
+          this.syncOpenHash();
         });
       }, SORT_FADE);
+    },
+
+    /**
+     * /courses/#law4024 opens that course.
+     *
+     * The anchor sits on the catalogue copy only — the schedule view lists a
+     * twice-taught course twice, and an id has to be unique — so a link has to
+     * put that view in play. Both views are always rendered but the inactive
+     * one is display:none, and a card filtered out by concentration is too, so
+     * neither can be scrolled to until it is actually on the page.
+     */
+    revealFromHash() {
+      const token = decodeURIComponent(location.hash.slice(1));
+      if (!token) return;
+      const card = document.getElementById(token) as HTMLDetailsElement | null;
+      if (!card?.classList.contains('course-card')) return;
+
+      if (this.sort !== 'course') {
+        this.sort = 'course';
+        this.syncUrl();
+      }
+
+      const concs = (card.dataset.conc ?? '').split(/\s+/).filter(Boolean);
+      if (concs.length && !concs.some((key) => this.conc[key])) {
+        concs.forEach((key) => { this.conc[key] = true; });
+        this.syncUrl();
+      }
+
+      this.$nextTick(() => {
+        const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        card.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
+        // Reuses the delegated summary handler, so the panel opens on the same
+        // animated path a click takes
+        if (!card.open) card.querySelector<HTMLElement>('.course-summary')?.click();
+      });
+    },
+
+    /**
+     * Mirrors the open card in the address bar, so a course someone opened is
+     * a link they can copy.
+     *
+     * Only when exactly one course is open: two open cards have no single URL
+     * between them, and the honest answer is no fragment at all. Counts
+     * distinct courses rather than cards, since the schedule view lists a
+     * twice-taught course twice, and only visible ones, which drops both the
+     * inactive view's cards and anything filtered out.
+     *
+     * replaceState rather than assigning location.hash: the latter fires
+     * hashchange, which would send revealFromHash straight back here.
+     */
+    syncOpenHash() {
+      const cards = [...document.querySelectorAll<HTMLElement>('.course-card')];
+      const open = cards.filter((card) => {
+        if (card.offsetParent === null) return false;
+        const state = card.dataset.state;
+        return state ? state === 'open' : (card as HTMLDetailsElement).open;
+      });
+      const tokens = new Set(open.map((card) => card.dataset.course).filter(Boolean));
+      const token = tokens.size === 1 ? [...tokens][0] : '';
+      const { pathname, search, hash } = window.location;
+      const next = token ? `#${token}` : '';
+      if (hash === next) return;
+      window.history.replaceState(null, '', `${pathname}${search}${next}`);
     },
 
     get anyOn(): boolean {
       return Object.values(this.conc).some(Boolean);
     },
 
-    syncUrl(sort: SortMode = this.sort) {
-      syncCoursesToUrl(this.conc, sort);
+    // `sort` is resolved in the body rather than as a parameter default: TS
+    // cannot type `this` inside a default in an object-literal method
+    syncUrl(sort?: SortMode) {
+      syncCoursesToUrl(this.conc, sort ?? this.sort);
     },
 
     // Sync inside the callback: transition() runs it exactly once whichever
@@ -951,6 +1120,9 @@ export default (Alpine: Alpine) => {
       this.transition(() => {
         this.conc[key] = !this.conc[key];
         this.syncUrl();
+        // A filter can hide the card the fragment names, so recheck once the
+        // change has landed rather than leaving the URL claiming it is open
+        this.$nextTick(() => this.syncOpenHash());
       });
     },
 
@@ -961,6 +1133,7 @@ export default (Alpine: Alpine) => {
           this.conc[key] = !on;
         });
         this.syncUrl();
+        this.$nextTick(() => this.syncOpenHash());
       });
     },
 

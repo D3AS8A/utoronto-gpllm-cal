@@ -6,6 +6,8 @@ export interface TimeEntry {
   run: RunDef;
   /** Names the course's other run, when it has one. */
   also?: string;
+  /** URL token for this course. */
+  token: string;
 }
 
 interface Props {
@@ -36,6 +38,7 @@ const { id, label, range, slots, concLabels, placeholder, urlBase } = Astro.prop
         {slot.note && <p class="cslot-note">{slot.note}</p>}
         {slot.entries.map((entry) => (
           <CourseCard
+            token={entry.token}
             course={entry.course}
             runs={[entry.run]}
             alsoTag={entry.also}

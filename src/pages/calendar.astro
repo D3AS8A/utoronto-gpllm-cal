@@ -1,6 +1,7 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
 import { loadGlobal, loadPage, loadModified } from '../lib/content';
+import { courseEventIndex } from '../lib/courses';
 import PageTitle from '../components/PageTitle.astro';
 import FilterBar from '../components/FilterBar.astro';
 import CalendarSection from '../components/CalendarSection.astro';
@@ -14,6 +15,11 @@ const { meta, content } = loadPage<{
   heading: string;
 }>('calendar');
 const lastUpdated = loadModified();
+
+/* Emitted once for the whole page rather than per cell: the same Saturday
+   courses recur across thirty dates, and their descriptions are long. Cells
+   carry only refs into this. */
+const courseIndex = courseEventIndex();
 
 const jsonLD = {
   '@context': 'https://schema.org',
@@ -59,6 +65,12 @@ const jsonLD = {
 
     <DetailModal />
     <CalendarTooltip />
+
+    <script
+      type="application/json"
+      id="gp-course-index"
+      set:html={JSON.stringify(courseIndex)}
+    />
   </div>
 </PageLayout>
 

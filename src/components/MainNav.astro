@@ -94,6 +94,8 @@ function isActive(href: string): boolean {
       flashTimers: [],
       activeIndex: null,
       anim: null,
+      ro: null,
+      resizeTimer: null,
 
       init() {
         this.onPageLoad = () => this.sync();
@@ -105,11 +107,45 @@ function isActive(href: string): boolean {
           onNextFrame(() => { this.ready = true; });
           // Webfonts land after first paint and change the link widths
           document.fonts?.ready.then(() => this.reset());
+
+          /*
+           * The blocks are positioned from measured pixels, so any change to
+           * the list's box leaves them pointing at where the links used to be.
+           * Watching the list rather than the window catches the lot: a resize,
+           * a zoom, the links wrapping to a second row.
+           */
+          if (typeof ResizeObserver !== 'undefined') {
+            this.ro = new ResizeObserver(() => this.remeasure());
+            this.ro.observe(this.$refs.list);
+          }
         });
       },
 
       destroy() {
         document.removeEventListener('astro:page-load', this.onPageLoad);
+        this.ro?.disconnect();
+        clearTimeout(this.resizeTimer);
+      },
+
+      /**
+       * Re-park on the active link after the layout moves under us.
+       *
+       * A tumble in flight is abandoned first: its keyframes are baked from
+       * pixel positions read when it started, so letting it finish against a
+       * new layout lands the block somewhere meaningless. Transitions come off
+       * for the duration too, or the block sails across the nav on every frame
+       * of a drag instead of simply keeping up.
+       */
+      remeasure() {
+        if (this.anim) this.settle();
+        this.ready = false;
+        this.reset();
+
+        clearTimeout(this.resizeTimer);
+        this.resizeTimer = setTimeout(() => {
+          this.reset();
+          onNextFrame(() => { this.ready = true; });
+        }, 150);
       },
 
       items() {

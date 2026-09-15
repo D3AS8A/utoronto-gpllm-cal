@@ -18,10 +18,10 @@ content:
     bl,Business Law,BUS
     ilt,Technology Law,TECH
 
-  program_courses[3]{key,code,kind,title,when,conc,capped,nca,desc}:
-    lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18, 9:30am-4:30pm",cl,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day."
-    lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended."
-    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,required,Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement.
+  program_courses[3]{key,code,kind,title,when,conc,capped,nca,desc,slug}:
+    lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18, 9:30am-4:30pm",cl,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day.",legal-methods-cdn
+    lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended.",legal-methods-bus
+    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,required,Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement.,
 
   profile_url_base: https://www.jackmanlaw.utoronto.ca
 
@@ -161,6 +161,8 @@ content:
       no: "01"
       label: Fall
       range: September 25 – November 21, 2026
+      start: 2026-09-25
+      end: 2026-11-21
       slots[5]{name,time,courses,note}:
         Program Foundations,September 10-20,lm-cdn|lm-bus|alrw,"Intensives that run before the fall term begins. Attend the stream for your concentration"
         Friday Evenings,4:00pm-9:00pm,LAW4010H F LEC0102|LAW4001H F LEC0101|LAW4026H F LEC0101,"Every student takes the Friday evening course for their concentration in the fall term. It counts as one of the ten required courses"
@@ -171,6 +173,8 @@ content:
       no: "02"
       label: Winter
       range: January 8 – March 20, 2027
+      start: 2027-01-08
+      end: 2027-03-20
       slots[4]{name,time,courses,note}:
         Friday Evenings,4:00pm-9:00pm,LAW4007H S LEC0102|LAW4036H S LEC0101,""
         Saturday Mornings,8:30am-1:00pm,LAW4009H S LEC0101|LAW4021H S LEC0101|LAW4069H S LEC0101|LAW4030H S LEC0101,""
@@ -180,6 +184,8 @@ content:
       no: "03"
       label: Summer
       range: April 30 – June 19, 2027
+      start: 2027-04-30
+      end: 2027-06-19
       slots[3]{name,time,courses,note}:
         Friday Evenings,4:00pm-9:00pm,LAW4022H Y LEC0101|LAW4031H Y LEC0101|LAW4075H Y LEC0101|LAW4076H Y LEC0101,""
         Saturday Mornings,8:30am-1:00pm,LAW4004H Y LEC0101|LAW4020H Y LEC0101|LAW4070H Y LEC0101|LAW4071H Y LEC0101,""

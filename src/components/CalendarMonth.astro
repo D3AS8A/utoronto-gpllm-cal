@@ -1,9 +1,11 @@
 ---
 import type { MonthDef } from '../lib/calendar-data';
+import { candidatesFor, type CourseOption } from '../lib/courses';
 import {
   cellVisual, swatchStyle, weekdayName, calloutStyle,
   META, pickHours, fmtHours, toLocalIso, cssColor, cssVar, itemNote,
 } from '../lib/calendar-data';
+import { candidatesFor, type CourseOption } from '../lib/courses';
 
 interface Props {
   month: MonthDef;
@@ -55,8 +57,14 @@ type Cell = {
       /** Naive local ISO strings (America/Toronto assumed). Null when no hours. */
       isoStart: string | null;
       isoEnd: string | null;
+      /** Drives the qualifier on a picked class's event title. */
+      cat: string;
       /** Day-level free-form note; embedded in ICS/Google Cal description. */
       note: string | null;
+      /** Classes that meet this day. One means it is folded in without a
+       *  picker; several means the modal offers a choice. Refs only — the
+       *  detail is in the page's single course dictionary. */
+      options: CourseOption[];
     }>;
     headBg: string;
     headFg: string;
@@ -120,6 +128,8 @@ for (let i = 0; i < rows * 7; i++) {
         isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
         isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
         note: itemNote(c as keyof typeof META, dow),
+        cat: c,
+        options: candidatesFor(dateIso, c as keyof typeof META, dow, month.season),
       });
       ariaParts.push(specific ? `${displayName}, ${time}` : displayName);
     }
@@ -173,10 +183,10 @@ const headingId = `month-${monthIdx}-name`;
         :class="{ 'is-dim': isDim($el.dataset.cats) }"
         :style="cellStyle($el.dataset.cats)"
         :aria-describedby={`tooltip.visible && tooltip.activeIso === '${cell.iso}' ? 'cal-tooltip' : null`}
-        @click={`openDetail(${JSON.stringify(cell.detail)}, $el)`}
-        @mouseenter={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
+        @click={`openDetail(cellDetail('${cell.iso}'), $el)`}
+        @mouseenter={`showTooltip('${cell.iso}', cellDetail('${cell.iso}'), $el.getBoundingClientRect())`}
         @mouseleave="hideTooltip()"
-        @focus={`showTooltip('${cell.iso}', ${JSON.stringify(cell.detail)}, $el.getBoundingClientRect())`}
+        @focus={`showTooltip('${cell.iso}', cellDetail('${cell.iso}'), $el.getBoundingClientRect())`}
         @blur="hideTooltip(0)"
       >
         {cell.cornerColor && <span class="cell-corner" aria-hidden="true"></span>}
@@ -188,6 +198,18 @@ const headingId = `month-${monthIdx}-name`;
       </div>
     ))}
   </div>
+
+  <!--
+    One payload per marked day, rather than the same object inlined into each
+    of the cell's three handlers. Click, hover and focus all read from here.
+  -->
+  <script
+    type="application/json"
+    class="gp-cells"
+    set:html={JSON.stringify(
+      Object.fromEntries(cells.filter((c) => c.detail).map((c) => [c.iso, c.detail])),
+    )}
+  />
 
   {callouts.map((co) => (
     <aside class="month-callout" style={calloutStyle(co.tone)}>
