@@ -1,7 +1,10 @@
 import type { APIRoute, GetStaticPaths } from 'astro';
 import { createEvent, type DateArray } from 'ics';
 import { MONTHS, META, pickHours, toLocalIso, itemNote, type CatKey } from '../../lib/calendar-data';
-import { buildDescription, courseEventTitle } from '../../lib/event';
+import {
+  buildDescription, courseEventTitle, eventSummary,
+  EVENT_ALARMS, EVENT_LOCATION, withTimezone,
+} from '../../lib/event';
 import { candidatesFor, courseEventIndex } from '../../lib/courses';
 
 const MONTH_NUM: Record<string, number> = {
@@ -123,13 +126,15 @@ function makeIcs(e: EventItem): Promise<string> {
       startOutputType: 'utc',
       endInputType:    'utc',
       endOutputType:   'utc',
-      title: e.name,
+      title: eventSummary(e.name),
       description: e.description,
+      location: EVENT_LOCATION,
+      alarms: EVENT_ALARMS,
       productId: 'utoronto-gpllm-cal/ics',
       calName: 'UofT GPLLM Calendar',
     }, (error, value) => {
       if (error) reject(error);
-      else resolve(value);
+      else resolve(withTimezone(value));
     });
   });
 }

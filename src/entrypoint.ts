@@ -10,7 +10,10 @@
 import type { Alpine } from 'alpinejs';
 import { createEvent, type DateArray } from 'ics';
 import { cellVisual, type CatKey } from './lib/calendar-data';
-import { buildDescription, courseEventTitle, type EventCourse } from './lib/event';
+import {
+  buildDescription, courseEventTitle, eventSummary,
+  EVENT_ALARMS, EVENT_LOCATION, EVENT_TZ, withTimezone, type EventCourse,
+} from './lib/event';
 
 // Filter key → cats mapping. Mirrors FILTERS_CLASSES + FILTERS_EXAMS in
 // src/lib/calendar-data.ts. Kept in sync manually; small and easy to spot-check.
@@ -878,9 +881,10 @@ export default (Alpine: Alpine) => {
       if (!e.isoStart || !e.isoEnd) return null;
       const params = new URLSearchParams({
         action: 'TEMPLATE',
-        text: e.name,
+        text: eventSummary(e.name),
         dates: `${toGcalStamp(e.isoStart)}/${toGcalStamp(e.isoEnd)}`,
-        ctz: 'America/Toronto',
+        ctz: EVENT_TZ,
+        location: EVENT_LOCATION,
         details: e.description,
       });
       return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -916,14 +920,16 @@ export default (Alpine: Alpine) => {
         startOutputType: 'utc',
         endInputType:    'utc',
         endOutputType:   'utc',
-        title: e.name,
+        title: eventSummary(e.name),
         description: e.description,
+        location: EVENT_LOCATION,
+        alarms: EVENT_ALARMS,
         productId: 'utoronto-gpllm-cal/ics',
         calName: 'UofT GPLLM Calendar',
       }, (error, value) => {
         if (error) { console.error('ics error', error); return; }
         const day = e.isoStart!.slice(0, 10);
-        cb(value, `${day}-${safeFilename(e.name)}.ics`);
+        cb(withTimezone(value), `${day}-${safeFilename(e.name)}.ics`);
       });
     },
 

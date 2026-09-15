@@ -12,7 +12,7 @@
 import { loadPage } from './content';
 import type { CatKey, HourMin } from './calendar-data';
 import { toLocalIso } from './calendar-data';
-import { courseEventTitle, safeFilename, type EventCourse } from './event';
+import { courseEventTitle, safeFilename, SITE_URL, type EventCourse } from './event';
 
 export interface CatalogRow {
   code: string; title: string; conc: string; capped: boolean; nca: string; req: boolean;
@@ -318,11 +318,14 @@ export function courseEventIndex(): Record<string, EventCourse> {
   const index: Record<string, EventCourse> = {};
 
   const add = (ref: string, slot: string, time: string) => {
-    const course = catalog[ref.split(' ')[0]];
+    const key = ref.split(' ')[0];
+    const course = catalog[key];
     if (!course || index[ref]) return;
     const offering = offerings[ref];
     index[ref] = {
       title: course.title,
+      // Absolute: the event leaves the browser entirely
+      siteUrl: `${SITE_URL}/courses/#${courseToken(course, key)}`,
       code: course.code,
       kind: course.kind,
       credits: course.credits,
