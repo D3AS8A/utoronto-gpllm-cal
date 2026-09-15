@@ -29,7 +29,10 @@ export default defineConfig({
     alpinejs({ entrypoint: '/src/entrypoint' }),
     sitemap(),
     AstroPWA({
-      registerType: 'prompt',
+      /*
+       * autoUpdate so the worker calls skipWaiting itself
+       */
+      registerType: 'autoUpdate',
       strategies: 'generateSW',
       injectRegister: null,
       devOptions: {

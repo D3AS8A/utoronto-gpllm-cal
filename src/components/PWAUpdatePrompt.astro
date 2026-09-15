@@ -14,8 +14,12 @@
   const reloadBtn = document.getElementById('pwa-update-reload');
   const dismissBtn = document.getElementById('pwa-update-dismiss');
 
-  const updateSW = registerSW({
-    onNeedRefresh() {
+  registerSW({
+    /*
+     * Supress the autoUpdate default that reloads the page when a new worker activates
+     * onNeedRefresh is the 'prompt' counterpart and never fires here
+     */
+    onNeedReload() {
       if (toast) toast.hidden = false;
     },
     onOfflineReady() {
@@ -27,7 +31,7 @@
      * This site routes on the client, so clicking between pages never
      * triggers that check and a returning visitor can sit on a stale worker
      * indefinitely, which is why updates only appeared after a hard reload.
-     * Asking explicitly is what makes the toast show up on its own.
+     * Asking explicitly is what brings the new worker in on its own.
      */
     onRegisteredSW(_swUrl, registration) {
       if (!registration) return;
@@ -43,7 +47,7 @@
   });
 
   reloadBtn?.addEventListener('click', () => {
-    updateSW(true);
+    window.location.reload();
   });
 
   dismissBtn?.addEventListener('click', () => {
