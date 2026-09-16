@@ -79,12 +79,19 @@ const courses = [...byCourse.entries()]
     <p>{content.requirements}</p>
   </PageTitle>
 
+  <!--
+    Every expression below names only state the component has carried for a
+    while, and each sits on one line. Both matter: the router can swap this
+    page in while an older bundle from the previous deploy is still the one
+    that registered `courseFilters`, and Astro's TSX transform, which `astro
+    check` reads, can't parse an attribute value that wraps.
+  -->
   <div
     class="courses-app"
     x-data="courseFilters"
     @hashchange.window="revealFromHash()"
-    @course:toggle.document="onCourseToggle()"
-    :class="appClass"
+    @course:toggle.document="$nextTick(syncOpenHash)"
+    :class="{ 'show-cl': conc.cl, 'show-bl': conc.bl, 'show-ilt': conc.ilt, 'sort-course': sort === 'course', 'sort-time': sort === 'time' }"
   >
     <ConcentrationFilter concentrations={content.concentrations}>
       <SortToggle

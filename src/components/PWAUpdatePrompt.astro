@@ -21,6 +21,21 @@
      */
     onNeedReload() {
       if (toast) toast.hidden = false;
+
+      /*
+       * The new worker has already claimed this page, so its precache now
+       * answers with the pages and bundles of a build this tab never loaded.
+       * Left alone, the router would swap in that newer markup while the old
+       * bundle is still the one that registered the Alpine components, and any
+       * expression naming something the old bundle lacks throws on init.
+       *
+       * Marking the links sends the next click through a real navigation, so
+       * markup and script arrive from the same build. Costs one page load the
+       * visitor was about to pay anyway, and only until they take the toast.
+       */
+      document
+        .querySelectorAll('a[href]')
+        .forEach((link) => link.setAttribute('data-astro-reload', ''));
     },
     onOfflineReady() {
       // Silent — no UI needed for first-time offline readiness
