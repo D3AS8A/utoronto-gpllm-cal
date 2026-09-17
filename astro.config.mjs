@@ -61,7 +61,12 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{html,css,js,svg,png,ico,webmanifest,ics,txt,xml}'],
+        /*
+         * woff2 is in the list, but globIgnores below keeps it to the cuts the
+         * site actually draws with. Precaching the fonts is what lets a cold
+         * offline load look like the site rather than like Helvetica.
+         */
+        globPatterns: ['**/*.{html,css,js,svg,png,ico,webmanifest,ics,txt,xml,woff2}'],
 
         /*
          * Cloudflare serves the not-found page at `/404`, the one route whose
@@ -70,7 +75,18 @@ export default defineConfig({
          * whole install, which takes the service worker down with it. Nothing
          * needs a cached not-found page.
          */
-        globIgnores: ['404.html'],
+        globIgnores: [
+          '404.html',
+          /*
+           * Latin-ext answers accented characters no page currently sets, and
+           * the italic cuts are two `em`s and a handful of notes. Both stay on
+           * the network, where unicode-range and font-style already gate them.
+           */
+          'fonts/*-latin-ext.woff2',
+          'fonts/archivo-italic-*.woff2',
+          // Licence text ships with the fonts, but nothing reads it offline
+          'fonts/OFL-*.txt',
+        ],
         /*
          * Explicitly undefined, not merely absent. @vite-pwa/astro tests with
          * `'navigateFallback' in workbox`, so leaving the key out lets it
@@ -89,24 +105,27 @@ export default defineConfig({
          */
         navigateFallback: undefined,
         cleanupOutdatedCaches: true,
+
+        /*
+         * The two Google Fonts routes that used to live here are gone with the
+         * fonts themselves. Worth recording why they had to: the stylesheet ran
+         * through StaleWhileRevalidate, which rejects outright on a cold cache
+         * and a failed network, and a rejected respondWith reads to the browser
+         * as a dead stylesheet. A flaky first visit lost the typeface for the
+         * whole session. Same-origin fonts are precached instead, so there is
+         * no handler left to fail.
+         *
+         * This leaves the worker with no cross-origin routes at all.
+         */
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.origin === 'https://fonts.googleapis.com',
-            handler: 'StaleWhileRevalidate',
-            options: {
-              cacheName: 'google-fonts-stylesheets',
-            },
-          },
-          {
-            urlPattern: ({ url }) => url.origin === 'https://fonts.gstatic.com',
+            // The two cuts held back from the precache above
+            urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/fonts/'),
             handler: 'CacheFirst',
             options: {
-              cacheName: 'google-fonts-webfonts',
+              cacheName: 'fonts',
               cacheableResponse: { statuses: [0, 200] },
-              expiration: {
-                maxAgeSeconds: 60 * 60 * 24 * 365,
-                maxEntries: 30,
-              },
+              expiration: { maxAgeSeconds: 60 * 60 * 24 * 365, maxEntries: 20 },
             },
           },
         ],

@@ -90,13 +90,15 @@ const canonicalURL = Astro.site
 
     <link rel="sitemap" href="/sitemap-index.xml" />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap"
-    />
+    <!--
+      Fonts are self-hosted, declared in styles/fonts.css. Preloaded here
+      because the @font-face rules sit inside a stylesheet, so the browser
+      would otherwise only learn of them after that stylesheet parses. Just
+      the two faces every page draws with: the italic and latin-ext cuts
+      stay on demand.
+    -->
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/archivo-latin.woff2" crossorigin />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/space-mono-bold-latin.woff2" crossorigin />
   </head>
 
   <body>
