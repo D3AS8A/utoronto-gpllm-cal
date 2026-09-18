@@ -22,9 +22,6 @@
 /manifest.webmanifest
   Cache-Control: public, max-age=0, must-revalidate
 
-/registerSW.js
-  Cache-Control: public, max-age=0, must-revalidate
-
 # Imported by sw.js at startup
 /sw-warm.js
   Cache-Control: public, max-age=0, must-revalidate

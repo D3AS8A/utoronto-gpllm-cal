@@ -58,14 +58,22 @@ export default defineConfig({
       },
       workbox: {
         // Precache immutable assets only; pages are handled network-first
-        // below (see README, PWA and caching)
-        globPatterns: ['**/*.{css,js,svg,png,ico,webmanifest,woff2}'],
+        // below (see README, PWA and caching). The plugin adds the manifest
+        // entry itself, so webmanifest stays out of the glob
+        globPatterns: ['**/*.{css,js,png,woff2}'],
 
         globIgnores: [
           // On-demand font cuts (unicode-range/font-style gated) and licences
           'fonts/*-latin-ext.woff2',
           'fonts/archivo-italic-*.woff2',
           'fonts/OFL-*.txt',
+          // Loaded by the worker itself via importScripts, never by pages
+          'sw-warm.js',
+          // Platforms fetch icons at install time and browsers cache their
+          // own; og-image only ever leaves through social scrapers
+          'favicon/**',
+          'favicon.png',
+          'images/og-image.png',
         ],
 
         // Warms the pages cache at install, clears Google Fonts era caches

@@ -21,8 +21,8 @@ Built with [Astro](https://astro.build) and [Alpine.js](https://alpinejs.dev). O
 ```bash
 bun install    # requires node 22+
 bun dev        # local development
-bun build      # outputs to ./dist
-bun preview    # preview the ./dist build locally
+bun run build      # outputs to ./dist
+bun run preview    # preview the ./dist build locally
 ```
 
 ## Content and last-updated dates
