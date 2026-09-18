@@ -9,11 +9,8 @@ export default defineConfig({
 
   output: 'static',
 
-  /*
-   * Cloudflare Pages serves a directory route with trailing slash `/calendar/`, 
-   * it 308s to the bare `/calendar`; always use trailing slash here to make the 
-   * precache manifest agree
-   */
+  // Match how Cloudflare Pages serves directory routes, so canonical URLs
+  // and cache keys agree
   trailingSlash: 'always',
 
   // The calendar is the site's landing page, `/` bounces to it
@@ -29,14 +26,13 @@ export default defineConfig({
     alpinejs({ entrypoint: '/src/entrypoint' }),
     sitemap(),
     AstroPWA({
-      /*
-       * autoUpdate so the worker calls skipWaiting itself
-       */
+      // autoUpdate: the worker calls skipWaiting itself
       registerType: 'autoUpdate',
       strategies: 'generateSW',
       injectRegister: null,
+      // No worker in dev; PWAUpdatePrompt scrubs any old dev registrations
       devOptions: {
-        enabled: true,
+        enabled: false,
       },
       manifest: {
         name: 'UofT GPLLM Calendar',
@@ -61,65 +57,42 @@ export default defineConfig({
         ],
       },
       workbox: {
-        /*
-         * woff2 is in the list, but globIgnores below keeps it to the cuts the
-         * site actually draws with. Precaching the fonts is what lets a cold
-         * offline load look like the site rather than like Helvetica.
-         */
-        globPatterns: ['**/*.{html,css,js,svg,png,ico,webmanifest,ics,txt,xml,woff2}'],
+        // Precache immutable assets only; pages are handled network-first
+        // below (see README, PWA and caching)
+        globPatterns: ['**/*.{css,js,svg,png,ico,webmanifest,woff2}'],
 
-        /*
-         * Cloudflare serves the not-found page at `/404`, the one route whose
-         * canonical shape is the opposite of every other page's. Precaching it
-         * meant asking for `/404/`, and a precache entry that 404s fails the
-         * whole install, which takes the service worker down with it. Nothing
-         * needs a cached not-found page.
-         */
         globIgnores: [
-          '404.html',
-          /*
-           * Latin-ext answers accented characters no page currently sets, and
-           * the italic cuts are two `em`s and a handful of notes. Both stay on
-           * the network, where unicode-range and font-style already gate them.
-           */
+          // On-demand font cuts (unicode-range/font-style gated) and licences
           'fonts/*-latin-ext.woff2',
           'fonts/archivo-italic-*.woff2',
-          // Licence text ships with the fonts, but nothing reads it offline
           'fonts/OFL-*.txt',
         ],
-        /*
-         * Explicitly undefined, not merely absent. @vite-pwa/astro tests with
-         * `'navigateFallback' in workbox`, so leaving the key out lets it
-         * default the fallback to the scope, and `/` here is the redirect stub
-         * that bounces to the calendar. Every navigation missing the precache
-         * then lands on the calendar, including the not-found page, which no
-         * controlled visitor would ever get to see. Falling through to the
-         * network is what lets a real 404 answer as one.
-         *
-         * The earlier value, `/index.html`, was a page the plugin never emits,
-         * and binding the fallback to it threw non-precached-url. The worker
-         * body runs inside the AMD factory's promise, so that throw was an
-         * unhandled rejection rather than a fatal script error: the worker
-         * still installed and precached, then stopped before registering
-         * anything below it.
-         */
+
+        // Warms the pages cache at install, clears Google Fonts era caches
+        importScripts: ['sw-warm.js'],
+        // Explicitly undefined: the plugin checks `'navigateFallback' in
+        // workbox` and would otherwise default it to `/`, which is not
+        // precached and throws non-precached-url
         navigateFallback: undefined,
         cleanupOutdatedCaches: true,
 
-        /*
-         * The two Google Fonts routes that used to live here are gone with the
-         * fonts themselves. Worth recording why they had to: the stylesheet ran
-         * through StaleWhileRevalidate, which rejects outright on a cold cache
-         * and a failed network, and a rejected respondWith reads to the browser
-         * as a dead stylesheet. A flaky first visit lost the typeface for the
-         * whole session. Same-origin fonts are precached instead, so there is
-         * no handler left to fail.
-         *
-         * This leaves the worker with no cross-origin routes at all.
-         */
         runtimeCaching: [
           {
-            // The two cuts held back from the precache above
+            // Pages: fresh when online, cached copy offline. The pathname arm
+            // catches ClientRouter fetches, which are not mode 'navigate'
+            urlPattern: ({ url, sameOrigin, request }) =>
+              sameOrigin && (request.mode === 'navigate' || url.pathname.endsWith('/')),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'pages',
+              networkTimeoutSeconds: 4,
+              // Offline /courses/?c=… still finds the cached /courses/
+              matchOptions: { ignoreSearch: true },
+              expiration: { maxEntries: 32, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+          {
+            // The font cuts held out of the precache above
             urlPattern: ({ url, sameOrigin }) => sameOrigin && url.pathname.startsWith('/fonts/'),
             handler: 'CacheFirst',
             options: {

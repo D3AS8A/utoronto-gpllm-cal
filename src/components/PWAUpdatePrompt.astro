@@ -10,44 +10,56 @@
 <script>
   import { registerSW } from 'virtual:pwa-register';
 
-  const toast = document.getElementById('pwa-update-toast');
-  const reloadBtn = document.getElementById('pwa-update-reload');
-  const dismissBtn = document.getElementById('pwa-update-dismiss');
+  // Query at act time and delegate clicks: the router swaps the body on
+  // every in-page navigation, detaching anything captured at load
+  let updateReady = false;
 
-  registerSW({
-    /*
-     * Supress the autoUpdate default that reloads the page when a new worker activates
-     * onNeedRefresh is the 'prompt' counterpart and never fires here
-     */
+  const applyUpdateUi = () => {
+    const toast = document.getElementById('pwa-update-toast');
+    if (toast) toast.hidden = false;
+    // Stamped links navigate for real, so markup and bundle arrive from the
+    // same build instead of the router mixing old script with new pages
+    document
+      .querySelectorAll('a[href]')
+      .forEach((link) => link.setAttribute('data-astro-reload', ''));
+  };
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement | null;
+    if (!target) return;
+    if (target.closest('#pwa-update-reload')) window.location.reload();
+    if (target.closest('#pwa-update-dismiss')) {
+      const toast = document.getElementById('pwa-update-toast');
+      if (toast) toast.hidden = true;
+    }
+  });
+
+  // Each swap brings a hidden toast and unstamped links; reapply
+  document.addEventListener('astro:page-load', () => {
+    if (updateReady) applyUpdateUi();
+  });
+
+  if (import.meta.env.DEV) {
+    // No worker in dev; scrub any registration and caches left from when
+    // devOptions was enabled
+    navigator.serviceWorker?.getRegistrations().then((regs) => {
+      regs.forEach((reg) => reg.unregister());
+    });
+    caches?.keys().then((keys) => {
+      keys.forEach((key) => caches.delete(key));
+    });
+  } else registerSW({
+    // Suppresses the autoUpdate default of reloading the page on activation
     onNeedReload() {
-      if (toast) toast.hidden = false;
-
-      /*
-       * The new worker has already claimed this page, so its precache now
-       * answers with the pages and bundles of a build this tab never loaded.
-       * Left alone, the router would swap in that newer markup while the old
-       * bundle is still the one that registered the Alpine components, and any
-       * expression naming something the old bundle lacks throws on init.
-       *
-       * Marking the links sends the next click through a real navigation, so
-       * markup and script arrive from the same build. Costs one page load the
-       * visitor was about to pay anyway, and only until they take the toast.
-       */
-      document
-        .querySelectorAll('a[href]')
-        .forEach((link) => link.setAttribute('data-astro-reload', ''));
+      updateReady = true;
+      applyUpdateUi();
     },
     onOfflineReady() {
-      // Silent — no UI needed for first-time offline readiness
+      // Silent, nothing to show for first-time offline readiness
     },
 
-    /*
-     * A browser only checks for a new service worker on a real navigation.
-     * This site routes on the client, so clicking between pages never
-     * triggers that check and a returning visitor can sit on a stale worker
-     * indefinitely, which is why updates only appeared after a hard reload.
-     * Asking explicitly is what brings the new worker in on its own.
-     */
+    // Browsers only check for a new worker on real navigations, which
+    // client-side routing never makes; ask explicitly instead
     onRegisteredSW(_swUrl, registration) {
       if (!registration) return;
 
@@ -59,14 +71,6 @@
       });
       setInterval(check, 60 * 60 * 1000);
     },
-  });
-
-  reloadBtn?.addEventListener('click', () => {
-    window.location.reload();
-  });
-
-  dismissBtn?.addEventListener('click', () => {
-    if (toast) toast.hidden = true;
   });
 </script>
 
