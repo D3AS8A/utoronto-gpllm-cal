@@ -4,13 +4,8 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
 
-  # Alpine.js v3 requires 'unsafe-eval' (uses new Function() for expression evaluation).
-  # Fonts are self-hosted, so 'self' is the whole story for style-src and font-src.
-  # script-src data: is for Astro's ClientRouter, which appends an empty
-  # `data:application/javascript,` module to force inline module scripts to run
-  # in order after a view transition. Alongside 'unsafe-inline' it grants nothing new.
-  # Cloudflare Web Analytics is enabled on the project, so its beacon needs both
-  # a script-src for the file and a connect-src for where it reports.
+  # Alpine needs unsafe-eval; data: is ClientRouter's empty module shim;
+  # cloudflareinsights is Web Analytics (script + beacon endpoint)
   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' data: https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://cloudflareinsights.com; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
 
 # Content-hashed asset bundles — safe to cache forever
@@ -27,7 +22,8 @@
 /manifest.webmanifest
   Cache-Control: public, max-age=0, must-revalidate
 
-/registerSW.js
+# Imported by sw.js at startup
+/sw-warm.js
   Cache-Control: public, max-age=0, must-revalidate
 
 # HTML pages — not content-hashed; revalidate on every visit
@@ -54,6 +50,6 @@
 /favicon/*
   Cache-Control: public, max-age=86400
 
-# Self-hosted fonts — a given file's bytes never change; a new cut gets a new name
+# Self-hosted fonts; a changed cut would ship under a new name
 /fonts/*
   Cache-Control: public, max-age=31536000, immutable
