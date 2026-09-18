@@ -35,6 +35,14 @@ function vibrate(ms: number) {
   try { if (navigator.vibrate) navigator.vibrate(ms); } catch { /* noop */ }
 }
 
+// Rerun a text measurement once the webfonts land; loadingdone covers Firefox
+// resolving fonts.ready before any face has been requested
+function remeasureOnFonts(cb: () => void) {
+  if (!document.fonts) return;
+  document.fonts.ready.then(cb);
+  document.fonts.addEventListener('loadingdone', cb);
+}
+
 interface DetailItem {
   name: string;
   time: string;
@@ -441,6 +449,9 @@ export default (Alpine: Alpine) => {
       const TOG_FIXED = 14 + 8 + 8 + 26 + 18; // swatch + 2×gap + track + tog padding
       const TOG_PAD = 0; // extra breathing room after label text (on top of 0.5rem flex gap)
       const measureGroup = (group: HTMLElement) => {
+        // A fallback-face measurement can differ by the pixel that decides how
+        // many cells fit a row; hold the default until the real face is in
+        if (document.fonts && !document.fonts.check('1rem Archivo')) return;
         const labels = group.querySelectorAll<HTMLElement>('.toggle-label');
         if (!labels.length) return;
         group.style.removeProperty('--tog-label-w');
@@ -466,7 +477,7 @@ export default (Alpine: Alpine) => {
       };
       scheduleMeasure();
       window.addEventListener('resize', scheduleMeasure, { passive: true });
-      if (document.fonts?.ready) document.fonts.ready.then(scheduleMeasure);
+      remeasureOnFonts(scheduleMeasure);
       this.$watch('classesOpen', (v: boolean) => { if (v) scheduleMeasure(); });
       this.$watch('examsOpen', (v: boolean) => { if (v) scheduleMeasure(); });
 
@@ -482,6 +493,7 @@ export default (Alpine: Alpine) => {
         // Defer initial measure past x-cloak / initial paint so offsetTop is real.
         requestAnimationFrame(recompute);
         window.addEventListener('resize', recompute, { passive: true });
+        remeasureOnFonts(recompute);
         window.addEventListener('scroll', () => {
           const y = window.scrollY;
           if (!threshold) recompute();
@@ -994,7 +1006,7 @@ export default (Alpine: Alpine) => {
         // travel in from the left on load
         onNextFrame(() => { this.sortReady = true; });
         // Webfonts land after first paint and change the option widths
-        document.fonts?.ready.then(() => this.syncSortPill());
+        remeasureOnFonts(() => this.syncSortPill());
       });
     },
 

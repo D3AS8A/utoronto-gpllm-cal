@@ -96,6 +96,7 @@ function isActive(href: string): boolean {
       anim: null,
       ro: null,
       resizeTimer: null,
+      onFonts: null,
 
       init() {
         this.onPageLoad = () => this.sync();
@@ -118,11 +119,16 @@ function isActive(href: string): boolean {
             this.ro = new ResizeObserver(() => this.remeasure());
             this.ro.observe(this.$refs.list);
           }
+          // Link widths shift when the webfonts land, which the observer
+          // misses when the list box itself keeps its size
+          this.onFonts = () => this.remeasure();
+          document.fonts?.addEventListener('loadingdone', this.onFonts);
         });
       },
 
       destroy() {
         document.removeEventListener('astro:page-load', this.onPageLoad);
+        if (this.onFonts) document.fonts?.removeEventListener('loadingdone', this.onFonts);
         this.ro?.disconnect();
         clearTimeout(this.resizeTimer);
       },
