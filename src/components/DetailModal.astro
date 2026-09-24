@@ -194,11 +194,6 @@
     margin-left: calc((var(--pick-rail) - var(--pick-ring)) / 2);
     border: 0.09375rem solid var(--chino);
     border-radius: 50%;
-    transition: border-color 0.3s linear;
-  }
-
-  .detail-pick-input:checked ~ .detail-pick-ring {
-    border-color: var(--matisse);
   }
 
   .detail-pick-input:focus-visible ~ .detail-pick-ring {
@@ -250,10 +245,11 @@
     background: var(--matisse);
     opacity: 0;
     pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+    transition:
+      opacity 0.125s ease,
+      transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.08);
   }
 
-  /* Nothing to travel from on the first pick, so it simply arrives */
   .detail-pick-dot.is-on {
     opacity: 1;
   }

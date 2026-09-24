@@ -72,6 +72,7 @@ input[type='search']::-webkit-search-results-decoration {
 
 a,
 button,
+label,
 [role='button'] {
   -webkit-tap-highlight-color: transparent;
 }
