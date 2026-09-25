@@ -60,7 +60,7 @@ export default defineConfig({
         // Precache immutable assets only; pages are handled network-first
         // below (see README, PWA and caching). The plugin adds the manifest
         // entry itself, so webmanifest stays out of the glob
-        globPatterns: ['**/*.{css,js,png,woff2}'],
+        globPatterns: ['**/*.{css,js,png,svg,woff2}'],
 
         globIgnores: [
           // On-demand font cuts (unicode-range/font-style gated) and licences
