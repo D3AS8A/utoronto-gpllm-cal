@@ -1,5 +1,4 @@
-
-<svg id="gpllm-logo-vector" data-name="gpllm-logo-vector" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 460 340">
+<svg id="gpllm-logo-vector" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 462 340">
   <defs>
     <style>
       .driftwood-fill { fill: #936e42; }
@@ -9,26 +8,24 @@
       .chamois-fill   { fill: #e5d3a1; }
     </style>
   </defs>
-  <g id="gpllm-letter-l2">
-    <path class="driftwood-fill" d="M307.01,169.01l2,.7v167.08l-2,1.23c-51.32.02-102.68.02-154,0l-2-.7v-167.08l2-1.23c51.32-2.48,102.68-2.5,154,0Z"/>
-    <polygon class="chamois-fill" points="212.01 190.01 212.01 292.01 276.01 292.01 276.01 318.01 184.01 318.01 184.01 316.51 184.01 190.01 212.01 190.01"/>
-  </g>
-  <g id="gpllm-letter-l1">
-    <path class="midnight-fill" d="M153.01,169.01v169c-50.98-.02-102.02.01-153.01,0v-169.01s.7-2,.7-2h151.08l1.23,2Z"/>
-    <polygon class="driftwood-fill" points="59.01 190.01 59.01 292.01 122.01 292.01 122.01 318.01 30.01 318.01 30.01 316.51 30.01 190.01 59.01 190.01"/>
-  </g>
   <g id="gpllm-letter-g">
-    <path class="prussian-fill" d="M153.01,0l2,.7v167.08l-2,1.23H0C0,112.69,0,56.32,0,0c50.98,0,102.02.02,153.01,0Z"/>
-    <path class="matisse-fill" d="M110.01,99.01h-28v-24h55v54.5c-37.15,33.96-107.94,26.16-119.51-28.49C2.7,31.13,80.5-6.63,131.96,35.61c-1.1,1.92-15.21,18.92-15.98,19.94-3-2.03-8.79-4.42-11.96-6.06-36.84-19.07-70.71,15.14-55.87,51.87,10.15,25.13,41.27,29.8,61.85,15.15v-17.5Z"/>
-  </g>
-  <g id="gpllm-letter-m">
-    <path class="prussian-fill" d="M462.01,326.01l-.71-1.76c-.91-45.61-.81-96.58-.35-143.98.63,1.07.82.05,1.06-1.26-.05-3.32.04-6.68,0-10.01-51.65,0-103.35.03-155.01,0v169c51.65-.02,103.35.01,155.01,0,.03-3.99-.05-8.02,0-12.01Z"/>
-    <path class="prussian-fill" d="M462.01,179.01c-3.03-.56-1.92,1.53-2,3.45-1.76,44.5-1.49,95.51,0,140.09.06,1.93-1.02,4.01,2,3.45.6-48.8.8-98.21,0-147Z"/>
-    <path class="matisse-fill" d="M417.01,190.01h31v127h-28v-82c-6.19,9.02-22.58,32.74-36.5,53.04-12.42-18.3-30.38-44.44-35.5-52.04v81h-28v-127h31l32.51,53.01"/>
+    <rect id="gpllm-block-g" class="prussian-fill" x="0" y="0" width="154" height="170" shape-rendering="crispEdges"/>
+    <path id="gpllm-glyph-g" class="matisse-fill" d="M110 99h-28v-24h55v54.5c-37.15 33.96-107.94 26.16-119.51-28.49C2.69 31.12 80.49-6.64 131.95 35.6c-1.1 1.92-15.21 18.92-15.98 19.94-3-2.03-8.79-4.42-11.96-6.06-36.84-19.07-70.71 15.14-55.87 51.87 10.15 25.13 41.27 29.8 61.85 15.15v-17.5z"/>
   </g>
   <g id="gpllm-letter-p">
-    <path class="matisse-fill" d="M153.01,0c51.32-.01,102.69.01,154.01,0,0,56.32,0,112.69,0,169.01-51.32-.02-102.68,0-154,0V0Z"/>
-    <path class="prussian-fill" d="M212.01,112.01v38h-28V22.01c15.99.64,32.61-.84,48.54-.04,18.67.94,37.76,4.85,47.28,22.72,16.7,31.35-6.47,67.32-41.32,67.32h-26.5Z"/>
-    <path class="matisse-fill" d="M212.01,87.01v-39h27.5c.53,0,4.82.7,5.87,1.13,14.97,6.19,13.84,30.14-.47,37.31-.98.49-5.88.56-6.4.56h-26.5Z"/>
+    <rect id="gpllm-block-p" class="matisse-fill" x="154" y="0" width="154" height="170" shape-rendering="crispEdges"/>
+    <path id="gpllm-glyph-p" class="prussian-fill" fill-rule="evenodd" d="M184 22h48.5c18.7.9 37.8 4.9 47.3 22.7 16.7 31.4-6.5 67.3-41.3 67.3H212v38h-28zm28 26v39h26.5c.5 0 5.4-.1 6.4-.6 14.3-7.2 15.4-31.1.5-37.3-1.1-.4-5.4-1.1-5.9-1.1z"/>
+  </g>
+  <g id="gpllm-letter-l1">
+    <rect id="gpllm-block-l1" class="midnight-fill" x="0" y="170" width="154" height="170" shape-rendering="crispEdges"/>
+    <path id="gpllm-glyph-l1" class="driftwood-fill" d="M30 190h28v102h64v26H30z"/>
+  </g>
+  <g id="gpllm-letter-l2">
+    <rect id="gpllm-block-l2" class="driftwood-fill" x="154" y="170" width="154" height="170" shape-rendering="crispEdges"/>
+    <path id="gpllm-glyph-l2" class="chamois-fill" d="M184 190h28v102h64v26h-92z"/>
+  </g>
+  <g id="gpllm-letter-m">
+    <rect id="gpllm-block-m" class="prussian-fill" x="308" y="170" width="154" height="170" shape-rendering="crispEdges"/>
+    <path id="gpllm-glyph-m" class="matisse-fill" d="M321 190h31l33 53 33-53h31v128h-28v-82l-36 52-36-52v82h-28z"/>
   </g>
 </svg>

@@ -1,9 +1,12 @@
 ---
 import MainNav from './MainNav.astro';
+import gpllmLogo from '../../public/images/gpllm-logo.svg?raw';
 ---
 <header class="cal-masthead">
   <div class="masthead-logos">
-    <img src="/images/gpllm-logo.svg" alt="GPLLM" class="masthead-gpllm-mark" />
+    <a href="/" class="masthead-gpllm-mark" aria-label="GPLLM" transition:persist="gpllm-mark">
+      <Fragment set:html={gpllmLogo} />
+    </a>
     <img
       src="/images/jackman-law-logo.png"
       alt="Henry N.R. Jackman Faculty of Law, University of Toronto"
@@ -29,8 +32,104 @@ import MainNav from './MainNav.astro';
 
   .masthead-gpllm-mark {
     height: clamp(5.25rem, 10vw, 7.5rem);
+    display: block;
+  }
+
+  .masthead-gpllm-mark :global(svg) {
+    height: 100%;
     width: auto;
     display: block;
+    overflow: visible;
+  }
+
+  .masthead-gpllm-mark :global([id^='gpllm-letter-']) {
+    --g: 0px;
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .masthead-gpllm-mark:hover :global([id^='gpllm-letter-']),
+  .masthead-gpllm-mark:focus-visible :global([id^='gpllm-letter-']) {
+    --g: 8px;
+  }
+
+  .masthead-gpllm-mark :global(#gpllm-letter-g)  { transform: translate(calc(var(--g) * -1), calc(var(--g) * -0.5)); }
+  .masthead-gpllm-mark :global(#gpllm-letter-p)  { transform: translate(0, calc(var(--g) * -0.5)); }
+  .masthead-gpllm-mark :global(#gpllm-letter-l1) { transform: translate(calc(var(--g) * -1), calc(var(--g) * 0.5)); }
+  .masthead-gpllm-mark :global(#gpllm-letter-l2) { transform: translate(0, calc(var(--g) * 0.5)); }
+  .masthead-gpllm-mark :global(#gpllm-letter-m)  { transform: translate(var(--g), calc(var(--g) * 0.5)); }
+
+  /* Drop-in on first load */
+  .masthead-gpllm-mark :global([id^='gpllm-letter-']) {
+    transform-box: fill-box;
+  }
+  .masthead-gpllm-mark :global(#gpllm-letter-l1) {
+    transform-origin: 0 100%;
+    animation: gpllm-drop-l1 1.1s linear 0s backwards;
+  }
+  .masthead-gpllm-mark :global(#gpllm-letter-l2) {
+    transform-origin: 100% 100%;
+    animation: gpllm-drop-l2 1.05s linear 0.08s backwards;
+  }
+  .masthead-gpllm-mark :global(#gpllm-letter-m) {
+    transform-origin: 100% 100%;
+    animation: gpllm-drop-m 1.15s linear 0.2s backwards;
+  }
+  .masthead-gpllm-mark :global(#gpllm-letter-g) {
+    transform-origin: 0 100%;
+    animation: gpllm-drop-g 1s linear 0.55s backwards;
+  }
+  .masthead-gpllm-mark :global(#gpllm-letter-p) {
+    transform-origin: 100% 100%;
+    animation: gpllm-drop-p 0.95s linear 0.7s backwards;
+  }
+
+  /* Gravity: ease-in falling, ease-out rising. Rotation only ever
+     settles toward flat, no overshoot, since the floor stops it */
+  @keyframes gpllm-drop-l1 {
+    0%   { transform: translate(-28px, -430px) rotate(-9deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    48%  { transform: translate(0, 0) rotate(-5deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    60%  { transform: translate(0, -18px) rotate(-3deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    72%  { transform: translate(0, 0) rotate(-1.75deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    80%  { transform: translate(0, -4px) rotate(-0.75deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    88%, 100% { transform: translate(0, 0) rotate(0); }
+  }
+  @keyframes gpllm-drop-l2 {
+    0%   { transform: translate(14px, -460px) rotate(4deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    48%  { transform: translate(0, 0) rotate(2.5deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    60%  { transform: translate(0, -10px) rotate(1.5deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    72%  { transform: translate(0, 0) rotate(0.875deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    80%  { transform: translate(0, -2px) rotate(0.375deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    88%, 100% { transform: translate(0, 0) rotate(0); }
+  }
+  @keyframes gpllm-drop-m {
+    0%   { transform: translate(36px, -500px) rotate(10deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    48%  { transform: translate(0, 0) rotate(6deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    60%  { transform: translate(0, -26px) rotate(3.6deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    72%  { transform: translate(0, 0) rotate(2.1deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    80%  { transform: translate(0, -5px) rotate(0.9deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    88%, 100% { transform: translate(0, 0) rotate(0); }
+  }
+  @keyframes gpllm-drop-g {
+    0%   { transform: translate(-20px, -420px) rotate(-7deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    48%  { transform: translate(0, 0) rotate(-4deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    60%  { transform: translate(0, -14px) rotate(-2.4deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    72%  { transform: translate(0, 0) rotate(-1.4deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    80%  { transform: translate(0, -3px) rotate(-0.6deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    88%, 100% { transform: translate(0, 0) rotate(0); }
+  }
+  @keyframes gpllm-drop-p {
+    0%   { transform: translate(24px, -440px) rotate(5deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    48%  { transform: translate(0, 0) rotate(3deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    60%  { transform: translate(0, -8px) rotate(1.8deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    72%  { transform: translate(0, 0) rotate(1.05deg); animation-timing-function: cubic-bezier(0, 0.55, 0.45, 1); }
+    80%  { transform: translate(0, -2px) rotate(0.45deg); animation-timing-function: cubic-bezier(0.55, 0, 1, 0.45); }
+    88%, 100% { transform: translate(0, 0) rotate(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .masthead-gpllm-mark :global([id^='gpllm-letter-']) {
+      animation: none;
+    }
   }
 
   .masthead-uoft-mark {
