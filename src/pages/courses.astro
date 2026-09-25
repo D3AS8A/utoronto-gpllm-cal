@@ -102,7 +102,7 @@ const courses = [...byCourse.entries()]
       />
     </ConcentrationFilter>
 
-    <main id="main-content" class="courses-main" tabindex="-1">
+    <main id="main-content" class="courses-main gp-reveal gp-reveal-rise gp-reveal-late" tabindex="-1">
       <p class="courses-empty" x-show="!anyOn" x-transition.opacity.duration.250ms x-cloak>
         Nothing selected, choose at least one concentration to see courses
       </p>
@@ -177,6 +177,13 @@ const courses = [...byCourse.entries()]
   }
 
   /* Both views are rendered; the sort switch decides which is in play */
+  /* Nothing is on the page until Alpine sets a sort class, so the reveal
+     waits for that moment rather than running against an empty container */
+  .courses-app:not(.sort-time):not(.sort-course) .gp-reveal {
+    animation-name: none;
+    opacity: 0;
+  }
+
   .courses-app:not(.sort-time) .view-time,
   .courses-app:not(.sort-course) .view-course {
     display: none;

@@ -99,6 +99,33 @@ p + p {
    Utilities
 --------------------------------------------------------------------------- */
 
+/* Entrance for page containers: fade while the visible box grows downward.
+   clip-path rather than height so layout, sticky and measurement never
+   change. No forwards fill, so once done nothing is clipped. Delay is
+   honoured during the wait thanks to the backwards fill */
+@keyframes gp-reveal {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+/* Tall containers clip mostly below the fold, so they also rise a touch to
+   make the growth readable in the viewport */
+@keyframes gp-reveal-rise {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); transform: translateY(-0.625rem); }
+  to   { opacity: 1; clip-path: inset(0 0 0 0); transform: translateY(0); }
+}
+
+.gp-reveal {
+  animation: gp-reveal 1s cubic-bezier(0.3, 0.5, 0.3, 1) var(--gp-reveal-delay, 0s) backwards;
+}
+
+.gp-reveal-rise { animation-name: gp-reveal-rise; }
+.gp-reveal-late { --gp-reveal-delay: 0.25s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .gp-reveal { --gp-reveal-delay: 0s; }
+}
+
 .container {
   width: 100%;
   max-width: var(--container-width);

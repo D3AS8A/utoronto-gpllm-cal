@@ -45,7 +45,7 @@ const classChips: Chip[] = FILTERS_CLASSES.map(toChip);
 const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
 ---
 
-<div class="filter-topbar">
+<div class="filter-topbar gp-reveal">
   <button
     type="button"
     class="filter-clear"
@@ -55,7 +55,7 @@ const examChips:  Chip[] = FILTERS_EXAMS.map(toChip);
   </button>
 </div>
 
-<aside class="filter-bar" :data-tucked="fbHidden ? 'true' : null" role="toolbar" aria-label="Calendar filters">
+<aside class="filter-bar gp-reveal" :data-tucked="fbHidden ? 'true' : null" role="toolbar" aria-label="Calendar filters">
   <div class="filter-inner">
     <div class="filter-row">
       <div class="filter-group" :class="{ 'is-open': classesOpen }" data-fb-group="classes">
