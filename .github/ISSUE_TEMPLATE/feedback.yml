@@ -1,0 +1,31 @@
+name: 💬 Feedback
+description: Ideas, suggestions, or general thoughts
+title: "💬 "
+labels: ["feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We'd love to hear what you think! ✨
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: 🏷️ Type of feedback
+      options:
+        - 💡 Idea or feature request
+        - 🎨 Design or usability
+        - 📝 Content
+        - ♿ Accessibility
+        - 🗨️ Something else
+    validations:
+      required: true
+
+  - type: textarea
+    id: feedback
+    attributes:
+      label: 💭 Your feedback
+      description: Tell us what's on your mind
+    validations:
+      required: true
+

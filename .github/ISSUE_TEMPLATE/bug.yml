@@ -1,0 +1,62 @@
+name: 🐛 Bug report
+description: Something on the site is broken, wrong, or out of date
+title: "🐛 "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug!
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 🔍 What happened?
+      description: A clear description of the problem (typos, wrong dates, broken links all count)
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: ✅ What should have happened?
+      description: What was the expected behaviour?
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: 🔗 Page URL
+      description: Where did you see it?
+      placeholder: https://...
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 👣 Steps to reproduce
+      description: If it's not obvious, how can we see it too?
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. See ...
+
+  - type: dropdown
+    id: device
+    attributes:
+      label: 💻 Device
+      options:
+        - Desktop
+        - Mobile
+        - Tablet
+
+  - type: input
+    id: browser
+    attributes:
+      label: 🌐 Browser
+      placeholder: e.g. Chrome 140, Safari on iOS 26
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 📸 Screenshots
+      description: Drag and drop images here if they help explain the problem.
