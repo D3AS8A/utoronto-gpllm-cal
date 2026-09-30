@@ -11,7 +11,6 @@
 
 import { loadPage } from './content';
 import type { CatKey, HourMin } from './calendar-data';
-import { toLocalIso } from './calendar-data';
 import { courseEventTitle, safeFilename, SITE_URL, type EventCourse } from './event';
 
 export interface CatalogRow {
@@ -201,12 +200,28 @@ export interface CourseOption {
   ref: string;
   title: string;
   slot: string;
-  /** Present only when the slot narrows the day's hours. */
-  isoStart?: string;
-  isoEnd?: string;
   /** Static .ics basename. Built here so the client never has to re-derive it. */
   slug: string;
 }
+
+/**
+ * One sitting on a calendar day: the classes that meet together and, where
+ * the slot names them, the hours they keep. A regular Saturday is two of
+ * these; every other day is one.
+ */
+export interface Session {
+  /** Suffix on the category name, e.g. "Morning". Null keeps the bare name. */
+  label: string | null;
+  /** Null hands the day back to the category's own hours. */
+  hours: [HourMin, HourMin] | null;
+  options: CourseOption[];
+}
+
+/** How a Saturday slot reads once the day itself is already on screen. */
+const SITTING_LABEL: Record<string, string> = {
+  [SAT_AM]: 'Morning',
+  [SAT_PM]: 'Afternoon',
+};
 
 function termFor(dateIso: string, terms: Record<string, Term>): Term | null {
   return Object.values(terms).find((t) => dateIso >= t.start && dateIso <= t.end) ?? null;
@@ -216,23 +231,10 @@ function termBySeason(season: string, terms: Record<string, Term>): Term | null 
   return terms[season] ?? null;
 }
 
-function optionsFromSlot(
-  slot: Slot,
-  dateIso: string,
-  shaped: ShapedCourses,
-): Array<Omit<CourseOption, 'slug'>> {
-  const hours = TIMED_SLOTS.has(slot.name) ? parseSlotTime(slot.time) : null;
+function optionsFromSlot(slot: Slot, shaped: ShapedCourses): Array<Omit<CourseOption, 'slug'>> {
   return slot.courses.split('|').flatMap((ref) => {
     const course = shaped.catalog[ref.split(' ')[0]];
-    if (!course) return [];
-    return [{
-      ref,
-      title: course.title,
-      slot: slot.name,
-      ...(hours
-        ? { isoStart: toLocalIso(dateIso, hours[0]), isoEnd: toLocalIso(dateIso, hours[1]) }
-        : {}),
-    }];
+    return course ? [{ ref, title: course.title, slot: slot.name }] : [];
   });
 }
 
@@ -240,7 +242,8 @@ function optionsFromSlot(
  * Constitutional Law meets Saturday morning and Saturday afternoon, so on a
  * Saturday two options share a title and would land on one .ics filename —
  * both choices would then download the morning's file. Only the colliding ones
- * take the section suffix, so every other slug stays readable.
+ * take the section suffix, so every other slug stays readable. Runs over the
+ * whole day's options, not one sitting's, or that collision goes unseen.
  */
 function withSlugs(
   options: Array<Omit<CourseOption, 'slug'>>,
@@ -258,57 +261,76 @@ function withSlugs(
   }));
 }
 
+const EMPTY_SESSION: Session = { label: null, hours: null, options: [] };
+
 /**
- * Classes that meet on a given calendar day.
+ * The sittings on a given calendar day, each with the classes that meet in it.
  *
  * Regular days resolve by date, not by the month's season: April 30 is marked
  * in a winter month but belongs to the summer term, which starts that day.
  * Intensives sit outside their term's weekly range, so those resolve by season
- * instead.
+ * instead. Never empty: a day the schedule cannot place still gets one plain
+ * session, so the calendar shows the category as it always has.
  */
-export function candidatesFor(
+export function sessionsFor(
   dateIso: string,
   cat: CatKey,
   dow: number,
   season: string,
-): CourseOption[] {
+  extra: string[] = [],
+): Session[] {
   const shaped = shapeCourses();
   const { terms } = shaped.content;
 
   const programKey = PROGRAM_CAT[cat];
   if (programKey) {
     const course = shaped.catalog[programKey];
-    if (!course) return [];
-    return withSlugs(
-      [{ ref: programKey, title: course.title, slot: 'Program Foundations' }],
-      dateIso, cat,
-    );
+    if (!course) return [EMPTY_SESSION];
+    // The day's own program course first, then anything the calendar says
+    // also meets that day (Foundations of Canadian Law on Sept 18)
+    const refs = [programKey, ...extra];
+    return [{
+      label: null,
+      hours: null,
+      options: withSlugs(
+        refs.flatMap((ref) => {
+          const c = shaped.catalog[ref.split(' ')[0]];
+          return c ? [{ ref, title: c.title, slot: 'Program Foundations' }] : [];
+        }),
+        dateIso, cat,
+      ),
+    }];
   }
 
   if (cat === 'reg') {
     const term = termFor(dateIso, terms);
-    if (!term) return [];
     const wanted = dow === 5 ? [FRI] : dow === 6 ? [SAT_AM, SAT_PM] : [];
-    return withSlugs(
-      term.slots
-        .filter((s) => wanted.includes(s.name))
-        .flatMap((s) => optionsFromSlot(s, dateIso, shaped)),
-      dateIso, cat,
-    );
+    const slots = term?.slots.filter((s) => wanted.includes(s.name)) ?? [];
+    if (!slots.length) return [EMPTY_SESSION];
+    const all = withSlugs(slots.flatMap((s) => optionsFromSlot(s, shaped)), dateIso, cat);
+    return slots.map((s) => ({
+      label: SITTING_LABEL[s.name] ?? null,
+      hours: parseSlotTime(s.time),
+      options: all.filter((o) => o.slot === s.name),
+    }));
   }
 
-  if (cat === 'intc' || cat === 'intb') {
+  if (cat === 'int') {
     const term = termBySeason(season, terms);
-    if (!term) return [];
-    return withSlugs(
-      term.slots
-        .filter((s) => s.name.includes('Intensive'))
-        .flatMap((s) => optionsFromSlot(s, dateIso, shaped)),
-      dateIso, cat,
-    );
+    if (!term) return [EMPTY_SESSION];
+    return [{
+      label: null,
+      hours: null,
+      options: withSlugs(
+        term.slots
+          .filter((s) => s.name.includes('Intensive'))
+          .flatMap((s) => optionsFromSlot(s, shaped)),
+        dateIso, cat,
+      ),
+    }];
   }
 
-  return [];
+  return [EMPTY_SESSION];
 }
 
 /** Everything the browser needs to describe a picked class, keyed by ref. */

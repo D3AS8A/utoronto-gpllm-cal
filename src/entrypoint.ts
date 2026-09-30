@@ -24,7 +24,7 @@ const FILTER_KEY_TO_CATS: Record<string, string[]> = {
   lmb:       ['lmb'],
   alrw:      ['alrw'],
   orient:    ['orient'],
-  intensive: ['intc', 'intb'],
+  intensive: ['int'],
   mid:       ['mid'],
   dmid:      ['dmid'],
   fin:       ['fin'],
@@ -62,8 +62,6 @@ interface CourseOption {
   ref: string;
   title: string;
   slot: string;
-  isoStart?: string;
-  isoEnd?: string;
   slug: string;
 }
 
@@ -885,19 +883,24 @@ export default (Alpine: Alpine) => {
     /**
      * One detail item resolved into the event it would produce. A day that
      * names a single class folds it in unasked; a day that names several waits
-     * for a choice and stays generic until it gets one. A chosen class brings
-     * its own hours, which is what narrows a Saturday to its actual sitting.
+     * for a choice and stays generic until it gets one. The item is already a
+     * single sitting, so its hours are the class's hours.
      */
     resolveEvent(item: DetailItem) {
       const options = item.options ?? [];
       const chosen = options.length === 1
         ? options[0]
         : options.find((o) => o.ref === this.courseChoice[item.name]);
-      const course = chosen ? this.courseIndex[chosen.ref] ?? null : null;
+      const indexed = chosen ? this.courseIndex[chosen.ref] ?? null : null;
+      // The index knows one slot per ref; a ref offered on some other day takes
+      // that day's slot and drops the stale time
+      const course = indexed && chosen && chosen.slot !== indexed.slot
+        ? { ...indexed, slot: chosen.slot, time: undefined }
+        : indexed;
       return {
         name: course ? courseEventTitle(course, item.cat as CatKey) : item.name,
-        isoStart: chosen?.isoStart ?? item.isoStart,
-        isoEnd:   chosen?.isoEnd   ?? item.isoEnd,
+        isoStart: item.isoStart,
+        isoEnd:   item.isoEnd,
         description: buildDescription(item.note, course),
         /* Built server-side alongside the static file, so the two cannot
            disagree — and so two runs of one course on the same day resolve to

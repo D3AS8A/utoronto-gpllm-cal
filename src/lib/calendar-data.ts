@@ -33,7 +33,7 @@ export const cssColor = (hex: string): string =>
 
 export type CatKey =
   | 'reg' | 'makeup' | 'lmc' | 'lmb' | 'alrw' | 'orient'
-  | 'intc' | 'intb'
+  | 'int'
   | 'mid' | 'dmid' | 'fin' | 'dfin';
 
 export type SwatchType = 'fill' | 'outline' | 'dashed' | 'circle' | 'alrw' | 'orient';
@@ -110,14 +110,9 @@ export const META: Record<CatKey, CatMeta> = {
     t: 'orient', c: '#af9b88',
     hours: { any: { start: [18, 0], end: [20, 0] } },
   },
-  intc: {
+  int: {
     name: 'Intensive Course', time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30',
     t: 'fill', c: '#e5d3a1',
-    hours: INTENSIVE_HOURS,
-  },
-  intb: {
-    name: 'Intensive Course', time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30',
-    t: 'fill', c: '#936e42',
     hours: INTENSIVE_HOURS,
   },
   mid:  { name: 'Mid-Term Exam',           time: 'Weekdays 6–9pm · Weekends 1–4pm', t: 'outline', c: '#1f6092', hours: EXAM_HOURS },
@@ -158,7 +153,7 @@ export function toLocalIso(dateIso: string, [h, m]: HourMin): string {
  * description. Distinct from `MonthDef.notes` (day-level, all items).
  */
 export function itemNote(cat: CatKey, dow: number): string | null {
-  if ((cat === 'intc' || cat === 'intb') && dow === 0) {
+  if (cat === 'int' && dow === 0) {
     return 'Classes may end as late as 2:30pm';
   }
   return null;
@@ -167,11 +162,6 @@ export function itemNote(cat: CatKey, dow: number): string | null {
 export interface FilterDef {
   key: string;
   cats: CatKey[];
-  /** Override META fields when the filter aggregates multiple cats (e.g. intensive). */
-  name?: string;
-  time?: string;
-  t?: SwatchType;
-  c?: string;
 }
 
 export const FILTERS_CLASSES: FilterDef[] = [
@@ -181,8 +171,7 @@ export const FILTERS_CLASSES: FilterDef[] = [
   { key: 'lmb',       cats: ['lmb'] },
   { key: 'alrw',      cats: ['alrw'] },
   { key: 'orient',    cats: ['orient'] },
-  { key: 'intensive', cats: ['intc', 'intb'], name: 'Intensive Courses',
-    time: 'Fri 4–9pm · Sat 8:30–5:30 · Sun 9–1:30', t: 'fill', c: '#e5d3a1' },
+  { key: 'intensive', cats: ['int'] },
 ];
 
 export const FILTERS_EXAMS: FilterDef[] = [
@@ -207,8 +196,10 @@ export interface MonthDef {
    * - `text` shows as italic note under the tooltip / modal items list and
    *   is appended to the ICS event description — use for supplementary info.
    * - `borderColor` (palette name) overrides the cell's outer border for a
-   *   subtle visual flag. */
-  notes?: Record<number, { title?: string; text?: string; borderColor?: ColorName }>;
+   *   subtle visual flag.
+   * - `courses` lists offering refs also taught that day, on top of what the
+   *   schedule already puts there — a one-day class inside an intensive. */
+  notes?: Record<number, { title?: string; text?: string; borderColor?: ColorName; courses?: string[] }>;
   callouts?: Array<{ label: string; detail: string; tone: 'cream' | 'ink' | 'tan' }>;
 }
 
@@ -219,36 +210,35 @@ export const MONTHS: MonthDef[] = [
     notes: {
       8:  { title: 'Canadian Law Orientation' },
       9:  { title: 'Business Law & ILT Orientation' },
-      18: { text: 'Foundations of Canadian Law (full day)', borderColor: 'driftwood' },
+      18: { text: 'Foundations of Canadian Law (full day)', borderColor: 'driftwood', courses: ['LAW4010H F LEC0102'] },
     } },
   { name: 'October', year: '2026', season: 'fall', fdow: 4, days: 31, marks: {
       2: ['reg'], 3: ['reg'], 4: ['makeup'], 16: ['reg'], 17: ['reg'],
       23: ['reg'], 24: ['reg'], 25: ['makeup'], 31: ['mid'] } },
   { name: 'November', year: '2026', season: 'fall', fdow: 0, days: 30, marks: {
       1: ['mid'], 5: ['mid'], 6: ['reg', 'dmid'], 7: ['reg'], 8: ['makeup'],
-      13: ['dmid'], 20: ['reg'], 21: ['reg'], 28: ['fin'], 29: ['fin'] } },
+      13: ['dmid'], 20: ['reg'], 21: ['reg'], 22: ['makeup'], 28: ['fin'], 29: ['fin'] } },
   { name: 'December', year: '2026', season: 'fall', fdow: 2, days: 31, marks: {
-      3: ['fin'], 4: ['intc'], 5: ['intc', 'fin'], 6: ['intc', 'fin'], 10: ['dfin'],
-      11: ['intb'], 12: ['intb'], 13: ['intb'], 17: ['dfin'], 18: ['intb'], 19: ['intb'] } },
+      5: ['fin'], 6: ['fin'], 10: ['dfin'], 11: ['int'], 12: ['int'], 13: ['int'],
+      17: ['dfin'], 18: ['int'], 19: ['int'], 20: ['int'] } },
   { name: 'January', year: '2027', season: 'winter', fdow: 5, days: 31, marks: {
       8: ['reg'], 9: ['reg'], 10: ['fin'], 22: ['reg'], 23: ['reg'], 24: ['makeup'] },
     notes: { 10: { title: 'December Intensive Final Exam(s)' } } },
   { name: 'February', year: '2027', season: 'winter', fdow: 1, days: 28, marks: {
       5: ['reg'], 6: ['reg'], 19: ['mid'], 20: ['mid'], 21: ['mid'],
-      26: ['dmid'], 27: ['reg'], 28: ['makeup'] } },
+      26: ['reg', 'dmid'], 27: ['reg'], 28: ['makeup'] } },
   { name: 'March', year: '2027', season: 'winter', fdow: 1, days: 31, marks: {
       5: ['reg', 'dmid'], 6: ['reg'], 7: ['dmid'], 19: ['reg'], 20: ['reg'], 21: ['makeup'] } },
   { name: 'April', year: '2027', season: 'winter', fdow: 4, days: 30, marks: {
-      3: ['fin'], 4: ['fin'], 8: ['fin'], 9: ['intc'], 10: ['intc'], 11: ['intc'],
-      16: ['intc'], 17: ['intc'], 18: ['intc'], 30: ['reg'] },
-    callouts: [{ label: 'April Intensive',
-      detail: 'Some dates to be released', tone: 'cream' }] },
+      3: ['fin'], 4: ['fin'], 8: ['fin'], 9: ['int'], 10: ['int'], 11: ['int'],
+      16: ['int'], 17: ['int'], 18: ['int'], 22: ['dfin'], 23: ['int'], 24: ['int'], 25: ['int'],
+      29: ['dfin'], 30: ['reg'] } },
   { name: 'May', year: '2027', season: 'summer', fdow: 6, days: 31, marks: {
       1: ['reg'], 7: ['reg'], 8: ['reg'], 9: ['makeup'], 14: ['reg'], 15: ['reg'],
-      16: ['fin'], 29: ['fin'], 30: ['fin'] },
+      16: ['fin'], 29: ['mid'], 30: ['mid'] },
     notes: { 16: { title: 'April Intensive Final Exam(s)' } } },
   { name: 'June', year: '2027', season: 'summer', fdow: 2, days: 30, marks: {
-      4: ['reg'], 5: ['reg'], 6: ['fin'], 11: ['reg', 'dfin'], 12: ['reg'],
+      4: ['reg'], 5: ['reg'], 6: ['fin'], 11: ['reg', 'dmid'], 12: ['reg'],
       13: ['dmid'], 18: ['reg'], 19: ['reg'], 25: ['fin'], 26: ['fin'], 27: ['fin'] } },
   { name: 'July', year: '2027', season: 'summer', fdow: 4, days: 31, marks: {
       9: ['dfin'], 10: ['dfin'], 11: ['dfin'], 12: ['dfin'] } },
@@ -294,15 +284,14 @@ const CLASS_COLORS: Record<string, [string, string]> = {
   makeup: [cssVar('heather'),   cssVar('prussian-blue')],
   lmc:    [cssVar('hillary'),   cssVar('espresso')],
   lmb:    [cssVar('driftwood'), '#fff'],
-  intc:   [cssVar('chamois'),   cssVar('bronzetone')],
-  intb:   [cssVar('driftwood'), '#fff'],
+  int:    [cssVar('chamois'),   cssVar('bronzetone')],
 };
 
 const DEFERRED_COLOR = cssVar('sky');
 
 export function cellVisual(cats: CatKey[]): CellVisual {
   const has = (k: CatKey) => cats.indexOf(k) !== -1;
-  const classKey = (['reg', 'makeup', 'lmc', 'lmb', 'intc', 'intb', 'orient'] as CatKey[]).find(has);
+  const classKey = (['reg', 'makeup', 'lmc', 'lmb', 'int', 'orient'] as CatKey[]).find(has);
   const hasDeferred = has('dmid') || has('dfin');
   let bg = 'transparent', fg = cssVar('prussian-blue'), border = '0.125rem solid transparent';
   let outline: string | undefined;

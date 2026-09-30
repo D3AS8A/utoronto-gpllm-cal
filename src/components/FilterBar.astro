@@ -24,9 +24,7 @@ interface Chip {
 }
 
 function toChip(f: FilterDef): Chip {
-  const meta = f.name
-    ? { t: f.t!, c: f.c! }
-    : { t: META[f.cats[0]].t, c: META[f.cats[0]].c };
+  const meta = META[f.cats[0]];
   const raw = LABEL[f.key] ?? f.key;
   const idx = raw.indexOf('(');
   const tail = idx > 0 ? raw.slice(idx) : null;

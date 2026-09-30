@@ -1,6 +1,6 @@
 ---
 import type { MonthDef } from '../lib/calendar-data';
-import { candidatesFor, type CourseOption } from '../lib/courses';
+import { sessionsFor, type CourseOption } from '../lib/courses';
 import {
   cellVisual, swatchStyle, weekdayName, calloutStyle,
   META, pickHours, fmtHours, toLocalIso, cssColor, cssVar, itemNote,
@@ -112,25 +112,28 @@ for (let i = 0; i < rows * 7; i++) {
     const items: NonNullable<Cell['detail']>['items'] = [];
     const ariaParts: string[] = [];
     for (const c of cats) {
-      const key = c === 'intb' ? 'intc' : c;
-      if (seen.has(key)) continue;
-      seen.add(key);
       const m = META[c as keyof typeof META];
-      const specific = pickHours(m.hours, dow);
-      const time = specific ? fmtHours(specific) : m.time;
-      // note.title overrides the primary (first) item's display name
-      const displayName = items.length === 0 && note?.title ? note.title : m.name;
-      items.push({
-        name: displayName,
-        time,
-        swatchStyle: swatchStyle(m.t, m.c, 20),
-        isoStart: specific ? toLocalIso(dateIso, specific.start) : null,
-        isoEnd:   specific ? toLocalIso(dateIso, specific.end)   : null,
-        note: itemNote(c as keyof typeof META, dow),
-        cat: c,
-        options: candidatesFor(dateIso, c as keyof typeof META, dow, month.season),
-      });
-      ariaParts.push(specific ? `${displayName}, ${time}` : displayName);
+      const dayHours = pickHours(m.hours, dow);
+      for (const session of sessionsFor(dateIso, c as keyof typeof META, dow, month.season, note?.courses ?? [])) {
+        const hours = session.hours
+          ? { start: session.hours[0], end: session.hours[1] }
+          : dayHours;
+        const time = hours ? fmtHours(hours) : m.time;
+        // note.title overrides the primary (first) item's display name
+        const baseName = items.length === 0 && note?.title ? note.title : m.name;
+        const displayName = session.label ? `${baseName} · ${session.label}` : baseName;
+        items.push({
+          name: displayName,
+          time,
+          swatchStyle: swatchStyle(m.t, m.c, 20),
+          isoStart: hours ? toLocalIso(dateIso, hours.start) : null,
+          isoEnd:   hours ? toLocalIso(dateIso, hours.end)   : null,
+          note: itemNote(c as keyof typeof META, dow),
+          cat: c,
+          options: session.options,
+        });
+        ariaParts.push(hours ? `${displayName}, ${time}` : displayName);
+      }
     }
     const rawHeadBg = META[cats[0] as keyof typeof META].c;
     const headBg = cssColor(rawHeadBg);

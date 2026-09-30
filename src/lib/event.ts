@@ -39,8 +39,7 @@ export interface EventCourse {
  */
 const CAT_QUALIFIER: Partial<Record<CatKey, string>> = {
   reg:  'regular class',
-  intc: 'intensive',
-  intb: 'intensive',
+  int:  'intensive',
   // Legal Methods and ALRW are deliberately absent: their titles already name
   // what they are, and a qualifier gives "Legal Methods (Canadian Law)
   // (intensive)" — two parentheticals in a row

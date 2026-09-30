@@ -21,11 +21,11 @@ content:
   program_courses[3]{key,code,kind,title,when,conc,capped,nca,desc,slug}:
     lm-cdn,,Intensive,Legal Methods (Canadian Law),"September 10, 11, 17 & 18, 9:30am-4:30pm",cl,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Classes are interactive, with time for questions and discussion. September 18 covers Foundations of Canadian Law as a full day.",legal-methods-cdn
     lm-bus,,Intensive,Legal Methods (Business & Technology Law),"September 12, 13, 19 & 20, 9:30am-4:30pm",bl/ilt,false,,"A broad overview of the foundational legal concepts key to success in the program: cases, the evolution of the common law, sources of Canadian law, and methods of legal analysis. Each topic is designed to teach you how to use your time effectively as you tackle readings and assignments. Lectures build on each other, so attending all four days is highly recommended.",legal-methods-bus
-    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm",cl,false,required,Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement.,
+    alrw,LAW4024H,NCA requirement,Applied Legal Research and Writing,"September 12, 13, 19 & 20, 9:30am-5:30pm, or the December intensive",cl,false,required,Designed for internationally trained lawyers pursuing a Certificate of Qualification through the National Committee on Accreditation (NCA) who are registered in the Canadian Law concentration. Business Law and Technology Law students with an international law degree can instead enroll in the Legal Research and Writing course offered through CPLED to satisfy this NCA requirement.,
 
   profile_url_base: https://www.jackmanlaw.utoronto.ca
 
-  profiles[25]{name,path}:
+  profiles[29]{name,path}:
     Peter L. Biro,/people/peter-l-biro
     Malcolm Thorburn,/people/malcolm-thorburn
     Patrick Hartford,/people/patrick-hartford
@@ -51,8 +51,12 @@ content:
     Nathalie Des Rosiers,/people/justice-nathalie-des-rosiers
     David Goodis,/people/david-goodis
     Rebecca Durcan,/people/rebecca-durcan
+    Sam Rogers,/people/sam-rogers
+    Eric Pellegrino,/people/eric-pellegrino
+    Sean Petrou,/people/sean-petrou
+    Noam Uri,/people/noam-uri
 
-  offerings[35]{ref,room,prof}:
+  offerings[38]{ref,room,prof}:
     alrw,LEC0102,
     LAW4010H F LEC0102,LEC0102,Patrick Hartford
     LAW4001H F LEC0101,LEC0101,Simone Sepe
@@ -66,6 +70,9 @@ content:
     LAW4046H F LEC0101,LEC0101,Abdi Aidid
     LAW4055H F LEC0101,LEC0101,Dera Nevin
     LAW4072H S LEC0101,LEC0101,David Walders
+    LAW4072H F LEC0101,LEC0101,David Walders
+    alrw F LEC0101,,
+    LAW4066H S LEC0101,LEC0101,"Sam Rogers, Eric Pellegrino, Sean Petrou, Noam Uri"
     LAW4007H S LEC0102,LEC0102,David Goodis
     LAW4036H S LEC0101,LEC0101,Patrick Hartford
     LAW4009H S LEC0101,LEC0101,Malcolm Thorburn
@@ -89,7 +96,7 @@ content:
     LAW4003H Y LEC0101,LEC0101,
     LAW4073H Y LEC0101,LEC0101,Rosario Cartagena
 
-  details[32]{code,credits,slug,desc}:
+  details[33]{code,credits,slug,desc}:
     LAW4010H,3,foundations-canadian-law,"An introduction to the Canadian legal system: sources of authority, separation of powers, judicial review and common law reasoning, with attention to Aboriginal peoples and international law."
     LAW4001H,3,law-and-business-global-economy,"The business law groundwork for the rest of the program, covering corporate governance, securities regulation, insolvency and financial oversight."
     LAW4026H,3,introduction-law-and-technology,"Starts from first-year foundations in torts, contracts, property, constitutional and criminal law, then asks how technology reshapes each of them and the justice system with them."
@@ -121,29 +128,30 @@ content:
     LAW4023H,3,business-organizations,"Sole proprietorships, partnerships and corporations compared, with the weight on corporate governance and the fiduciary duties directors and officers owe."
     LAW4003H,3,securities-regulation-and-corporate-finance,"How businesses raise capital: exemptions in the private markets, the obligations that come with going public, insider duties, and the regulation of market intermediaries."
     LAW4073H,3,data-law-health-perspective,"Data law applied to health care, across privacy, cybersecurity, intellectual property and AI, for students who will advise or lead inside a health system."
+    LAW4066H,3,trial-advocacy,"The techniques of a trial worked through by doing them: opening and closing statements, examinations-in-chief and cross-examinations, introducing evidence, objections and motions, taught through demonstrations and hands-on exercises."
     LAW4024H,3,applied-legal-research-and-writing,"Finding legal information, judging it critically and communicating the answer clearly: the research-to-writing path lawyers take on a hard question."
 
-  catalog[31]{code,title,conc,capped,nca,req}:
+  catalog[32]{code,title,conc,capped,nca,req}:
     LAW4026H,Introduction to Law and Technology,ilt,false,,true
     LAW4010H,Foundations of Canadian Law,cl,true,required,true
     LAW4001H,Law and Business in a Global Economy,bl,false,,true
     LAW4008H,Constitutional Law,cl,true,required,false
     LAW4009H,Criminal Law,cl,true,required,false
-    LAW4032H,Intellectual Property Law,bl,false,,false
+    LAW4032H,Intellectual Property Law,bl/ilt,false,,false
     LAW4002H,Comparative Corporate Governance,bl,false,,false
     LAW4017H,Professional Responsibility,cl,true,required,false
     LAW4046H,Privacy and Data Governance,ilt,false,,false
-    LAW4055H,Disruptive Innovations & Legal Infrastructure,ilt,false,,false
+    LAW4055H,Disruptive Innovations & Legal Infrastructure,bl/ilt,false,,false
     LAW4072H,Aboriginal Law,cl,true,yes,false
     LAW4007H,Administrative Law,cl,true,required,false
-    LAW4036H,Applied Contract Law,bl,false,,false
+    LAW4036H,Applied Contract Law,bl/ilt,false,,false
     LAW4021H,Tort Law,cl,true,yes,false
     LAW4069H,Electrification and the Energy Transition: Law and Policy,bl,false,,false
     LAW4030H,Financing Technological Innovation,ilt,false,,false
     LAW4053H,Law and Regulation of Banks and Financial Institutions,bl,false,,false
     LAW4063H,Regulation of Artificial Intelligence: A Legal and Practical Study,ilt,false,,false
     LAW4074H,Immigration Law,cl,true,yes,false
-    LAW4028H,"Blockchain, Digital Assets, and the Law",bl,false,,false
+    LAW4028H,"Blockchain, Digital Assets, and the Law",bl/ilt,false,,false
     LAW4022H,Contract Law,cl,true,yes,false
     LAW4031H,Cybersecurity & Data Protection,ilt,false,,false
     LAW4075H,Financial Crime in a Global Context,bl,false,,false
@@ -155,6 +163,7 @@ content:
     LAW4023H,Business Organizations,cl,true,yes,false
     LAW4003H,Securities Regulation and Corporate Finance,bl,false,,false
     LAW4073H,Data Law: A Health Perspective,ilt,false,,false
+    LAW4066H,Trial Advocacy,cl,true,,false
 
   terms:
     fall:
@@ -168,7 +177,7 @@ content:
         Friday Evenings,4:00pm-9:00pm,LAW4010H F LEC0102|LAW4001H F LEC0101|LAW4026H F LEC0101,"Every student takes the Friday evening course for their concentration in the fall term. It counts as one of the ten required courses"
         Saturday Mornings,8:30am-1:00pm,LAW4008H F LEC0102|LAW4009H F LEC0101|LAW4032H F LEC0101,""
         Saturday Afternoons,2:00pm-6:30pm,LAW4002H F LEC0101|LAW4008H F LEC0101|LAW4017H F LEC0101|LAW4046H F LEC0101,""
-        December Intensive,"December 11-13 & 18-20",LAW4055H F LEC0101|LAW4072H S LEC0101,"Friday evenings 4:00pm-9:00pm, Saturdays 8:30am-5:30pm, Sundays 9:00am-1:30pm Dates and times may change"
+        December Intensive,"December 11-13 & 18-20",LAW4055H F LEC0101|LAW4072H F LEC0101|alrw F LEC0101,"Friday evenings 4:00pm-9:00pm, Saturdays 8:30am-5:30pm, Sundays 9:00am-1:30pm Dates and times may change"
     winter:
       no: "02"
       label: Winter
@@ -179,7 +188,7 @@ content:
         Friday Evenings,4:00pm-9:00pm,LAW4007H S LEC0102|LAW4036H S LEC0101,""
         Saturday Mornings,8:30am-1:00pm,LAW4009H S LEC0101|LAW4021H S LEC0101|LAW4069H S LEC0101|LAW4030H S LEC0101,""
         Saturday Afternoons,2:00pm-6:30pm,LAW4017H S LEC0101|LAW4053H S LEC0101|LAW4063H S LEC0101|LAW4074H S LEC0101,""
-        April Intensive,"April 9-11, 16-18 & 23-25",LAW4028H S LEC0101|LAW4072H S LEC0101,"Friday evenings 4:00pm-9:00pm, Saturdays 8:30am-5:30pm, Sundays 9:00am-2:30pm Dates and times may change"
+        April Intensive,"April 9-11, 16-18 & 23-25",LAW4028H S LEC0101|LAW4072H S LEC0101|LAW4066H S LEC0101,"Friday evenings 4:00pm-9:00pm, Saturdays 8:30am-5:30pm, Sundays 9:00am-1:30pm Dates and times may change"
     summer:
       no: "03"
       label: Summer

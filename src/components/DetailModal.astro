@@ -58,10 +58,7 @@
                              One strip per row rather than a single overlay, so
                              the rows can be any height they like. -->
                         <span class="detail-pick-mask" aria-hidden="true"></span>
-                        <span class="detail-pick-text">
-                          <span class="detail-pick-title" x-text="opt.title"></span>
-                          <span class="detail-pick-slot" x-text="opt.slot"></span>
-                        </span>
+                        <span class="detail-pick-title" x-text="opt.title"></span>
                       </label>
                     </template>
 
@@ -260,28 +257,12 @@
     }
   }
 
-  .detail-pick-text {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: 0.0625rem 0.4375rem;
-    min-width: 0;
-  }
-
   .detail-pick-title {
+    min-width: 0;
     font-size: 0.8125rem;
     font-weight: 600;
     line-height: 1.1;
     color: var(--prussian-blue);
-  }
-
-  .detail-pick-slot {
-    font-family: 'Space Mono', ui-monospace, monospace;
-    font-size: 0.59375rem;
-    line-height: 1.2;
-    letter-spacing: 0.06em;
-    color: var(--driftwood);
-    white-space: nowrap;
   }
 
   .detail-scrim {

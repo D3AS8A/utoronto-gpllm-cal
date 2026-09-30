@@ -5,7 +5,8 @@ import {
   buildDescription, courseEventTitle, eventSummary,
   EVENT_ALARMS, EVENT_LOCATION, withTimezone,
 } from '../../lib/event';
-import { candidatesFor, courseEventIndex } from '../../lib/courses';
+import { sessionsFor, courseEventIndex } from '../../lib/courses';
+import type { EventCourse } from '../../lib/event';
 
 const MONTH_NUM: Record<string, number> = {
   January: 1, February: 2, March: 3, April: 4, May: 5, June: 6,
@@ -44,6 +45,14 @@ interface EventItem extends Record<string, unknown> {
   description: string;
 }
 
+/**
+ * The index knows one slot per ref. A ref offered on some other day (Foundations
+ * of Canadian Law on Sept 18) takes that day's slot and drops the stale time.
+ */
+function slotFor(course: EventCourse, slot: string): EventCourse {
+  return slot === course.slot ? course : { ...course, slot, time: undefined };
+}
+
 function allEvents(): Array<{ slug: string; event: EventItem }> {
   const out: Array<{ slug: string; event: EventItem }> = [];
   const seen = new Set<string>();
@@ -56,57 +65,59 @@ function allEvents(): Array<{ slug: string; event: EventItem }> {
       const iso = `${month.year}-${String(monthNum).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const dow = (month.fdow + day - 1) % 7;
       const noteEntry = month.notes?.[day];
-      const dedup = new Set<string>();
       let firstItem = true;
       for (const cat of cats as CatKey[]) {
-        // intc + intb dedup to the same displayed session
-        const key = cat === 'intb' ? 'intc' : cat;
-        if (dedup.has(key)) continue;
-        dedup.add(key);
         const meta = META[cat];
-        const specific = pickHours(meta.hours, dow);
-        if (!specific) continue;
-        // note.title overrides the primary (first) event's title
-        const name = firstItem && noteEntry?.title ? noteEntry.title : meta.name;
-        firstItem = false;
-        const slug = `${iso}-${safeFilename(name)}`;
-        if (seen.has(slug)) continue;
-        seen.add(slug);
-        // Merge day-level note (all items) with per-item note (this cat+dow).
-        const combinedNote = [noteEntry?.text, itemNote(cat, dow)]
-          .filter(Boolean)
-          .join('\n');
-        out.push({
-          slug,
-          event: {
-            isoStart: toLocalIso(iso, specific.start),
-            isoEnd: toLocalIso(iso, specific.end),
-            name,
-            description: buildDescription(combinedNote || null, null),
-          },
-        });
-
-        /*
-         * A variant per class that meets this day, so the webcal:// CTA still
-         * resolves once someone picks one. Titles come from the same helper the
-         * client uses, which is what keeps the two slug schemes in step rather
-         * than merely alike.
-         */
-        for (const opt of candidatesFor(iso, cat, dow, month.season)) {
-          const course = index[opt.ref];
-          if (!course) continue;
-          const courseName = courseEventTitle(course, cat);
-          if (seen.has(opt.slug)) continue;
-          seen.add(opt.slug);
+        const dayHours = pickHours(meta.hours, dow);
+        for (const session of sessionsFor(iso, cat, dow, month.season, noteEntry?.courses ?? [])) {
+          const hours = session.hours
+            ? { start: session.hours[0], end: session.hours[1] }
+            : dayHours;
+          if (!hours) continue;
+          // note.title overrides the primary (first) event's title
+          const baseName = firstItem && noteEntry?.title ? noteEntry.title : meta.name;
+          firstItem = false;
+          const name = session.label ? `${baseName} · ${session.label}` : baseName;
+          const slug = `${iso}-${safeFilename(name)}`;
+          if (seen.has(slug)) continue;
+          seen.add(slug);
+          const isoStart = toLocalIso(iso, hours.start);
+          const isoEnd = toLocalIso(iso, hours.end);
+          // Merge day-level note (all items) with per-item note (this cat+dow).
+          const combinedNote = [noteEntry?.text, itemNote(cat, dow)]
+            .filter(Boolean)
+            .join('\n');
           out.push({
-            slug: opt.slug,
+            slug,
             event: {
-              isoStart: opt.isoStart ?? toLocalIso(iso, specific.start),
-              isoEnd:   opt.isoEnd   ?? toLocalIso(iso, specific.end),
-              name: courseName,
-              description: buildDescription(combinedNote || null, course),
+              isoStart,
+              isoEnd,
+              name,
+              description: buildDescription(combinedNote || null, null),
             },
           });
+
+          /*
+           * A variant per class that meets this sitting, so the webcal:// CTA
+           * still resolves once someone picks one. Titles come from the same
+           * helper the client uses, which is what keeps the two slug schemes in
+           * step rather than merely alike.
+           */
+          for (const opt of session.options) {
+            const course = index[opt.ref];
+            if (!course) continue;
+            if (seen.has(opt.slug)) continue;
+            seen.add(opt.slug);
+            out.push({
+              slug: opt.slug,
+              event: {
+                isoStart,
+                isoEnd,
+                name: courseEventTitle(course, cat),
+                description: buildDescription(combinedNote || null, slotFor(course, opt.slot)),
+              },
+            });
+          }
         }
       }
     }
