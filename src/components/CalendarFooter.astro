@@ -1,4 +1,6 @@
 ---
+import GitHubIcon from './GitHubIcon.astro';
+import { loadGlobal } from '../lib/content';
 import { formatUpdated } from '../lib/date';
 
 interface Props {
@@ -8,6 +10,7 @@ interface Props {
 const { lastUpdated } = Astro.props;
 
 const updatedLabel = formatUpdated(lastUpdated);
+const { issues_url } = loadGlobal();
 ---
 <footer class="cal-footer">
   <div class="footer-col-stack">
@@ -18,14 +21,24 @@ const updatedLabel = formatUpdated(lastUpdated);
         please consult syllabi on <a href="https://idpz.utorauth.utoronto.ca/idp/profile/SAML2/Redirect/SSO?execution=e1s1" target="_blank" rel="noopener"><strong>Quercus</strong></a>.
       </p>
     </section>
-    {updatedLabel && (
-      <section class="footer-col" aria-labelledby="footer-updated-label">
-        <h2 id="footer-updated-label" class="footer-label">LAST UPDATED</h2>
+    <div class="footer-row">
+      <section class="footer-col" aria-labelledby="footer-feedback-label">
+        <h2 id="footer-feedback-label" class="footer-label">FEEDBACK</h2>
         <p>
-          <em><time datetime={lastUpdated}>{updatedLabel}</time></em>
+          <a class="footer-gh-link" href={issues_url} target="_blank" rel="noopener">
+            <GitHubIcon /><strong>Report an issue</strong>
+          </a>
         </p>
       </section>
-    )}
+      {updatedLabel && (
+        <section class="footer-col" aria-labelledby="footer-updated-label">
+          <h2 id="footer-updated-label" class="footer-label">LAST UPDATED</h2>
+          <p>
+            <em><time datetime={lastUpdated}>{updatedLabel}</time></em>
+          </p>
+        </section>
+      )}
+    </div>
   </div>
   <section class="footer-col mobile" aria-labelledby="footer-viewport-label">
     <h2 id="footer-viewport-label" class="footer-label">VIEWPORT</h2>
@@ -60,6 +73,12 @@ const updatedLabel = formatUpdated(lastUpdated);
     max-width: 27.5rem;
   }
 
+  .footer-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem 2.5rem;
+  }
+
   .footer-col:last-child  { max-width: 22.5rem; }
 
   .footer-col.mobile { display: none; }
@@ -82,6 +101,13 @@ const updatedLabel = formatUpdated(lastUpdated);
     line-height: 1.5;
     font-weight: 500;
     color: var(--oxford-blue);
+  }
+
+  .footer-gh-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    color: var(--prussian-blue);
   }
 
   .cal-footer strong {

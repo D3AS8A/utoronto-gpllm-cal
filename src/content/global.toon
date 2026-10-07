@@ -4,3 +4,4 @@ description: An interactive academic calendar for the GPLLM program at the UofT 
 url: https://gpllm.pages.dev
 title_postfix: " — UofT GPLLM Calendar"
 og_image: /images/og-image.png
+issues_url: https://github.com/D3AS8A/utoronto-gpllm-cal/issues

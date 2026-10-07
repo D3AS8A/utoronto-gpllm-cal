@@ -9,6 +9,7 @@ export interface GlobalContent {
   url: string;
   title_postfix: string;
   og_image: string;
+  issues_url: string;
 }
 
 export interface PageMeta {
