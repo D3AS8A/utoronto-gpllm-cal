@@ -59,28 +59,48 @@ a:hover {
 
 @keyframes gp-link-wave {
   from { background-position-x: 0; }
-  to   { background-position-x: 0.75rem; }
+  to   { background-position-x: 0.625rem; }
+}
+
+/* Square wave */
+@property --gp-link-ink {
+  syntax: '<color>';
+  inherits: false;
+  initial-value: transparent;
 }
 
 .gp-link {
-  --gp-link-wave: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 6' shape-rendering='crispEdges'%3E%3Cpath d='M0 5.5H3V0.5H9V5.5H12' fill='none' stroke='%231f6092' stroke-width='1'/%3E%3C/svg%3E");
+  --gp-link-ink: var(--tana);
   color: var(--matisse);
   text-decoration: none;
-  padding-bottom: 0.3125rem;
-  background-image: var(--gp-link-wave);
+  padding-bottom: 0.375rem;
+  background-image:
+    linear-gradient(to right, var(--gp-link-ink) 0 0.1875rem, transparent 0.1875rem 0.4375rem, var(--gp-link-ink) 0.4375rem),
+    linear-gradient(to right, transparent 0 0.125rem, var(--gp-link-ink) 0.125rem 0.1875rem, transparent 0.1875rem 0.4375rem, var(--gp-link-ink) 0.4375rem 0.5rem, transparent 0.5rem),
+    linear-gradient(to right, transparent 0 0.125rem, var(--gp-link-ink) 0.125rem 0.5rem, transparent 0.5rem);
   background-repeat: repeat-x;
-  background-position: 0 100%;
-  background-size: 0.75rem 0.375rem;
-  transition: color 200ms ease;
+  background-position:
+    0 100%,
+    0 calc(100% - 0.0625rem),
+    0 calc(100% - 0.25rem);
+  background-size:
+    0.625rem 0.0625rem,
+    0.625rem 0.1875rem,
+    0.625rem 0.0625rem;
+  transition: color 200ms ease, --gp-link-ink 200ms ease;
+  /* Always running but paused, so leaving hover freezes the wave in place
+     instead of snapping it back to the start */
+  animation: gp-link-wave 600ms linear infinite paused;
 }
 
 .gp-link:hover {
+  --gp-link-ink: var(--matisse);
   color: var(--prussian-blue);
-  animation: gp-link-wave 600ms linear infinite;
+  animation-play-state: running;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .gp-link:hover { animation: none; }
+  .gp-link { animation: none; }
 }
 
 /* ---------------------------------------------------------------------------
