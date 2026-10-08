@@ -30,7 +30,7 @@ const updatedLabel = formatUpdated(lastUpdated);
       <p class="page-updated">
         This site's content was last updated on <time datetime={lastUpdated}>{updatedLabel}</time>.
         <br />
-        <a class="page-issue-link" href={issues_url} target="_blank" rel="noopener">Report an issue or send feedback.</a>
+        <a class="gp-link" href={issues_url} target="_blank" rel="noopener">Report an issue or send feedback</a>.
       </p>
     )}
   </div>
@@ -85,19 +85,6 @@ const updatedLabel = formatUpdated(lastUpdated);
 
   .page-desc :global(p:last-child) {
     margin-bottom: 0;
-  }
-
-  .page-issue-link {
-    color: var(--matisse);
-    text-decoration: underline;
-    text-decoration-thickness: 0.0625rem;
-    text-underline-offset: 0.1875rem;
-    transition: color 200ms ease;
-  }
-
-  .page-issue-link:hover {
-    color: var(--prussian-blue);
-    text-decoration-thickness: 0.125rem;
   }
 
   .page-desc :global(strong) {

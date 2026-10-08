@@ -1,3 +1,5 @@
 #!/bin/sh
 # Repo-shared hooks, wired up by the `prepare` script in package.json
+# Git GUIs inherit the system PATH, which lacks homebrew and the bun installer dir
+PATH="/opt/homebrew/bin:$HOME/.bun/bin:$PATH"
 bun run scripts/stamp-modified.ts || exit 1
