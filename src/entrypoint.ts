@@ -440,6 +440,24 @@ export default (Alpine: Alpine) => {
       const fromUrl = readFiltersFromUrl();
       this.filters = fromUrl !== null ? fromUrl : allFiltersOn();
 
+      // Today ring. Set on the client since the page is static; re-run when
+      // the tab comes back so a PWA left open past midnight moves the ring.
+      const markToday = () => {
+        const now = new Date();
+        const pad = (n: number) => String(n).padStart(2, '0');
+        const iso = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+        document.querySelectorAll<HTMLElement>('.cell.is-today').forEach((el) => {
+          if (el.querySelector('time')?.getAttribute('datetime') !== iso) el.classList.remove('is-today');
+        });
+        document.querySelectorAll<HTMLElement>(`.month-day-grid time[datetime="${iso}"]`).forEach((t) => {
+          t.closest<HTMLElement>('.cell')?.classList.add('is-today');
+        });
+      };
+      markToday();
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') markToday();
+      });
+
       // Size all toggle labels in a group to the widest one so their tracks
       // align at a consistent X (rather than being pushed to the cell's edge).
       // Also drive the grid cell min-width from the same measurement so the
