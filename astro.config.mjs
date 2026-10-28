@@ -120,6 +120,10 @@ export default defineConfig({
   },
 
   vite: {
+    // Lets a page tell whether the server has moved past the build it runs
+    define: {
+      __BUILD_ID__: JSON.stringify(Date.now().toString(36)),
+    },
     server: {
       headers: {
         'X-Content-Type-Options': 'nosniff',

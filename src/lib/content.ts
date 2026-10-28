@@ -10,6 +10,12 @@ export interface GlobalContent {
   title_postfix: string;
   og_image: string;
   issues_url: string;
+  pwa: {
+    update_msg: string;
+    update_btn: string;
+    cached_msg: string;
+    cached_btn: string;
+  };
 }
 
 export interface PageMeta {

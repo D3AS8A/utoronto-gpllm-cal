@@ -5,3 +5,8 @@ url: https://gpllm.pages.dev
 title_postfix: " - UofT GPLLM Calendar"
 og_image: /images/og-image.png
 issues_url: https://github.com/D3AS8A/utoronto-gpllm-cal/issues/new/choose
+pwa:
+  update_msg: A new version is ready
+  update_btn: Reload
+  cached_msg: Loaded from device memory, but a newer version is ready
+  cached_btn: Reload
