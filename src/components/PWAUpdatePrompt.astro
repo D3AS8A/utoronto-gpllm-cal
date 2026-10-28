@@ -1,9 +1,23 @@
 ---
+import { loadGlobal } from '../lib/content';
+
+const { pwa } = loadGlobal();
 ---
 
-<div id="pwa-update-toast" class="pwa-toast" hidden role="status" aria-live="polite">
-  <span class="pwa-toast__msg">A new version is ready</span>
-  <button type="button" id="pwa-update-reload" class="pwa-toast__btn">Reload</button>
+<div
+  id="pwa-update-toast"
+  class="pwa-toast"
+  hidden
+  role="status"
+  aria-live="polite"
+  data-build={__BUILD_ID__}
+  data-update-msg={pwa.update_msg}
+  data-update-btn={pwa.update_btn}
+  data-cached-msg={pwa.cached_msg}
+  data-cached-btn={pwa.cached_btn}
+>
+  <span class="pwa-toast__msg">{pwa.update_msg}</span>
+  <button type="button" id="pwa-update-reload" class="pwa-toast__btn">{pwa.update_btn}</button>
   <button type="button" id="pwa-update-dismiss" class="pwa-toast__dismiss" aria-label="Dismiss">&times;</button>
 </div>
 
@@ -12,11 +26,22 @@
 
   // Query at act time and delegate clicks: the router swaps the body on
   // every in-page navigation, detaching anything captured at load
-  let updateReady = false;
+  type UpdateKind = 'update' | 'cached';
+  let updateKind: UpdateKind | null = null;
 
-  const applyUpdateUi = () => {
+  // A stale page this soon after a real load was served from the pages
+  // cache; router swaps don't reset performance.now()
+  const CACHED_LOAD_WINDOW_MS = 15000;
+
+  const applyUpdateUi = (kind: UpdateKind) => {
     const toast = document.getElementById('pwa-update-toast');
-    if (toast) toast.hidden = false;
+    if (toast) {
+      const msg = toast.querySelector('.pwa-toast__msg');
+      const btn = toast.querySelector('.pwa-toast__btn');
+      if (msg) msg.textContent = toast.dataset[`${kind}Msg`] ?? '';
+      if (btn) btn.textContent = toast.dataset[`${kind}Btn`] ?? '';
+      toast.hidden = false;
+    }
     // Stamped links navigate for real, so markup and bundle arrive from the
     // same build instead of the router mixing old script with new pages
     document
@@ -36,8 +61,22 @@
 
   // Each swap brings a hidden toast and unstamped links; reapply
   document.addEventListener('astro:page-load', () => {
-    if (updateReady) applyUpdateUi();
+    if (updateKind) applyUpdateUi(updateKind);
   });
+
+  // A new worker also takes over on the first load after a deploy, when the
+  // page came from the network and is already current. Ask the server which
+  // build it serves; any failure falls back to assuming stale
+  const isStale = async () => {
+    try {
+      const res = await fetch(location.pathname, { cache: 'no-store' });
+      const html = await res.text();
+      const served = html.match(/data-build="([^"]+)"/)?.[1];
+      return served !== __BUILD_ID__;
+    } catch {
+      return true;
+    }
+  };
 
   if (import.meta.env.DEV) {
     // No worker in dev; scrub any registration and caches left from when
@@ -50,9 +89,11 @@
     });
   } else registerSW({
     // Suppresses the autoUpdate default of reloading the page on activation
-    onNeedReload() {
-      updateReady = true;
-      applyUpdateUi();
+    async onNeedReload() {
+      const loadedAt = performance.now();
+      if (!(await isStale())) return;
+      updateKind = loadedAt < CACHED_LOAD_WINDOW_MS ? 'cached' : 'update';
+      applyUpdateUi(updateKind);
     },
     onOfflineReady() {
       // Silent, nothing to show for first-time offline readiness
@@ -99,7 +140,12 @@
   }
 
   .pwa-toast__msg {
-    white-space: nowrap;
+    text-wrap: balance;
+  }
+
+  .pwa-toast__btn,
+  .pwa-toast__dismiss {
+    flex-shrink: 0;
   }
 
   .pwa-toast__btn {
